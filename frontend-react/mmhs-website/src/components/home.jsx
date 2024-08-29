@@ -22,7 +22,7 @@ const problems = [
   { name: '2024 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2024/s1' },
   { name: '2024 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2024/s2' },
   { name: '2024 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2024/s3' },
-  { name: '2024 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2024/s4' },
+  { name: '2024 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2024/s4' },
   { name: '2024 S5: Chocolate Bar Partition', difficulty: 'Wicked', tags: ['simulation', 'math'], link: '/contest/2024/s5' },
 
   // 2023 Junior
@@ -36,7 +36,7 @@ const problems = [
   { name: '2023 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2023/s1' },
   { name: '2023 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2023/s2' },
   { name: '2023 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2023/s3' },
-  { name: '2023 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2023/s4' },
+  { name: '2023 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2023/s4' },
   { name: '2023 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2023/s5' },
 
   // 2022 Junior
@@ -50,7 +50,7 @@ const problems = [
   { name: '2022 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2022/s1' },
   { name: '2022 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2022/s2' },
   { name: '2022 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2022/s3' },
-  { name: '2022 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2022/s4' },
+  { name: '2022 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2022/s4' },
   { name: '2022 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2022/s5' },
 
   // 2021 Junior
@@ -64,7 +64,7 @@ const problems = [
   { name: '2021 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2021/s1' },
   { name: '2021 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2021/s2' },
   { name: '2021 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2021/s3' },
-  { name: '2021 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2021/s4' },
+  { name: '2021 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2021/s4' },
   { name: '2021 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2021/s5' },
 
   // 2020 Junior
@@ -78,7 +78,7 @@ const problems = [
   { name: '2020 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2020/s1' },
   { name: '2020 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2020/s2' },
   { name: '2020 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2020/s3' },
-  { name: '2020 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2020/s4' },
+  { name: '2020 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2020/s4' },
   { name: '2020 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2020/s5' },
 
   // 2019 Junior
@@ -92,7 +92,7 @@ const problems = [
   { name: '2019 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2019/s1' },
   { name: '2019 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2019/s2' },
   { name: '2019 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2019/s3' },
-  { name: '2019 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2019/s4' },
+  { name: '2019 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2019/s4' },
   { name: '2019 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2019/s5' },
 
   // 2018 Junior
@@ -106,7 +106,7 @@ const problems = [
   { name: '2018 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2018/s1' },
   { name: '2018 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2018/s2' },
   { name: '2018 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2018/s3' },
-  { name: '2018 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2018/s4' },
+  { name: '2018 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2018/s4' },
   { name: '2018 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2018/s5' },
 
 	// 2017 Junior
@@ -120,7 +120,7 @@ const problems = [
 	{ name: '2017 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2017/s1' },
 	{ name: '2017 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2017/s2' },
 	{ name: '2017 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2017/s3' },
-	{ name: '2017 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2017/s4' },
+	{ name: '2017 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2017/s4' },
 	{ name: '2017 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2017/s5' },
 
   // 2016 Junior
@@ -134,7 +134,7 @@ const problems = [
   { name: '2016 S1: Ragaman', difficulty: 'Easy', tags: ['simple if'], link: '/contest/2016/s1' },
   { name: '2016 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2' },
   { name: '2016 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2016/s3' },
-  { name: '2016 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2016/s4' },
+  { name: '2016 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2016/s4' },
   { name: '2016 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2016/s5' },
 
   // 2015 Junior
@@ -149,7 +149,7 @@ const problems = [
   { name: '2015 S2: Jerseys', difficulty: 'Normal', tags: ['arrays'], link: '/contest/2015/s2' },
   { name: '2015 S3: Gates', difficulty: 'Hard', tags: ['disjoint sets', 'counting'], link: '/contest/2015/s3' },
   { name: '2015 S4: Convex Hull', difficulty: 'Insane', tags: ['shortest path', 'SPFA', 'Dijkstra'], link: '/contest/2015/s4' },
-  { name: '2015 S5: Greedy for Pies', difficulty: 'Insane', tags: ['dynamic programming', 'greedy'], link: '/contest/2015/s5' },
+  { name: '2015 S5: Greedy for Pies', difficulty: 'Wicked', tags: ['dynamic programming', 'greedy'], link: '/contest/2015/s5' },
 
   // 2014 Junior
   { name: '2014 J1: Triangle Times', difficulty: 'Easy', tags: ['simple else-if'], link: '/contest/2014/j1' },
@@ -219,7 +219,7 @@ const problems = [
 	{ name: '2010 S2: Huffman Encoding', difficulty: 'Normal', tags: ["arrays", "string handling"], link: '/contest/2010/s2' },
 	{ name: '2010 S3: Firehose', difficulty: 'Insane', tags: ["arrays", "linked lists", "binary search"], link: '/contest/2010/s3' },
 	{ name: '2010 S4: Animal Farm', difficulty: 'Insane', tags: ["2D arrays", "graph theory", "Prim\'s algorithm"], link: '/contest/2010/s4' },
-	{ name: '2010 S5: Nutrient Tree', difficulty: 'Insane', tags: ["binary tree", "recursion", "arrays"], link: '/contest/2010/s5' },
+	{ name: '2010 S5: Nutrient Tree', difficulty: 'Wicked', tags: ["binary tree", "recursion", "arrays"], link: '/contest/2010/s5' },
 
 	// 2009 Junior
 	{ name: '2009 J1: ISBN', difficulty: 'Easy', tags: ["arithmetic"], link: '/contest/2009/j1' },
