@@ -11,6 +11,7 @@ export default {
         'pastel-blue': '#c6e4ee',
         'pastel-red': '#f6c6c6',
         'pastel-orange': '#ffd5b9',
+        'pastel-purple': '#d6aaff',
         'pastel-gray': '#e3e3e3',
       },
     },

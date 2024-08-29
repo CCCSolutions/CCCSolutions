@@ -1,13 +1,15 @@
 import React from "react";
 import ProblemsTable from "./problemtable";
 import SearchBar from "./searchbar";
+import { FooterWithLogo } from "./footer";
+import { Test } from "./fun";
 
 const problems = [
-  { name: 'LEAKED CCC 2025 SOLUTIONS 🔞🔞🔞', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
-	{ name: 'LEAKED CCC 2025 SOLUTIONS 🔞🔞🔞', difficulty: '$50', tags: ['paypal me danielzhang.936@gmail.com'], link: '/contest/2024/j1' },
-	{ name: 'LEAKED CCC 2025 SOLUTIONS 🔞🔞🔞', difficulty: '$50', tags: ['bitcoin OK'], link: '/contest/2024/j1' },
-	{ name: 'LEAKED CCC 2025 SOLUTIONS 🔞🔞🔞', difficulty: '$50', tags: ['etransfer OK'], link: '/contest/2024/j1' },
-	{ name: 'LEAKED CCC 2025 SOLUTIONS 🔞🔞🔞', difficulty: '$50', tags: ['cheque OK'], link: '/contest/2024/j1' },
+  { name: 'SOLUCIONES FILTRADAS CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
+  { name: 'SOLUTIONS DIVULGUÉES CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['paypal me danielzhang.936@gmail.com'], link: '/contest/2024/j1' },
+  { name: 'GELEAKTE CCC 2025 LÖSUNGEN 🔞🔞🔞', difficulty: '$50', tags: ['bitcoin OK'], link: '/contest/2024/j1' },
+  { name: 'SOLUZIONI DIVULGATE CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['etransfer OK'], link: '/contest/2024/j1' },
+  { name: '泄露的 CCC 2025 解决方案 🔞🔞🔞', difficulty: '???', tags: ['cheque OK'], link: '/contest/2024/j1' },
 
   // 2024 Junior
   { name: '2024 J1: Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2024/j1' },
@@ -21,7 +23,7 @@ const problems = [
   { name: '2024 S2: Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2024/s2' },
   { name: '2024 S3: Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2024/s3' },
   { name: '2024 S4: Combining Riceballs', difficulty: 'Insane', tags: ['interval dp'], link: '/contest/2024/s4' },
-  { name: '2024 S5: Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2024/s5' },
+  { name: '2024 S5: Chocolate Bar Partition', difficulty: 'Wicked', tags: ['simulation', 'math'], link: '/contest/2024/s5' },
 
   // 2023 Junior
   { name: '2023 J1: Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2023/j1' },
@@ -361,14 +363,14 @@ const problems = [
 ];
 
 
-
 const Home = () => {
   return (
     <div>
-		
-		<SearchBar problems={problems} />
-		<h1 className="m-8">Holy crap ChatGPT orz orz orz orz orz Welcome to MMHS! Solutions currently updated to 2015.</h1>
-		<ProblemsTable problems={problems} />
+			<Test />
+			<SearchBar problems={problems} />
+			<h1 className="m-8">Holy crap ChatGPT orz orz orz orz orz Welcome to MMHS! Solutions currently updated to 2015.</h1>
+			<ProblemsTable problems={problems} />
+			<FooterWithLogo />
     </div>
   );
 };

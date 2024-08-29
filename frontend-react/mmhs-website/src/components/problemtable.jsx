@@ -75,9 +75,12 @@ const getDifficultyClass = (difficulty) => {
       return 'bg-pastel-orange text-orange-800';
     case 'insane':
       return 'bg-pastel-red text-red-800';
+    case 'wicked':
+      return 'bg-pastel-purple text-purple-800 evil-purple-glow';
     default:
       return 'bg-pastel-gray text-gray-800';
   }
 };
+
 
 export default ProblemsTable;
