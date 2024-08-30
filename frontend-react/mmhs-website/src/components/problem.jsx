@@ -12,12 +12,12 @@ const Problem = ({ contestYear, problemCode }) => {
       .then((response) => response.text())
       .then((text) => {
         if (text.toLowerCase().includes('<!doctype html>')) {
-          setSolution("Solution does not currently exist.");
+          setSolution("Solution does not currently exist. If you have a solution, please upload your solution along with commented explanation on our forum. Thank you!");
         } else {
           setSolution(text);
         }
       })
-      .catch(() => setSolution("Solution does not currently exist."));
+      .catch(() => setSolution("Solution does not currently exist. If you have a solution, please upload your solution along with commented explanation on our forum. Thank you!"));
   }, [contestYear, problemCode]);
 
   return (

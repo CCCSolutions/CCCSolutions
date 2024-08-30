@@ -34,7 +34,7 @@ const About = () => {
             </div>
             {/* Timeline Item 3 */}
             <div className="flex items-center">
-              <div className="bg-blue-600 h-12 w-12 rounded-full flex items-center justify-center text-white font-bold">Present</div>
+              <div className="bg-blue-600 h-12 w-12 rounded-full flex items-center justify-center text-white font-bold">2024</div>
               <div className="ml-4">
                 <h3 className="text-xl font-semibold">Ongoing Contributions</h3>
                 <p>The repository is maintained and expanded with contributions from various enthusiasts.</p>

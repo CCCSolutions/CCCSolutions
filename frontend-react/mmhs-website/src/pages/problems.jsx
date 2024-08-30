@@ -4,11 +4,11 @@ import SearchBar from "../components/searchbar.jsx";
 import { ChevronDown } from 'lucide-react';
 
 const problems = [
-  { name: 'SOLUCIONES FILTRADAS CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
-  { name: 'SOLUTIONS DIVULGUÉES CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['paypal me danielzhang.936@gmail.com'], link: '/contest/2024/j1' },
-  { name: 'GELEAKTE CCC 2025 LÖSUNGEN 🔞🔞🔞', difficulty: '$50', tags: ['bitcoin OK'], link: '/contest/2024/j1' },
-  { name: 'SOLUZIONI DIVULGATE CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['etransfer OK'], link: '/contest/2024/j1' },
-  { name: '泄露的 CCC 2025 解决方案 🔞🔞🔞', difficulty: '???', tags: ['cheque OK'], link: '/contest/2024/j1' },
+  { name: 'SOLUCIONES FILTRADAS CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
+  { name: 'SOLUTIONS DIVULGUÉES CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['paypal me danielzhang.936@gmail.com'], link: '/contest/2024/j1' },
+  { name: 'GELEAKTE CCC 2025 LÖSUNGEN ⚠️⚠️⚠️', difficulty: '$50', tags: ['bitcoin OK'], link: '/contest/2024/j1' },
+  { name: 'SOLUZIONI DIVULGATE CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['etransfer OK'], link: '/contest/2024/j1' },
+  { name: '泄露的 CCC 2025 解决方案 ⚠️⚠️⚠️', difficulty: '???', tags: ['cheque OK'], link: '/contest/2024/j1' },
 
 	// 2024 Junior
 	{ name: '2024 J1 - Conveyor Belt Sushi', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2024/j1' },
@@ -360,34 +360,25 @@ const problems = [
 	{ name: '2000 S5 - Sheep and Coyotes', difficulty: 'Insane', tags: ['geometry', '1D arrays'], link: '/contest/2000/s5' },
 ];
 
-// const HeroSection = ({ onSearch }) => {
-//   return (
-//     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20 px-4">
-//       <div className="container mx-auto text-center">
-//         <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
-//         <p className="text-xl mb-8">Explore and practice Canadian Computing Competition problems</p>
-//         <div className="flex justify-center">
-//           <input
-//             type="text"
-//             placeholder="Search problems..."
-//             className="px-4 py-2 rounded-l-md w-64 text-black"
-//             onChange={(e) => onSearch(e.target.value)}
-//           />
-//           <button className="bg-blue-500 px-4 py-2 rounded-r-md hover:bg-blue-600 transition duration-300">
-//             Search
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+const HeroSection = ({ onSearch }) => {
+  return (
+    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20 px-4">
+      <div className="container mx-auto text-center">
+        <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
+        <p className="text-xl">Find  and practice Canadian Computing Competition problems</p>
+        <div className="flex justify-center text-justify text-black">
+          <SearchBar problems={problems} />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Problems = () => {
   return (
     <div className="flex flex-col min-h-screen">
+		<HeroSection />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-4">CCC Problems</h1>
-        <SearchBar problems={problems} />
         <ProblemsTable problems={problems} />
       </main>
     </div>

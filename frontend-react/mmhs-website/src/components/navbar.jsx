@@ -12,8 +12,9 @@ const Navbar = () => {
         <ul className="flex space-x-8 text-lg">
           <li><Link to="/" className="hover:text-blue-400 transition-colors duration-300">Home</Link></li>
           <li><Link to="/about" className="hover:text-blue-400 transition-colors duration-300">About</Link></li>
-          <li><Link to="/problems" className="hover:text-blue-400 transition-colors duration-300">Solutions</Link></li>
+          <li><Link to="/problems" className="hover:text-blue-400 transition-colors duration-300">Problems</Link></li>
           <li><Link to="/forum" className="hover:text-blue-400 transition-colors duration-300">Forum</Link></li>
+          <li><Link to="/resources" className="hover:text-blue-400 transition-colors duration-300">Resources</Link></li>
         </ul>
       </div>
     </nav>
