@@ -1,8 +1,7 @@
 import React from "react";
-import ProblemsTable from "./problemtable";
-import SearchBar from "./searchbar";
-import { FooterWithLogo } from "./footer";
-import { Test } from "./fun";
+import ProblemsTable from "../components/problemtable.jsx";
+import SearchBar from "../components/searchbar.jsx";
+import { ChevronDown } from 'lucide-react';
 
 const problems = [
   { name: 'SOLUCIONES FILTRADAS CCC 2025 🔞🔞🔞', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
@@ -52,7 +51,7 @@ const problems = [
 	{ name: '2022 S3 - Good Samples', difficulty: 'Insane', tags: ['ad hoc', 'constructive', 'greedy algorithms'], link: '/contest/2022/s3' },
 	{ name: '2022 S4 - Good Triplets', difficulty: 'Insane', tags: ['ad hoc', 'simple math'], link: '/contest/2022/s4' },
 	{ name: '2022 S5 - Good Influencers', difficulty: 'Wicked', tags: ['dynamic programming', 'graph theory'], link: '/contest/2022/s5' },
-		
+
 	// 2021 Junior
 	{ name: '2021 J1 - Boiling Water', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2021/j1' },
 	{ name: '2021 J2 - Silent Auction', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2021/j2' },
@@ -65,7 +64,7 @@ const problems = [
 	{ name: '2021 S3 - Lunch Concert', difficulty: 'Insane', tags: ['data structures'], link: '/contest/2021/s3' },
 	{ name: '2021 S4 - Daily Commute', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2021/s4' },
 	{ name: '2021 S5 - Math Homework', difficulty: 'Insane', tags: ['data structures', 'intermediate math'], link: '/contest/2021/s5' },
-		
+
 	// 2020 Junior
 	{ name: '2020 J1 - Dog Treats', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2020/j1' },
 	{ name: '2020 J2 - Epidemiology', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2020/j2' },
@@ -121,7 +120,7 @@ const problems = [
 	{ name: '2017 S3 - Nailed It!', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/s3' },
 	{ name: '2017 S4 - Minimum Cost Flow', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2017/s4' },
 	{ name: '2017 S5 - RMT', difficulty: 'Wicked', tags: ['data structures'], link: '/contest/2017/s5' },
-		
+
 	// 2016 Junior
   { name: '2016 J1 - Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2016/j1' },
   { name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2' },
@@ -361,16 +360,38 @@ const problems = [
 	{ name: '2000 S5 - Sheep and Coyotes', difficulty: 'Insane', tags: ['geometry', '1D arrays'], link: '/contest/2000/s5' },
 ];
 
+// const HeroSection = ({ onSearch }) => {
+//   return (
+//     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20 px-4">
+//       <div className="container mx-auto text-center">
+//         <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
+//         <p className="text-xl mb-8">Explore and practice Canadian Computing Competition problems</p>
+//         <div className="flex justify-center">
+//           <input
+//             type="text"
+//             placeholder="Search problems..."
+//             className="px-4 py-2 rounded-l-md w-64 text-black"
+//             onChange={(e) => onSearch(e.target.value)}
+//           />
+//           <button className="bg-blue-500 px-4 py-2 rounded-r-md hover:bg-blue-600 transition duration-300">
+//             Search
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
-const Home = () => {
+const Problems = () => {
   return (
-    <div>
-			<SearchBar problems={problems} />
-			<h1 className="m-8">Welcome to MMHS! Solutions currently updated to 2015.</h1>
-			<ProblemsTable problems={problems} />
-			<FooterWithLogo />
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">CCC Problems</h1>
+        <SearchBar problems={problems} />
+        <ProblemsTable problems={problems} />
+      </main>
     </div>
   );
 };
 
-export default Home;
+export default Problems;
