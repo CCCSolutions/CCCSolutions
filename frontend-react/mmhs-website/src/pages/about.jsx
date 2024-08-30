@@ -37,7 +37,7 @@ const About = () => {
               <div className="bg-blue-600 h-12 w-12 rounded-full flex items-center justify-center text-white font-bold">2024</div>
               <div className="ml-4">
                 <h3 className="text-xl font-semibold">Ongoing Contributions</h3>
-                <p>The repository is maintained and expanded with contributions from various enthusiasts.</p>
+                <p>The repository has been modernized with a new forum feature added for users to submit new solutions for C++, Python and Java</p>
               </div>
             </div>
           </div>
