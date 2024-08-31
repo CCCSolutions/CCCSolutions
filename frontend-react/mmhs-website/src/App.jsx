@@ -1,12 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-dom";
-import Problem from "./components/problem";
-import Home from "./pages/home.jsx";
-import Problems from "./pages/problems.jsx";
-import NotFound from "./components/notfound";
-import Navbar from "./components/navbar";
-import FooterWithLogo from "./components/footer";
-import About from "./pages/about.jsx"
+
+import Problem from "./components/Solution.jsx";
+import Home from "./pages/HomePage.jsx";
+import Problems from "./pages/ProblemsPage.jsx";
+import NotFound from "./pages/NotfoundPage.jsx";
+import Navbar from "./components/Navbar.jsx";
+import FooterWithLogo from "./components/Footer.jsx";
+import About from "./pages/AboutPage.jsx"
 
 const App = () => {
   return (
@@ -18,8 +19,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/problems" element={<Problems />} />
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
-            <Route path="*" element={<NotFound />} />
             <Route path="/about" element = {<About />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         <FooterWithLogo />

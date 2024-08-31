@@ -1,6 +1,6 @@
 import React from "react";
-import ProblemsTable from "../components/problemtable.jsx";
-import SearchBar from "../components/searchbar.jsx";
+import ProblemsTable from "../components/ProblemTable.jsx";
+import SearchBar from "../components/Searchbar.jsx";
 
 const problems = [
 	// 2024 Junior
