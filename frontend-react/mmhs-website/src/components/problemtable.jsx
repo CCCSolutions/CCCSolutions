@@ -76,20 +76,18 @@ const ProblemsTable = ({ problems }) => {
                 className={`border-t border-gray-200 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800'}`}
               >
               <td className="py-3 whitespace-nowrap text-sm font-medium">
-                <div className="flex justify-center items-center">
                   {solutionStatuses[problem.name] === 'Has Solution' ? (
-                    <div className="flex items-center text-green-600">
+                    <div className="px-10 text-green-600">
                       <CheckCircle className="w-5 h-5" />
                     </div>
                   ) : solutionStatuses[problem.name] === 'No Solution' ? (
-                    <div className="flex items-center text-red-600">
+                    <div className="px-10 text-red-600">
                       <XCircle className="w-5 h-5" />
                     </div>
                   ) : (
                     'Loading...'
                   )}
-                </div>
-              </td>
+                </td>
 
 
                 <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
