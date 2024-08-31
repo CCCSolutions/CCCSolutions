@@ -44,28 +44,58 @@ const About = () => {
         </div>
       </div>
 
+      {/* Tribute Section */}
+      <div className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-6">A Special Tribute</h2>
+          <p className="text-lg text-center mb-16">
+            We are incredibly grateful for two teachers from MMHS who have been key in creating and maintaining this website. Enjoy your retirement!
+          </p>
+          <div className="flex justify-center space-x-8">
+            <div className="text-center w-1/2">
+              <img
+                src="[Chris Robart Photo URL]"
+                alt="Chris Robart"
+                className="w-32 h-32 rounded-full mx-auto mb-4"
+              />
+              <h3 className="text-2xl font-semibold mb-2">Chris Robart</h3>
+              <p className="text-lg">Computer Science, 1996-2015</p>
+            </div>
+            <div className="text-center w-1/2">
+              <img
+                src="[Don Smith Photo URL]"
+                alt="Don Smith"
+                className="w-32 h-32 rounded-full mx-auto mb-4"
+              />
+              <h3 className="text-2xl font-semibold mb-2">Don Smith</h3>
+              <p className="text-lg">Math & Computer Science, 1988-2022</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Revampers Section */}
       <div className="bg-gray-200 py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">Revamp</h2>
+          <h2 className="text-4xl font-bold text-center mb-16">The Revamp Team</h2>
           <p className="text-lg text-center mb-10">
-            Special thanks to the following individuals who helped revamp this website:
+
           </p>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="w-1/3 flex flex-col items-center">
-              <img src="[Photo URL 1]" alt="[Revamper Name 1]" className="w-32 h-32 rounded-full mb-4" />
-              <h3 className="text-xl font-semibold">[Revamper Name 1]</h3>
-              <p>Description of their contributions.</p>
+              <img src="https://cdn.discordapp.com/attachments/1174486466961866793/1279247554969604207/william_yang.jpg?ex=66d3bfa0&is=66d26e20&hm=a6ce984e7a879974cd07459e7661093b8e836942975efbc711fa4bc4aec5e950&" alt="../assets/william_yang.jpg" className="w-32 h-32 rounded-full mb-4" />
+              <h3 className="text-xl font-semibold">William Yang</h3>
+              <p>Milliken Mills H.S.</p>
             </div>
             <div className="w-1/3 flex flex-col items-center">
-              <img src="[Photo URL 2]" alt="[Revamper Name 2]" className="w-32 h-32 rounded-full mb-4" />
-              <h3 className="text-xl font-semibold">[Revamper Name 2]</h3>
-              <p>Description of their contributions.</p>
+              <img src="https://media.licdn.com/dms/image/v2/D4E03AQHWDwWmAWQXzQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721608220428?e=1730332800&v=beta&t=zSJan6bXI4Mb6vJH9YmQ9yODA4GEq1O-R3SfBZG9SGg" alt="[Revamper Name 2]" className="w-32 h-32 rounded-full mb-4" />
+              <h3 className="text-xl font-semibold">Daniel Zhang</h3>
+              <p>Pinetree S.S.</p>
             </div>
             <div className="w-1/3 flex flex-col items-center">
-              <img src="[Photo URL 3]" alt="[Revamper Name 3]" className="w-32 h-32 rounded-full mb-4" />
-              <h3 className="text-xl font-semibold">[Revamper Name 3]</h3>
-              <p>Description of their contributions.</p>
+              <img src="https://cdn.discordapp.com/attachments/1174486466961866793/1279248182911438858/image.png?ex=66d3c036&is=66d26eb6&hm=8ecc1e6807d1f543a1da4d26b3d346ebb5f019cddfbc4ab6902393e4b76539b5&" alt=" " className="w-32 h-32 rounded-full mb-4" />
+              <h3 className="text-xl font-semibold">John Liao</h3>
+              <p>Lo-Ellen Park S.S.</p>
             </div>
           </div>
         </div>
@@ -74,7 +104,7 @@ const About = () => {
       {/* Contributors Section */}
       <div className="bg-white py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">Contributors</h2>
+          <h2 className="text-4xl font-bold text-center mb-16">Major Contributors</h2>
           <p className="text-lg text-center mb-10">
             We are grateful for the contributions of the following individuals who have helped contribute solutions to this website
           </p>
