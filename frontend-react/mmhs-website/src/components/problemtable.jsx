@@ -14,8 +14,8 @@ const ProblemsTable = ({ problems }) => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
       for (const problem of problems) {
-        const { name } = problem;
-        const [year, code] = getYearAndCodeFromName(name);
+        const { link } = problem;
+        const [year, code] = getYearAndCodeFromLink(link);
         const basePath = `/past_contests/${year}/${code}`;
 
         try {
@@ -23,12 +23,12 @@ const ProblemsTable = ({ problems }) => {
           const text = await response.text();
 
           if (text.toLowerCase().includes('<!doctype html>')) {
-            statuses[name] = 'No Solution';
+            statuses[problem.name] = 'No Solution';
           } else {
-            statuses[name] = 'Has Solution';
+            statuses[problem.name] = 'Has Solution';
           }
         } catch {
-          statuses[name] = 'No Solution';
+          statuses[problem.name] = 'No Solution';
         }
       }
       setSolutionStatuses(statuses);
@@ -37,10 +37,11 @@ const ProblemsTable = ({ problems }) => {
     fetchSolutionStatuses();
   }, [problems]);
 
-  const getYearAndCodeFromName = (name) => {
-    const parts = name.split(' ');
-    const year = parts[0];
-    const code = parts[1].toLowerCase();
+  // Function to extract year and code from the problem link
+  const getYearAndCodeFromLink = (link) => {
+    const parts = link.split('/');
+    const year = parts[2]; // Extract the year
+    const code = parts[3].toLowerCase(); // Extract the problem code
     return [year, code];
   };
 
@@ -85,7 +86,9 @@ const ProblemsTable = ({ problems }) => {
                       <XCircle className="w-5 h-5" />
                     </div>
                   ) : (
-                    'Loading...'
+                    <div className="px-10">
+                      . . .
+                    </div>
                   )}
                 </td>
 

@@ -357,7 +357,6 @@ const Problems = () => {
   return (
     <div>
 		<SearchBar problems={problems} />
-		<h1 className="m-8">Welcome to MMHS! Solutions currently updated to 2015.</h1>
 		<ProblemsTable problems={problems} />
     </div>
   );
