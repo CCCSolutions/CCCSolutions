@@ -353,10 +353,24 @@ const problems = [
 	{ name: '2000 S5 - Sheep and Coyotes', difficulty: 'Insane', tags: ['geometry', '1D arrays'], link: '/contest/2000/s5' },
 ];
 
+const HeroSection = ({ onSearch }) => {
+  return (
+    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16 px-4">
+      <div className="container mx-auto text-center">
+        <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
+        <p className="text-xl">Find  and practice Canadian Computing Competition problems</p>
+        <div className="flex justify-center text-justify text-black">
+          <SearchBar problems={problems} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Problems = () => {
   return (
     <div>
-		<SearchBar problems={problems} />
+		<HeroSection />
 		<ProblemsTable problems={problems} />
     </div>
   );
