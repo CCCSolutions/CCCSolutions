@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, XCircle } from 'react-feather';
-
+import { Book, BookOpen, Info } from 'react-feather';
 
 const ProblemsTable = ({ problems }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,10 +62,27 @@ const ProblemsTable = ({ problems }) => {
     <div className="overflow-x-auto m-8">
       <table className="w-full text-gray-700">
         <thead>
-          <tr className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
+          <tr className="bg-gray-100 border-b border-gray-200">
             <th className="pl-6 py-3 text-left text-md font-normal">Solution</th>
             <th className="pl-6 py-3 text-left text-md font-normal">Problem Name</th>
-            <th className="pr-6 py-3 text-left text-md font-normal">Difficulty</th>
+            <th className="pr-6 py-3 text-left text-md font-normal">
+              <div className="flex items-center space-x-2 relative">
+                <span>Difficulty</span>
+                <div className="relative group">
+                  <Info className="w-4 h-4 text-gray-500 cursor-pointer" />
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-slate-200 rounded z-10 whitespace-nowrap">
+                    <div className="mb-1"><strong>Easy</strong> - Simple syntax</div>
+                    <div className="mb-1"><strong>Normal</strong> - Typical problem</div>
+                    <div className="mb-1"><strong>Hard</strong> - Requires some thinking</div>
+                    <div className="mb-1"><strong>Insane</strong> - Deep observation</div>
+                    <div><strong>Wicked</strong> - Almost impossible</div>
+                  </div>
+                </div>
+              </div>
+            </th>
+
+
+
             <th className="pl-6 py-3 text-left text-md font-normal">Tags</th>
           </tr>
         </thead>
@@ -78,12 +94,12 @@ const ProblemsTable = ({ problems }) => {
               >
               <td className="py-3 whitespace-nowrap text-sm font-medium">
                   {solutionStatuses[problem.name] === 'Has Solution' ? (
-                    <div className="px-10 text-green-600">
-                      <CheckCircle className="w-5 h-5" />
+                    <div className="px-10 text-green-400">
+                      <BookOpen className="w-5 h-5" />
                     </div>
                   ) : solutionStatuses[problem.name] === 'No Solution' ? (
                     <div className="px-10 text-red-600">
-                      <XCircle className="w-5 h-5" />
+                      <Book className="w-5 h-5" />
                     </div>
                   ) : (
                     <div className="px-10">
