@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ProblemsTable = ({ problems }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const problemsPerPage = 20;
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(problems.length / problemsPerPage);
+
+  // Calculate the current problems to display based on the current page
+  const currentProblems = problems.slice(
+    (currentPage - 1) * problemsPerPage,
+    currentPage * problemsPerPage
+  );
+
+  // Function to handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto m-8">
       <table className="w-full text-gray-700">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
@@ -12,9 +29,11 @@ const ProblemsTable = ({ problems }) => {
           </tr>
         </thead>
         <tbody>
-          {problems.map((problem, index) => (
+          {currentProblems.map((problem, index) => (
             <React.Fragment key={index}>
-              <tr className={`border-t border-gray-200 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800'}`}>
+              <tr
+                className={`border-t border-gray-200 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800'}`}
+              >
                 <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
                   <a
                     href={problem.link}
@@ -33,17 +52,31 @@ const ProblemsTable = ({ problems }) => {
                   {problem.tags.join(', ')}
                 </td>
               </tr>
-              {(index + 1) % 5 === 0 && index !== problems.length - 1 && (
-                <tr>
-                  <td colSpan="3" className="py-3">
-                    <div className="border-t-2 border-gray-400 my-4"></div>
-                  </td>
-                </tr>
-              )}
             </React.Fragment>
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <div className="text-sm text-gray-600 dark:text-gray-300">
+          Page {currentPage} of {totalPages}
+        </div>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

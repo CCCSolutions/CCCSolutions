@@ -1,15 +1,8 @@
 import React from "react";
 import ProblemsTable from "../components/problemtable.jsx";
 import SearchBar from "../components/searchbar.jsx";
-import { ChevronDown } from 'lucide-react';
 
 const problems = [
-  { name: 'SOLUCIONES FILTRADAS CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['paypal me willi64645@gmail.com'], link: '/contest/2024/j1' },
-  { name: 'SOLUTIONS DIVULGUÉES CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['paypal me danielzhang.936@gmail.com'], link: '/contest/2024/j1' },
-  { name: 'GELEAKTE CCC 2025 LÖSUNGEN ⚠️⚠️⚠️', difficulty: '$50', tags: ['bitcoin OK'], link: '/contest/2024/j1' },
-  { name: 'SOLUZIONI DIVULGATE CCC 2025 ⚠️⚠️⚠️', difficulty: '$50', tags: ['etransfer OK'], link: '/contest/2024/j1' },
-  { name: '泄露的 CCC 2025 解决方案 ⚠️⚠️⚠️', difficulty: '???', tags: ['cheque OK'], link: '/contest/2024/j1' },
-
 	// 2024 Junior
 	{ name: '2024 J1 - Conveyor Belt Sushi', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2024/j1' },
 	{ name: '2024 J2 - Dusa And The Yobis', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2024/j2' },
@@ -20,7 +13,7 @@ const problems = [
 	// 2024 Senior
 	{ name: '2024 S1 - Hat Circle', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2024/s1' },
 	{ name: '2024 S2 - Heavy-Light Composition', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2024/s2' },
-	{ name: '2024 S3 - Swipe', difficulty: 'Insane', tags: ['ad hoc'], link: '/contest/2024/s3' },
+	{ name: '2024 S3 - Swipe', difficulty: 'Hard', tags: ['ad hoc'], link: '/contest/2024/s3' },
 	{ name: '2024 S4 - Painting Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2024/s4' },
 	{ name: '2024 S5 - Chocolate Bar Partition', difficulty: 'Wicked', tags: ['dynamic programming'], link: '/contest/2024/s5' },
 
@@ -33,8 +26,8 @@ const problems = [
 
 	// 2023 Senior
 	{ name: '2023 S1 - Trianglane', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2023/s1' },
-	{ name: '2023 S2 - Symmetric Mountains', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2023/s2' },
-	{ name: '2023 S3 - Palindromic Poster', difficulty: 'Insane', tags: ['ad hoc', 'constructive'], link: '/contest/2023/s3' },
+	{ name: '2023 S2 - Symmetric Mountains', difficulty: 'Hard', tags: ['implementation'], link: '/contest/2023/s2' },
+	{ name: '2023 S3 - Palindromic Poster', difficulty: 'Hard', tags: ['ad hoc', 'constructive'], link: '/contest/2023/s3' },
 	{ name: '2023 S4 - Minimum Cost Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2023/s4' },
 	{ name: '2023 S5 - The Filter', difficulty: 'Wicked', tags: ['graph theory', 'intermediate math'], link: '/contest/2023/s5' },
 
@@ -60,7 +53,7 @@ const problems = [
 	{ name: '2021 J5 - Modern Art', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2021/s2' },
 	// 2021 Senior
 	{ name: '2021 S1 - Crazy Fencing', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2021/s1' },
-	{ name: '2021 S2 - Modern Art', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2021/s2' },
+	{ name: '2021 S2 - Modern Art', difficulty: 'Hard', tags: ['implementation'], link: '/contest/2021/s2' },
 	{ name: '2021 S3 - Lunch Concert', difficulty: 'Insane', tags: ['data structures'], link: '/contest/2021/s3' },
 	{ name: '2021 S4 - Daily Commute', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2021/s4' },
 	{ name: '2021 S5 - Math Homework', difficulty: 'Insane', tags: ['data structures', 'intermediate math'], link: '/contest/2021/s5' },
@@ -97,15 +90,15 @@ const problems = [
 	{ name: '2018 J1 - Telemarketer or not?', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/j1' },
 	{ name: '2018 J2 - Occupy parking', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/j2' },
 	{ name: '2018 J3 - Are we there yet?', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/j3' },
-	{ name: '2018 J4 - Sunflowers', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/s2' },
+	{ name: '2018 J4 - Sunflowers', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2018/s2' },
 	{ name: '2018 J5 - Choose your own path', difficulty: 'Normal', tags: ['graph theory'], link: '/contest/2018/j5' },
 
 	// 2018 Senior
 	{ name: '2018 S1 - Voronoi Villages', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2018/s1' },
-	{ name: '2018 S2 - Sunflowers', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/s2' },
-	{ name: '2018 S3 - RoboThieves', difficulty: 'Normal', tags: ['graph theory', 'implementation'], link: '/contest/2018/s3' },
-	{ name: '2018 S4 - Balanced Trees', difficulty: 'Normal', tags: ['dynamic programming'], link: '/contest/2018/s4' },
-	{ name: '2018 S5 - Maximum Strategic Savings', difficulty: 'Hard', tags: ['graph theory'], link: '/contest/2018/s5' },
+	{ name: '2018 S2 - Sunflowers', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2018/s2' },
+	{ name: '2018 S3 - RoboThieves', difficulty: 'Hard', tags: ['graph theory', 'implementation'], link: '/contest/2018/s3' },
+	{ name: '2018 S4 - Balanced Trees', difficulty: 'Insane', tags: ['dynamic programming'], link: '/contest/2018/s4' },
+	{ name: '2018 S5 - Maximum Strategic Savings', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2018/s5' },
 
 	// 2017 Junior
 	{ name: '2017 J1 - Quadrant Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2017/j1' },
@@ -122,88 +115,88 @@ const problems = [
 	{ name: '2017 S5 - RMT', difficulty: 'Wicked', tags: ['data structures'], link: '/contest/2017/s5' },
 
 	// 2016 Junior
-  { name: '2016 J1 - Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2016/j1' },
-  { name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2' },
-  { name: '2016 J3 - Hidden Palindrome', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2016/j3' },
-  { name: '2016 J4 - Arrival Time', difficulty: 'Normal', tags: ['strings', 'loops'], link: '/contest/2016/j4' },
-  { name: '2016 J5 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2' },
+	{ name: '2016 J1 - Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2016/j1' },
+	{ name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2' },
+	{ name: '2016 J3 - Hidden Palindrome', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2016/j3' },
+	{ name: '2016 J4 - Arrival Time', difficulty: 'Normal', tags: ['strings', 'loops'], link: '/contest/2016/j4' },
+	{ name: '2016 J5 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2' },
 
-  // 2016 Senior
-  { name: '2016 S1 - Ragaman', difficulty: 'Easy', tags: ['decisions'], link: '/contest/2016/s1' },
-  { name: '2016 S2 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2' },
-  { name: '2016 S3 - Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2016/s3' },
-  { name: '2016 S4 - Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2016/s4' },
-  { name: '2016 S5 - Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2016/s5' },
+	// 2016 Senior
+	{ name: '2016 S1 - Ragaman', difficulty: 'Easy', tags: ['decisions'], link: '/contest/2016/s1' },
+	{ name: '2016 S2 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2' },
+	{ name: '2016 S3 - Phonomenal Reviews', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2016/s3' },
+	{ name: '2016 S4 - Combining Riceballs', difficulty: 'Insane', tags: ['interval dynamic programming'], link: '/contest/2016/s4' },
+	{ name: '2016 S5 - Circle of Life', difficulty: 'Insane', tags: ['simulation', 'math'], link: '/contest/2016/s5' },
 
-  // 2015 Junior
-  { name: '2015 J1 - Special Day', difficulty: 'Easy', tags: ['decisions'], link: '/contest/2015/j1' },
-  { name: '2015 J2 - Happy or Sad', difficulty: 'Easy', tags: ['strings', 'counting'], link: '/contest/2015/j2' },
-  { name: '2015 J3 - Rovarspraket', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2015/j3' },
-  { name: '2015 J4 - Wait Time', difficulty: 'Normal', tags: ['array of records', 'sorting'], link: '/contest/2015/j4' },
-  { name: '2015 J5 - Pi-Day', difficulty: 'Hard', tags: ['recursion'], link: '/contest/2015/j5' },
+	// 2015 Junior
+	{ name: '2015 J1 - Special Day', difficulty: 'Easy', tags: ['decisions'], link: '/contest/2015/j1' },
+	{ name: '2015 J2 - Happy or Sad', difficulty: 'Easy', tags: ['strings', 'counting'], link: '/contest/2015/j2' },
+	{ name: '2015 J3 - Rovarspraket', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2015/j3' },
+	{ name: '2015 J4 - Wait Time', difficulty: 'Normal', tags: ['array of records', 'sorting'], link: '/contest/2015/j4' },
+	{ name: '2015 J5 - Pi-Day', difficulty: 'Hard', tags: ['recursion'], link: '/contest/2015/j5' },
 
-  // 2015 Senior
-  { name: '2015 S1 - Zero That Out', difficulty: 'Easy', tags: ['stacks'], link: '/contest/2015/s1' },
-  { name: '2015 S2 - Jerseys', difficulty: 'Normal', tags: ['arrays'], link: '/contest/2015/s2' },
-  { name: '2015 S3 - Gates', difficulty: 'Hard', tags: ['disjoint sets', 'counting'], link: '/contest/2015/s3' },
-  { name: '2015 S4 - Convex Hull', difficulty: 'Insane', tags: ['shortest path', 'SPFA', 'Dijkstra'], link: '/contest/2015/s4' },
-  { name: '2015 S5 - Greedy for Pies', difficulty: 'Wicked', tags: ['dynamic programming', 'greedy'], link: '/contest/2015/s5' },
+	// 2015 Senior
+	{ name: '2015 S1 - Zero That Out', difficulty: 'Easy', tags: ['stacks'], link: '/contest/2015/s1' },
+	{ name: '2015 S2 - Jerseys', difficulty: 'Normal', tags: ['arrays'], link: '/contest/2015/s2' },
+	{ name: '2015 S3 - Gates', difficulty: 'Hard', tags: ['disjoint sets', 'counting'], link: '/contest/2015/s3' },
+	{ name: '2015 S4 - Convex Hull', difficulty: 'Insane', tags: ['shortest path', 'SPFA', 'Dijkstra'], link: '/contest/2015/s4' },
+	{ name: '2015 S5 - Greedy for Pies', difficulty: 'Wicked', tags: ['dynamic programming', 'greedy'], link: '/contest/2015/s5' },
 
-  // 2014 Junior
-  { name: '2014 J1 - Triangle Times', difficulty: 'Easy', tags: ['simple else-if'], link: '/contest/2014/j1' },
-  { name: '2014 J2 - Vote Count', difficulty: 'Easy', tags: ['loops', 'counting'], link: '/contest/2014/j2' },
-  { name: '2014 J3 - Double Dice', difficulty: 'Normal', tags: ['loops', 'counting'], link: '/contest/2014/j3' },
-  { name: '2014 J4 - Party Invitation', difficulty: 'Normal', tags: ['1D array'], link: '/contest/2014/s1' },
-  { name: '2014 J5 - Assigning Partners', difficulty: 'Hard', tags: ['arrays', 'sorting'], link: '/contest/2014/j5' },
+	// 2014 Junior
+	{ name: '2014 J1 - Triangle Times', difficulty: 'Easy', tags: ['simple else-if'], link: '/contest/2014/j1' },
+	{ name: '2014 J2 - Vote Count', difficulty: 'Easy', tags: ['loops', 'counting'], link: '/contest/2014/j2' },
+	{ name: '2014 J3 - Double Dice', difficulty: 'Normal', tags: ['loops', 'counting'], link: '/contest/2014/j3' },
+	{ name: '2014 J4 - Party Invitation', difficulty: 'Normal', tags: ['1D array'], link: '/contest/2014/s1' },
+	{ name: '2014 J5 - Assigning Partners', difficulty: 'Hard', tags: ['arrays', 'sorting'], link: '/contest/2014/j5' },
 
-  // 2014 Senior
-  { name: '2014 S1 - Party Invitation', difficulty: 'Normal', tags: ['1D array'], link: '/contest/2014/s1' },
-  { name: '2014 S2 - Assigning Partners', difficulty: 'Normal', tags: ['arrays', 'sorting'], link: '/contest/2014/s2' },
-  { name: '2014 S3 - The Geneva Confection', difficulty: 'Hard', tags: ['stacks'], link: '/contest/2014/s3' },
-  { name: '2014 S4 - Tinted Glass Window', difficulty: 'Insane', tags: ['sweep-line', 'difference arrays'], link: '/contest/2014/s4' },
-  { name: '2014 S5 - Lazy Fox', difficulty: 'Wicked', tags: ['dynamic programming', 'greedy'], link: '/contest/2014/s5' },
+	// 2014 Senior
+	{ name: '2014 S1 - Party Invitation', difficulty: 'Normal', tags: ['1D array'], link: '/contest/2014/s1' },
+	{ name: '2014 S2 - Assigning Partners', difficulty: 'Normal', tags: ['arrays', 'sorting'], link: '/contest/2014/s2' },
+	{ name: '2014 S3 - The Geneva Confection', difficulty: 'Hard', tags: ['stacks'], link: '/contest/2014/s3' },
+	{ name: '2014 S4 - Tinted Glass Window', difficulty: 'Insane', tags: ['sweep-line', 'difference arrays'], link: '/contest/2014/s4' },
+	{ name: '2014 S5 - Lazy Fox', difficulty: 'Wicked', tags: ['dynamic programming', 'greedy'], link: '/contest/2014/s5' },
 
-  // 2013 Junior
-  { name: '2013 J1 - Next in Line', difficulty: 'Easy', tags: ['simple calculation'], link: '/contest/2013/j1' },
-  { name: '2013 J2 - Rotating Letters', difficulty: 'Easy', tags: ['string processing'], link: '/contest/2013/j2' },
-  { name: '2013 J3 - From 1987 to 2013', difficulty: 'Normal', tags: ['digit processing'], link: '/contest/2013/s1' },
-  { name: '2013 J4 - Time on Task', difficulty: 'Normal', tags: ['sorting'], link: '/contest/2013/j4' },
-  { name: '2013 J5 - Chances of Winning', difficulty: 'Hard', tags: ['recursion', 'loops'], link: '/contest/2013/s3' },
+	// 2013 Junior
+	{ name: '2013 J1 - Next in Line', difficulty: 'Easy', tags: ['simple calculation'], link: '/contest/2013/j1' },
+	{ name: '2013 J2 - Rotating Letters', difficulty: 'Easy', tags: ['string processing'], link: '/contest/2013/j2' },
+	{ name: '2013 J3 - From 1987 to 2013', difficulty: 'Normal', tags: ['digit processing'], link: '/contest/2013/s1' },
+	{ name: '2013 J4 - Time on Task', difficulty: 'Normal', tags: ['sorting'], link: '/contest/2013/j4' },
+	{ name: '2013 J5 - Chances of Winning', difficulty: 'Hard', tags: ['recursion', 'loops'], link: '/contest/2013/s3' },
 
-  // 2013 Senior
-  { name: '2013 S1 - From 1987 to 2013', difficulty: 'Easy', tags: ['digit processing'], link: '/contest/2013/s1' },
-  { name: '2013 S2 - Bridge Transport', difficulty: 'Normal', tags: ['1D array processing'], link: '/contest/2013/s2' },
-  { name: '2013 S3 - Chances of Winning', difficulty: 'Hard', tags: ['recursion', 'brute force'], link: '/contest/2013/s3' },
-  { name: '2013 S4 - Who is Taller?', difficulty: 'Hard', tags: ['graph theory', 'BFS'], link: '/contest/2013/s4' },
-  { name: '2013 S5 - Factor Solitaire', difficulty: 'Insane', tags: ['dynamic programming'], link: '/contest/2013/s5' },
+	// 2013 Senior
+	{ name: '2013 S1 - From 1987 to 2013', difficulty: 'Easy', tags: ['digit processing'], link: '/contest/2013/s1' },
+	{ name: '2013 S2 - Bridge Transport', difficulty: 'Normal', tags: ['1D array processing'], link: '/contest/2013/s2' },
+	{ name: '2013 S3 - Chances of Winning', difficulty: 'Hard', tags: ['recursion', 'brute force'], link: '/contest/2013/s3' },
+	{ name: '2013 S4 - Who is Taller?', difficulty: 'Hard', tags: ['graph theory', 'BFS'], link: '/contest/2013/s4' },
+	{ name: '2013 S5 - Factor Solitaire', difficulty: 'Insane', tags: ['dynamic programming'], link: '/contest/2013/s5' },
 
-  // 2012 Junior
-  { name: '2012 J1 - Speed Fines Are Not Fine!', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2012/j1' },
-  { name: '2012 J2 - Sounds Fishy!', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2012/j2' },
-  { name: '2012 J3 - Icon Scaling', difficulty: 'Normal', tags: ['loops'], link: '/contest/2012/j3' },
-  { name: '2012 J4 - Big Bang Secrets', difficulty: 'Normal', tags: ['character manipulation'], link: '/contest/2012/j4' },
-  { name: '2012 J5 - A Coin Game', difficulty: 'Hard', tags: ['BFS', 'game tree'], link: '/contest/2012/s4' },
+	// 2012 Junior
+	{ name: '2012 J1 - Speed Fines Are Not Fine!', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2012/j1' },
+	{ name: '2012 J2 - Sounds Fishy!', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2012/j2' },
+	{ name: '2012 J3 - Icon Scaling', difficulty: 'Normal', tags: ['loops'], link: '/contest/2012/j3' },
+	{ name: '2012 J4 - Big Bang Secrets', difficulty: 'Normal', tags: ['character manipulation'], link: '/contest/2012/j4' },
+	{ name: '2012 J5 - A Coin Game', difficulty: 'Hard', tags: ['BFS', 'game tree'], link: '/contest/2012/s4' },
 
-  // 2012 Senior
-  { name: '2012 S1 - Don\'t Pass Me the Ball!', difficulty: 'Easy', tags: ['combinatorics'], link: '/contest/2012/s1' },
-  { name: '2012 S2 - Aromatic Numbers', difficulty: 'Normal', tags: ['roman numerals'], link: '/contest/2012/s2' },
-  { name: '2012 S3 - Absolutely Acidic', difficulty: 'Normal', tags: ['arrays', 'sorting'], link: '/contest/2012/s3' },
-  { name: '2012 S4 - A Coin Game', difficulty: 'Insane', tags: ['BFS', 'game tree'], link: '/contest/2012/s4' },
-  { name: '2012 S5 - Mouse Journey', difficulty: 'Normal', tags: ['dynamic programming', '2D arrays'], link: '/contest/2012/s5' },
+	// 2012 Senior
+	{ name: '2012 S1 - Don\'t Pass Me the Ball!', difficulty: 'Easy', tags: ['combinatorics'], link: '/contest/2012/s1' },
+	{ name: '2012 S2 - Aromatic Numbers', difficulty: 'Normal', tags: ['roman numerals'], link: '/contest/2012/s2' },
+	{ name: '2012 S3 - Absolutely Acidic', difficulty: 'Normal', tags: ['arrays', 'sorting'], link: '/contest/2012/s3' },
+	{ name: '2012 S4 - A Coin Game', difficulty: 'Insane', tags: ['BFS', 'game tree'], link: '/contest/2012/s4' },
+	{ name: '2012 S5 - Mouse Journey', difficulty: 'Normal', tags: ['dynamic programming', '2D arrays'], link: '/contest/2012/s5' },
 
-  // 2011 Junior
-  { name: '2011 J1 - Which Alien?', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2011/j1' },
-  { name: '2011 J2 - Who Has Seen the Wind?', difficulty: 'Easy', tags: ['loops', 'if statements'], link: '/contest/2011/j2' },
-  { name: '2011 J3 - Sumac Sequences', difficulty: 'Normal', tags: ['loops'], link: '/contest/2011/j3' },
-  { name: '2011 J4 - Boring Business', difficulty: 'Normal', tags: ['2D arrays'], link: '/contest/2011/j4' },
-  { name: '2011 J5 - Unfriend', difficulty: 'Hard', tags: ['counting', 'recursion'], link: '/contest/2011/j5' },
+	// 2011 Junior
+	{ name: '2011 J1 - Which Alien?', difficulty: 'Easy', tags: ['if statements'], link: '/contest/2011/j1' },
+	{ name: '2011 J2 - Who Has Seen the Wind?', difficulty: 'Easy', tags: ['loops', 'if statements'], link: '/contest/2011/j2' },
+	{ name: '2011 J3 - Sumac Sequences', difficulty: 'Normal', tags: ['loops'], link: '/contest/2011/j3' },
+	{ name: '2011 J4 - Boring Business', difficulty: 'Normal', tags: ['2D arrays'], link: '/contest/2011/j4' },
+	{ name: '2011 J5 - Unfriend', difficulty: 'Hard', tags: ['counting', 'recursion'], link: '/contest/2011/j5' },
 
-  // 2011 Senior
-  { name: '2011 S1 - English or French?', difficulty: 'Easy', tags: ['character counting'], link: '/contest/2011/s1' },
-  { name: '2011 S2 - Multiple Choice', difficulty: 'Normal', tags: ['array processing'], link: '/contest/2011/s2' },
-  { name: '2011 S3 - Alice Through the Looking Glass', difficulty: 'Hard', tags: ['recursion'], link: '/contest/2011/s3' },
-  { name: '2011 S4 - Blood Distribution', difficulty: 'Insane', tags: ['array processing'], link: '/contest/2011/s4' },
-  { name: '2011 S5 - Switch', difficulty: 'Insane', tags: ['dynamic programming'], link: '/contest/2011/s5' },
+	// 2011 Senior
+	{ name: '2011 S1 - English or French?', difficulty: 'Easy', tags: ['character counting'], link: '/contest/2011/s1' },
+	{ name: '2011 S2 - Multiple Choice', difficulty: 'Normal', tags: ['array processing'], link: '/contest/2011/s2' },
+	{ name: '2011 S3 - Alice Through the Looking Glass', difficulty: 'Hard', tags: ['recursion'], link: '/contest/2011/s3' },
+	{ name: '2011 S4 - Blood Distribution', difficulty: 'Insane', tags: ['array processing'], link: '/contest/2011/s4' },
+	{ name: '2011 S5 - Switch', difficulty: 'Insane', tags: ['dynamic programming'], link: '/contest/2011/s5' },
 
 	// 2010 Junior
 	{ name: '2010 J1 - What is n, Daddy?', difficulty: 'Easy', tags: ["if statements", "calculation"], link: '/contest/2010/j1' },
@@ -360,27 +353,12 @@ const problems = [
 	{ name: '2000 S5 - Sheep and Coyotes', difficulty: 'Insane', tags: ['geometry', '1D arrays'], link: '/contest/2000/s5' },
 ];
 
-const HeroSection = ({ onSearch }) => {
-  return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20 px-4">
-      <div className="container mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
-        <p className="text-xl">Find  and practice Canadian Computing Competition problems</p>
-        <div className="flex justify-center text-justify text-black">
-          <SearchBar problems={problems} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Problems = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-		<HeroSection />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <ProblemsTable problems={problems} />
-      </main>
+    <div>
+		<SearchBar problems={problems} />
+		<h1 className="m-8">Welcome to MMHS! Solutions currently updated to 2015.</h1>
+		<ProblemsTable problems={problems} />
     </div>
   );
 };

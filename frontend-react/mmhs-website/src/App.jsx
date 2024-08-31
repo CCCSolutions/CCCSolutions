@@ -5,7 +5,7 @@ import Home from "./pages/home.jsx";
 import Problems from "./pages/problems.jsx";
 import NotFound from "./components/notfound";
 import Navbar from "./components/navbar";
-import {FooterWithLogo} from "./components/footer";
+import FooterWithLogo from "./components/footer";
 import About from "./pages/about.jsx"
 
 const App = () => {
