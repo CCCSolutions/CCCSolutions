@@ -37,7 +37,7 @@ const Home = () => {
       <div ref={contentRef} className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
-            Find all CCC solutions <span className="bg-yellow-300 px-2 py-1 rounded">Available Since 1996, Completely Free</span>
+            Find all CCC solutions <span className="bg-yellow-300 px-2 py-1 rounded"> Since 1996, Completely Free</span>
           </h2>
 
           {/* Feature Cards */}
