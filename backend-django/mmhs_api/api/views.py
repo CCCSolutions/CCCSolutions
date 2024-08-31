@@ -6,8 +6,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 
-from api.models import Forum
-from api.serializers import ForumSerializer
+from api.models import Forum, Thread, Post, UserProfile
+from api.serializers import ForumListSerializer, ForumDetailSerializer, ThreadListSerializer, ThreadDetailSerializer, PostSerializer, UserProfileSerializer
 
 # Create your views here.
 
@@ -18,10 +18,10 @@ def forum_list(request):
     """
     Either list forums (get) or create forums (post)
     """
-    # List Forums
+    # List Forums (no detail)
     if request.method == 'GET':
         forums = Forum.objects.all()
-        serializer = ForumSerializer(forums, many=True)
+        serializer = ForumListSerializer(forums, many=True)
 
         # should it be safe=False ?
         return JsonResponse(serializer.data, safe=False)
@@ -29,7 +29,7 @@ def forum_list(request):
     # Create Forum
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = ForumSerializer(data=data)
+        serializer = ForumListSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
@@ -46,12 +46,13 @@ def forum_detail(request, pk):
         return HttpResponse(status=404)
 
     if request.method == 'GET':
-        serializer = ForumSerializer(forum)
+        # includes all threads underneath
+        serializer = ForumDetailSerializer(forum)
         return JsonResponse(serializer.data)
 
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = ForumSerializer(forum, data=data)
+        serializer = ForumDetailSerializer(forum, data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)
@@ -60,3 +61,42 @@ def forum_detail(request, pk):
     elif request.method == 'DELETE':
         forum.delete()
         return HttpResponse(status=204)
+
+
+@csrf_exempt
+def create_thread(request):
+    """
+    Create a thread within a forum
+    """
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ThreadDetailSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+@csrf_exempt
+def get_thread(request, pk):
+    if request.method == 'GET':
+        try:
+            thread = Thread.objects.get(pk=pk)
+        except Thread.DoesNotExist:
+            return HttpResponse(status=404)
+
+        # thread & all posts under the thread
+        serializer = ThreadDetailSerializer(thread)
+        return JsonResponse(serializer.data)
+        
+@csrf_exempt
+def create_post(request):
+    """
+    Create a post in a thread
+    """
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = PostSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
