@@ -1,6 +1,6 @@
 import React from "react";
-import ProblemsTable from "../components/problemtable.jsx";
-import SearchBar from "../components/searchbar.jsx";
+import ProblemsTable from "../components/ProblemTable.jsx";
+import SearchBar from "../components/Searchbar.jsx";
 
 const problems = [
 	// 2024 Junior
@@ -357,7 +357,6 @@ const Problems = () => {
   return (
     <div>
 		<SearchBar problems={problems} />
-		<h1 className="m-8">Welcome to MMHS! Solutions currently updated to 2015.</h1>
 		<ProblemsTable problems={problems} />
     </div>
   );
