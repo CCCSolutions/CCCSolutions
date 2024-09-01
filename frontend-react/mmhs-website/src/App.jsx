@@ -7,7 +7,8 @@ import Problems from "./pages/ProblemsPage.jsx";
 import NotFound from "./pages/NotfoundPage.jsx";
 import Navbar from "./components/Navbar.jsx";
 import FooterWithLogo from "./components/Footer.jsx";
-import About from "./pages/AboutPage.jsx"
+import About from "./pages/AboutPage.jsx";
+import ForumList from "./pages/ForumList.jsx";
 
 const App = () => {
   return (
@@ -20,6 +21,9 @@ const App = () => {
             <Route path="/problems" element={<Problems />} />
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
             <Route path="/about" element = {<About />} />
+            <Route path="/forum" element={<ForumList/>} />
+            {//<Route path="/forum/:forumId" element={<Forum/>} />
+            }
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
