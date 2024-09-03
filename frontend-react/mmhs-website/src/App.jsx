@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar.jsx";
 import FooterWithLogo from "./components/Footer.jsx";
 import About from "./pages/AboutPage.jsx";
 import ForumList from "./pages/ForumList.jsx";
+import Forum from "./pages/Forum.jsx";
 
 const App = () => {
   return (
