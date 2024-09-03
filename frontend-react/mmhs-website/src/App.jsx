@@ -10,6 +10,7 @@ import FooterWithLogo from "./components/Footer.jsx";
 import About from "./pages/AboutPage.jsx";
 import ForumList from "./pages/ForumList.jsx";
 import Forum from "./pages/Forum.jsx";
+import Thread from "./pages/Thread.jsx";
 
 const App = () => {
   return (

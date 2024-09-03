@@ -5,7 +5,7 @@ const Post = ({user, content, created_at, contributions, username_color}) => {
   return (
     <div className="p-6">
       <div className="postheader">
-        <h3 className="text-2xl font-semibold mb-2">{user}</h2>
+        <h3 className="text-2xl font-semibold mb-2">{user}</h3>
       </div>
       <div> className="postcontent">
         <p className="text-gray-700">{content}</p>
