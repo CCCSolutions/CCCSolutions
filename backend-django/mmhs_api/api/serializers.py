@@ -7,6 +7,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['user', 'contributions', 'username_color']
 
 class PostSerializer(serializers.ModelSerializer):
+    author = UserProfileSerializer(many=False, read_only=True)  # readonly?
+
     class Meta:
         model = Post
         fields = ['thread', 'author', 'content', 'created_at']

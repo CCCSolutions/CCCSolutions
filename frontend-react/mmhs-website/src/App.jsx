@@ -23,8 +23,8 @@ const App = () => {
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
             <Route path="/about" element = {<About />} />
             <Route path="/forum" element={<ForumList/>} />
-            {//<Route path="/forum/:forumId" element={<Forum/>} />
-            }
+            <Route path="/forum/:forumId" element={<Forum/>} />
+            <Route path="/thread/:forumId" element={<Thread/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
