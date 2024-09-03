@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ClickableCard from '../components/ClickableCard.jsx';
 
-const Forum = ({forumid, title}) => {
-  const [threads, setThreads] = useState([]);
+const Forum = ({forumId}) => {
+  const [threads, setThreads] = useState({"title": "loading...", "description": "loading...", "threads": []});
+
+  console.log("forumId is ", forumId)
 
   useEffect(() => { 
-    axios.get(`http://localhost:8000/forum/${forumid}`)
+    axios.get(`http://localhost:8000/forum/${forumId}`)
       .then(response => setThreads(response.data))
       .catch(error => console.error('Error fetching data:', error));
   }, []);
@@ -20,7 +22,7 @@ const Forum = ({forumid, title}) => {
         {threads.description}
       </p>
       <div className="bg-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-          {threads.map(thread => (
+          {threads.threads.map(thread => (
               <ClickableCard title={thread.title} description={thread.description} link={thread.id}/>
           ))}
       </div>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Post from '../components/Post.jsx';
 
-const Thread = ({forumid, title}) => {
+const Thread = ({forumid}) => {
   const [thread, setThread] = useState([]);
 
   useEffect(() => { 

@@ -24,8 +24,8 @@ const App = () => {
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
             <Route path="/about" element = {<About />} />
             <Route path="/forum" element={<ForumList/>} />
-            <Route path="/forum/:forumId" element={<Forum/>} />
-            <Route path="/thread/:forumId" element={<Thread/>} />
+            <Route path="/forum/:forumId" element={<ForumWrapper/>} />
+            <Route path="/thread/:forumId" element={<ThreadWrapper/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -40,5 +40,16 @@ const ProblemWrapper = () => {
   const { contestYear, problemCode } = useParams();
   return <Problem contestYear={contestYear} problemCode={problemCode} />;
 };
+
+const ForumWrapper = () => {
+  const { forumId } = useParams();
+  console.log("forumid 1 is ", forumId)
+  return <Forum forumId={forumId}/>;
+}
+
+const ThreadWrapper = () => {
+  const { forumId } = useParams();
+  return <Thread forumId={forumId}/>;
+}
 
 export default App;

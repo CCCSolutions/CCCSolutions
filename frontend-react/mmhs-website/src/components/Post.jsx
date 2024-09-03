@@ -7,7 +7,7 @@ const Post = ({user, content, created_at, contributions, username_color}) => {
       <div className="postheader">
         <h3 className="text-2xl font-semibold mb-2">{user}</h3>
       </div>
-      <div> className="postcontent">
+      <div className="postcontent">
         <p className="text-gray-700">{content}</p>
       </div>
       <div className="postfooter">
