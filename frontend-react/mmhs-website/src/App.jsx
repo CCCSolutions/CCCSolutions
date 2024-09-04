@@ -43,7 +43,6 @@ const ProblemWrapper = () => {
 
 const ForumWrapper = () => {
   const { forumId } = useParams();
-  console.log("forumid 1 is ", forumId)
   return <Forum forumId={forumId}/>;
 }
 

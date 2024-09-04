@@ -11,8 +11,6 @@ const ForumList = () => {
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  console.log("forum: ", forums)
-
   return (
     <div className="p-6">
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">
@@ -20,7 +18,7 @@ const ForumList = () => {
       </h1>
       <div className="bg-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {forums.map(forum => (
-              <ClickableCard title={forum.title} description={forum.description} link={`forum/1`}/>
+              <ClickableCard title={forum.title} description={forum.description} link={`forum/${forum.id}`}/>
           ))}
       </div>
     </div>
