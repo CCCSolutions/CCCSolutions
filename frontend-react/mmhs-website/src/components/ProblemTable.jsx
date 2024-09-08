@@ -132,26 +132,26 @@ const ProblemsTable = ({ problems }) => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <div className="text-sm text-gray-600 dark:text-gray-300">
-          Page {currentPage} of {totalPages}
-        </div>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+{/* Pagination Controls */}
+<div className="flex justify-between items-center mt-4">
+  <button
+    onClick={() => handlePageChange(currentPage - 1)}
+    disabled={currentPage === 1}
+    className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:opacity-50"
+  >
+    Previous
+  </button>
+  <div className="text-sm text-gray-600 dark:text-gray-300">
+    Page {currentPage} of {totalPages}
+  </div>
+  <button
+    onClick={() => handlePageChange(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
     </div>
   );
 };

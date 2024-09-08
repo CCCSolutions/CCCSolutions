@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logoImage from '../assets/mmhs_logo.png';
 
 const Navbar = () => {
   return (
@@ -7,10 +8,9 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <img
-              src="https://cdn.discordapp.com/attachments/1174486466961866793/1279184503281287339/school_logo.png?ex=66d384e7&is=66d23367&hm=143e20e8b175b53c598e2781883b30c9312bca10a172eb4323acf115af770504&"
-              alt="MMHS Logo"
-              className="h-[48px] w-auto mr-3"
-          /> <span className="text-2xl font-semibold">Milliken Mills High School</span>
+              src={logoImage}
+              className="h-[52px] w-auto mr-3"
+          /> <span className="text-xl font-medium">Milliken Mills High School</span>
         </div>
         <ul className="flex space-x-8 text-lg">
           <li><Link to="/" className="hover:text-blue-400 transition-colors duration-300">Home</Link></li>

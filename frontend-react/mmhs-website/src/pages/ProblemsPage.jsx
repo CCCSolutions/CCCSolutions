@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from "react";
 import ProblemsTable from "../components/ProblemTable.jsx";
 import SearchBar from "../components/Searchbar.jsx";
@@ -355,10 +356,10 @@ const problems = [
 
 const HeroSection = ({ onSearch }) => {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16 px-4">
+    <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
       <div className="container mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-4">CCC Problems</h1>
-        <p className="text-xl">Find  and practice Canadian Computing Competition problems</p>
+        <h1 className="text-5xl font-bold mb-4">CCC Problems</h1>
+        <p className="text-2xl">Find  and practice Canadian Computing Competition problems</p>
         <div className="flex justify-center text-justify text-black">
           <SearchBar problems={problems} />
         </div>

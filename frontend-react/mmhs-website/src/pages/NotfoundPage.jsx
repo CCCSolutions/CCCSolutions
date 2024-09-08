@@ -2,9 +2,9 @@ import React from "react";
 
 const NotFound = () => {
   return (
-    <div className="max-w-2xl mx-auto my-8 p-6 bg-white text-center">
-      <h1 className="text-4xl font-semibold text-gray-800 mb-4">404 - Page Not Found</h1>
-      <p className="text-lg text-gray-600">Sorry, the page you are looking for does not exist.</p>
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-r from-blue-800 to-indigo-900 text-center py-16 px-6">
+      <h1 className="text-5xl font-extrabold text-white mb-6">404 - Page Not Found</h1>
+      <p className="text-2xl text-white">Sorry, the page you are looking for does not exist.</p>
     </div>
   );
 };
