@@ -1,6 +1,6 @@
 import { Typography } from "@material-tailwind/react";
 import logoImage from "../assets/mmhs_logo.png";
- 
+
 const FooterWithLogo = () => {
   return (
     <footer className="w-full bg-white p-8">
@@ -10,7 +10,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="#"
+              href="/About"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
@@ -20,7 +20,9 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="#"
+              href="https://github.com/Tankman61/mmhs-website"
+              target="_blank"
+              rel="noopener noreferrer"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
@@ -30,7 +32,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="#"
+              href="/forum"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
@@ -40,7 +42,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="#"
+              href="mailto:willi64645@gmail.com,test@gmail.com,test2@gmail.com"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
