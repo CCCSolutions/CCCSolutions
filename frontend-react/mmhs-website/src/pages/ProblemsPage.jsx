@@ -358,8 +358,8 @@ const HeroSection = ({ onSearch }) => {
   return (
     <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
       <div className="container mx-auto text-center">
-        <h1 className="text-5xl font-bold mb-4">CCC Problems</h1>
-        <p className="text-2xl">Find  and practice Canadian Computing Competition problems</p>
+        <h1 className="text-5xl font-bold mb-4">CCC Solutions</h1>
+        <p className="text-2xl">Find all solutions to Canadian Computing Competition problems</p>
         <div className="flex justify-center text-justify text-black">
           <SearchBar problems={problems} />
         </div>
@@ -368,7 +368,7 @@ const HeroSection = ({ onSearch }) => {
   );
 };
 
-const Problems = () => {
+const Solutions = () => {
   return (
     <div>
 		<HeroSection />
@@ -377,4 +377,4 @@ const Problems = () => {
   );
 };
 
-export default Problems;
+export default Solutions;

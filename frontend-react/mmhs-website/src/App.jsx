@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-
 
 import Problem from "./components/Solution.jsx";
 import Home from "./pages/HomePage.jsx";
-import Problems from "./pages/ProblemsPage.jsx";
+import Solutions from "./pages/ProblemsPage.jsx";
 import NotFound from "./pages/NotfoundPage.jsx";
 import Navbar from "./components/Navbar.jsx";
 import FooterWithLogo from "./components/Footer.jsx";
@@ -21,7 +21,7 @@ const App = () => {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/problems" element={<Problems />} />
+            <Route path="/solutions" element={<Solutions />} />
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
             <Route path="/about" element = {<About />} />
             <Route path="/resources" element = {<Resources />} />
