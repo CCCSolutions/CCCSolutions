@@ -1,6 +1,40 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 import BackgroundImage from '../assets/mmhs.jpg';
+import { RocketOutlined, TeamOutlined, FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
+
+// I just used the iconwrapper code from another project so it ain't tailwind
+const IconWrapper = styled.div`
+    font-size: 2rem;
+    margin-right: 20px;
+    border-radius: 12px;
+    background: ${props => props.background || 'linear-gradient(135deg, #8a59fa, #7f73ff, #786cae, #8a59fa)'};
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const RocketIconWrapper = styled(IconWrapper)`
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+`;
+
+const TeamIconWrapper = styled(IconWrapper)`
+    background: linear-gradient(135deg, #4E54C8, #8F94FB);
+`;
+
+const FileTextIconWrapper = styled(IconWrapper)`
+    background: linear-gradient(135deg, #11998E, #38EF7D);
+`;
+
+const TrophyIconWrapper = styled(IconWrapper)`
+  background: linear-gradient(135deg, #edca08, #FFA500);
+`;
 
 const Home = () => {
   const contentRef = useRef(null);
@@ -15,92 +49,94 @@ const Home = () => {
   }, []);
 
   return (
-      <div className="bg-gray-100">
-        {/* Hero Section */}
-          <div
-              className="relative bg-cover bg-center text-white min-h-screen flex flex-col  justify-center items-center text-center px-4"
-              style={{backgroundImage: `url(${BackgroundImage})`}}
-          >
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="text-blue-400 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC
-              Solutions
-            </h1>
-            <p className="text-xl md:text-2xl max-w-2xl mb-10">
-              Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
-            </p>
-            <div className="flex space-x-4">
-              <Link to="/problems" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-                Explore Problems
-              </Link>
-              <Link to="/forum" className="bg-white text-blue-900 font-bold py-3 px-6 rounded-lg">
-                Visit Forum
-              </Link>
-            </div>
+    <div className="bg-gray-100">
+      {/* Hero Section */}
+      <div
+        className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
+        style={{ backgroundImage: `url(${BackgroundImage})` }}
+      >
+        <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <span className="text-blue-400 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
+        </h1>
+        <p className="text-xl md:text-2xl max-w-2xl mb-10">
+          Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
+        </p>
+        <div className="flex space-x-4">
+          <Link to="/problems" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+            Explore Problems
+          </Link>
+          <Link to="/forum" className="bg-white text-blue-900 font-bold py-3 px-6 rounded-lg">
+            Visit Forum
+          </Link>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div ref={contentRef} className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16">
+            Find all CCC solutions <span className="bg-blue-200 px-2 py-1 rounded"> Since 1996, Completely Free</span>
+          </h2>
+
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-2 gap-8 mb-20 ms-2">
+            {[
+              {
+                title: 'Fast Learning',
+                content: 'Our website contains a set of resources for learning CP, and solutions with commented explanations.',
+                icon: <RocketIconWrapper><RocketOutlined /></RocketIconWrapper>,
+              },
+              {
+                title: 'Collaborative Problem Solving',
+                content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
+                icon: <TeamIconWrapper><TeamOutlined /></TeamIconWrapper>,
+              },
+              {
+                title: 'Comprehensive Solutions',
+                content: (
+                  <p>
+                    Access detailed explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.
+                  </p>
+                ),
+                icon: <FileTextIconWrapper><FileTextOutlined /></FileTextIconWrapper>,
+              },
+              {
+                title: 'Interactive Challenges',
+                content: 'Engage in fun, competitive coding challenges to boost your motivation and skills.',
+                icon: <TrophyIconWrapper><TrophyOutlined /></TrophyIconWrapper>,
+              },
+            ].map((feature, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-lg flex items-start space-x-4">
+                {feature.icon}
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p>{feature.content}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Content Section */}
-          <div ref={contentRef} className="py-20 px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl font-bold text-center mb-16">
-                Find all CCC solutions <span
-                  className="bg-yellow-300 px-2 py-1 rounded"> Since 1996, Completely Free</span>
-              </h2>
-
-              {/* Feature Cards */}
-              <div className="grid md:grid-cols-2 gap-8 mb-20">
-                {[
-                  {
-                    title: "Personalized Learning",
-                    content: "Our adaptive algorithms tailor questions to your skill level, ensuring efficient progress.",
-                  },
-                  {
-                    title: "Collaborative Problem Solving",
-                    content: "Work together with peers to tackle challenging CCC problems and improve your skills.",
-                  },
-                  {
-                    title: "Comprehensive Solutions",
-                    content: (
-                        <p>
-                          Access detailed explanations, test files, and multiple approaches to solve CCC problems.
-                          Solutions date back to <strong>1996, which no other platform offers.</strong>
-                        </p>
-                    ),
-                  },
-                  {
-                    title: "Interactive Challenges",
-                    content: "Engage in fun, competitive coding challenges to boost your motivation and skills.",
-                  },
-                ].map((feature, index) => (
-                    <div key={index} className="bg-white p-6 rounded-lg shadow-lg flex items-start space-x-4">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                        <p>{feature.content}</p>
-                      </div>
-                    </div>
-                ))}
+          {/* Statistics */}
+          <div className="bg-white p-8 rounded-lg shadow-lg mb-20">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <p className="text-4xl font-bold text-blue-700">N/A</p>
+                <p className="text-gray-600">Forum Users</p>
               </div>
-
-              {/* Statistics */}
-              <div className="bg-white p-8 rounded-lg shadow-lg mb-20">
-                <div className="grid md:grid-cols-3 gap-8">
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-blue-600">N/A</p>
-                    <p className="text-gray-600">Forum Users</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-green-600">200+</p>
-                    <p className="text-gray-600">CCC Solutions</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-purple-600">10,000+</p>
-                    <p className="text-gray-600">Students Helped</p>
-                  </div>
-                </div>
+              <div className="text-center">
+                <p className="text-4xl font-bold text-blue-700">200+</p>
+                <p className="text-gray-600">CCC Solutions</p>
+              </div>
+              <div className="text-center">
+                <p className="text-4xl font-bold text-blue-700">10,000+</p>
+                <p className="text-gray-600">Students Helped</p>
               </div>
             </div>
           </div>
         </div>
-        );
-        };
+      </div>
+    </div>
+  );
+};
 
-        export default Home;
+export default Home;

@@ -80,9 +80,6 @@ const ProblemsTable = ({ problems }) => {
                 </div>
               </div>
             </th>
-
-
-
             <th className="pl-6 py-3 text-left text-md font-normal">Tags</th>
           </tr>
         </thead>
@@ -92,7 +89,7 @@ const ProblemsTable = ({ problems }) => {
               <tr
                 className={`border-t border-gray-200 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800'}`}
               >
-              <td className="py-3 whitespace-nowrap text-sm font-medium">
+                <td className="py-3 whitespace-nowrap text-sm font-medium">
                   {solutionStatuses[problem.name] === 'Has Solution' ? (
                     <div className="px-10 text-green-400">
                       <BookOpen className="w-5 h-5" />
@@ -107,8 +104,6 @@ const ProblemsTable = ({ problems }) => {
                     </div>
                   )}
                 </td>
-
-
                 <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
                   <a
                     href={problem.link}
@@ -132,26 +127,26 @@ const ProblemsTable = ({ problems }) => {
         </tbody>
       </table>
 
-{/* Pagination Controls */}
-<div className="flex justify-between items-center mt-4">
-  <button
-    onClick={() => handlePageChange(currentPage - 1)}
-    disabled={currentPage === 1}
-    className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:opacity-50"
-  >
-    Previous
-  </button>
-  <div className="text-sm text-gray-600 dark:text-gray-300">
-    Page {currentPage} of {totalPages}
-  </div>
-  <button
-    onClick={() => handlePageChange(currentPage + 1)}
-    disabled={currentPage === totalPages}
-    className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 disabled:opacity-50"
-  >
-    Next
-  </button>
-</div>
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-700 text-white rounded transition-colors duration-300 hover:bg-gray-500 disabled:bg-gray-300 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <div className="text-sm text-gray-600 dark:text-gray-300">
+          Page {currentPage} of {totalPages}
+        </div>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-blue-700 text-white rounded transition-colors duration-300 hover:bg-gray-500 disabled:bg-gray-300 disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

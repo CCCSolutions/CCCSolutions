@@ -11,6 +11,7 @@ import About from "./pages/AboutPage.jsx";
 import ForumList from "./pages/ForumList.jsx";
 import Forum from "./pages/Forum.jsx";
 import Thread from "./pages/Thread.jsx";
+import Resources from "./pages/ResourcesPage.jsx";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/problems" element={<Problems />} />
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
             <Route path="/about" element = {<About />} />
+            <Route path="/resources" element = {<Resources />} />
             <Route path="/forum" element={<ForumList/>} />
             <Route path="/forum/:forumId" element={<ForumWrapper/>} />
             <Route path="/thread/:forumId" element={<ThreadWrapper/>} />
