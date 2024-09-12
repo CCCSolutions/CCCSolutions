@@ -352,7 +352,36 @@ const problems = [
 	{ name: '2000 S3 - Surfing', difficulty: 'Hard', tags: ['graph theory', 'Warshall\'s algorithm', 'BFS'], link: '/contest/2000/s3' },
 	{ name: '2000 S4 - Golf', difficulty: 'Hard', tags: ['dynamic programming', 'BFS'], link: '/contest/2000/s4' },
 	{ name: '2000 S5 - Sheep and Coyotes', difficulty: 'Insane', tags: ['geometry', '1D arrays'], link: '/contest/2000/s5' },
+  // 1999 Problems
+  { name: '1999 P1 - Card Game', difficulty: 'Easy', tags: ['1D array', 'decisions'], link: '/contest/1999/p1' },
+  { name: '1999 P2 - Year 2000', difficulty: 'Hard', tags: ['string processing'], link: '/contest/1999/p2' },
+  { name: '1999 P3 - Divided Fractals', difficulty: 'Hard', tags: ['character graphics', 'recursion'], link: '/contest/1999/p3' },
+  { name: '1999 P4 - A Knightly Pursuit', difficulty: 'Insane', tags: ['2D array', 'dynamic programming'], link: '/contest/1999/p4' },
+  { name: '1999 P5 - Letter Arithmetic', difficulty: 'Insane', tags: ['exhaustive search', 'string', '1D array', 'complex algorithm'], link: '/contest/1999/p5' },
+
+  // 1998 Problems
+  { name: '1998 P1 - Censor', difficulty: 'Easy', tags: ['strings', 'loops', 'decisions'], link: '/contest/1998/p1' },
+  { name: '1998 P2 - Cross Numbers', difficulty: 'Easy', tags: ['simple arithmetic', 'div', 'mod'], link: '/contest/1998/p2' },
+  { name: '1998 P3 - Mars Rover', difficulty: 'Normal', tags: ['decisions'], link: '/contest/1998/p3' },
+  { name: '1998 P4 - Lottery', difficulty: 'Hard', tags: ['string', 'complex algorithm'], link: '/contest/1998/p4' },
+  { name: '1998 P5 - Mountain Passage', difficulty: 'Insane', tags: ['2D arrays', 'dynamic programming'], link: '/contest/1998/p5' },
+
+  // 1997 Problems
+  { name: '1997 P1 - Sentences', difficulty: 'Easy', tags: ['nested loops'], link: '/contest/1997/p1' },
+  { name: '1997 P2 - Nasty Numbers', difficulty: 'Normal', tags: ['complex arithmetic', 'div', 'mod'], link: '/contest/1997/p2' },
+  { name: '1997 P3 - Double Knockout Competition', difficulty: 'Normal', tags: ['simple arithmetic', 'div', 'mod'], link: '/contest/1997/p3' },
+  { name: '1997 P4 - Dynamic Dictionary Coding', difficulty: 'Normal', tags: ['string', '1D array'], link: '/contest/1997/p4' },
+  { name: '1997 P5 - Long Division', difficulty: 'Insane', tags: ['string', '1D array', 'complex algorithm'], link: '/contest/1997/p5' },
+
+  // 1996 Problems
+  { name: '1996 P1 - Perfect Numbers', difficulty: 'Easy', tags: ['simple arithmetic', 'div', 'mod'], link: '/contest/1996/p1' },
+  { name: '1996 P2 - Divisibility by 11', difficulty: 'Hard', tags: ['string', '1D array', 'complex algorithm'], link: '/contest/1996/p2' },
+  { name: '1996 P3 - Pattern Generator', difficulty: 'Hard', tags: ['complex string algorithm'], link: '/contest/1996/p3' },
+  { name: '1996 P4 - Roman Numerals', difficulty: 'Normal', tags: ['decisions'], link: '/contest/1996/p4' },
+  { name: '1996 P5 - Max Distance', difficulty: 'Hard', tags: ['1D array', 'linear search', 'binary search'], link: '/contest/1996/p5' },
+
 ];
+
 
 const HeroSection = ({ onSearch }) => {
   return (

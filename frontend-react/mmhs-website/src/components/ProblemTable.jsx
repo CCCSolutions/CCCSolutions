@@ -4,31 +4,33 @@ import { Book, BookOpen, Info } from 'react-feather';
 const ProblemsTable = ({ problems }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 20;
-
-  // State to store solution status for each problem
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
   useEffect(() => {
-    // Fetch solution statuses for all problems
     const fetchSolutionStatuses = async () => {
       const statuses = {};
       for (const problem of problems) {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
-        const basePath = `/past_contests/${year}/${code}`;
+        const alternativeCode = getAlternativeCode(code);
+        let hasSolution = false;
 
-        try {
-          const response = await fetch(`${basePath}/solution.txt`);
-          const text = await response.text();
-
-          if (text.toLowerCase().includes('<!doctype html>')) {
-            statuses[problem.name] = 'No Solution';
-          } else {
-            statuses[problem.name] = 'Has Solution';
+        for (const checkCode of [code, alternativeCode]) {
+          if (!checkCode) continue;
+          const basePath = `/past_contests/${year}/${checkCode}`;
+          try {
+            const response = await fetch(`${basePath}/solution.txt`);
+            const text = await response.text();
+            if (!text.toLowerCase().includes('<!doctype html>')) {
+              hasSolution = true;
+              break;
+            }
+          } catch (error) {
+            console.error(`Error fetching solution for ${checkCode}:`, error);
           }
-        } catch {
-          statuses[problem.name] = 'No Solution';
         }
+
+        statuses[problem.name] = hasSolution ? 'Has Solution' : 'No Solution';
       }
       setSolutionStatuses(statuses);
     };
@@ -36,12 +38,20 @@ const ProblemsTable = ({ problems }) => {
     fetchSolutionStatuses();
   }, [problems]);
 
-  // Function to extract year and code from the problem link
   const getYearAndCodeFromLink = (link) => {
     const parts = link.split('/');
-    const year = parts[2]; // Extract the year
-    const code = parts[3].toLowerCase(); // Extract the problem code
+    const year = parts[2];
+    const code = parts[3].toLowerCase();
     return [year, code];
+  };
+
+  const getAlternativeCode = (code) => {
+    const mapping = {
+      'j5': 's3',
+      'j4': 's2',
+      'j3': 's1'
+    };
+    return mapping[code.toLowerCase()];
   };
 
   // Calculate the total number of pages

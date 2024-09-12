@@ -63,7 +63,7 @@ const Home = () => {
         </p>
         <div className="flex space-x-4">
           <Link to="/problems" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-            Explore Problems
+            Explore Solutions
           </Link>
           <Link to="/forum" className="bg-white text-blue-900 font-bold py-3 px-6 rounded-lg">
             Visit Forum
