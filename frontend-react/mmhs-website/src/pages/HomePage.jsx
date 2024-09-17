@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import BackgroundImage from '../assets/mmhs.jpg';
-import { RocketOutlined, TeamOutlined, FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
+import { TeamOutlined, FileTextOutlined } from '@ant-design/icons';
 
 // I just used the iconwrapper code from another project so it ain't tailwind
 const IconWrapper = styled.div`
@@ -20,20 +20,12 @@ const IconWrapper = styled.div`
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const RocketIconWrapper = styled(IconWrapper)`
-    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-`;
-
 const TeamIconWrapper = styled(IconWrapper)`
     background: linear-gradient(135deg, #4E54C8, #8F94FB);
 `;
 
 const FileTextIconWrapper = styled(IconWrapper)`
     background: linear-gradient(135deg, #11998E, #38EF7D);
-`;
-
-const TrophyIconWrapper = styled(IconWrapper)`
-  background: linear-gradient(135deg, #edca08, #FFA500);
 `;
 
 const Home = () => {
@@ -82,12 +74,7 @@ const Home = () => {
           <div className="grid md:grid-cols-2 gap-8 mb-20 ms-2">
             {[
               {
-                title: 'Fast Learning',
-                content: 'Our website contains a set of resources for learning CP, and solutions with commented explanations.',
-                icon: <RocketIconWrapper><RocketOutlined /></RocketIconWrapper>,
-              },
-              {
-                title: 'Collaborative Problem Solving',
+                title: 'Interactive Forum',
                 content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
                 icon: <TeamIconWrapper><TeamOutlined /></TeamIconWrapper>,
               },
@@ -99,11 +86,6 @@ const Home = () => {
                   </p>
                 ),
                 icon: <FileTextIconWrapper><FileTextOutlined /></FileTextIconWrapper>,
-              },
-              {
-                title: 'Interactive Challenges',
-                content: 'Engage in fun, competitive coding challenges to boost your motivation and skills.',
-                icon: <TrophyIconWrapper><TrophyOutlined /></TrophyIconWrapper>,
               },
             ].map((feature, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-lg flex items-start space-x-4">
