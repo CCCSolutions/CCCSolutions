@@ -9,7 +9,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <img
               src={logoImage}
-              className="h-[50px] w-auto mr-3"
+              className="h-[46px] w-auto mr-3"
           /> <span className="text-xl font-medium">Milliken Mills High School</span>
         </div>
         <ul className="flex space-x-8 text-lg">

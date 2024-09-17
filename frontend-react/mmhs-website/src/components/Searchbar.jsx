@@ -38,7 +38,7 @@ const SearchBar = ({ problems }) => {
   );
 
   return (
-    <div ref={searchBarRef} className="w-full max-w-lg m-8 relative">
+    <div ref={searchBarRef} className="w-full max-w-lg m-6 m-2b relative">
       <div className="relative">
         <input
           type="text"

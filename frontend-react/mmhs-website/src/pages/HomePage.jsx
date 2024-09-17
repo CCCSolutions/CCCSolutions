@@ -99,7 +99,7 @@ const Home = () => {
           </div>
 
           {/* Statistics */}
-          <div className="bg-white p-8 rounded-lg shadow-lg mb-20">
+          <div className="bg-white p-8 rounded-lg shadow-lg mb-16">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <p className="text-4xl font-bold text-blue-800">N/A</p>
