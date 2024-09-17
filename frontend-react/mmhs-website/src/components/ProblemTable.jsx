@@ -69,8 +69,8 @@ const ProblemsTable = ({ problems }) => {
   };
 
   return (
-    <div className="overflow-x-auto m-8">
-      <table className="w-full text-gray-700">
+    <div className="light-mode overflow-x-auto m-8">
+      <table className="w-full text-gray-700 bg-white">
         <thead>
           <tr className="bg-gray-100 border-b border-gray-200">
             <th className="pl-6 py-3 text-left text-md font-normal">Solution</th>
@@ -97,7 +97,7 @@ const ProblemsTable = ({ problems }) => {
           {currentProblems.map((problem, index) => (
             <React.Fragment key={index}>
               <tr
-                className={`border-t border-gray-200 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800'}`}
+                className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
               >
                 <td className="py-3 whitespace-nowrap text-sm font-medium">
                   {solutionStatuses[problem.name] === 'Has Solution' ? (
@@ -117,7 +117,7 @@ const ProblemsTable = ({ problems }) => {
                 <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
                   <a
                     href={problem.link}
-                    className="truncate text-blue-600 dark:text-blue-300 hover:underline"
+                    className="truncate text-blue-600 hover:underline"
                     style={{ maxWidth: '20rem' }}
                   >
                     {problem.name}
@@ -146,7 +146,7 @@ const ProblemsTable = ({ problems }) => {
         >
           Previous
         </button>
-        <div className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
         </div>
         <button
