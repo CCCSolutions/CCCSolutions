@@ -48,13 +48,13 @@ const Home = () => {
         style={{ backgroundImage: `url(${BackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          <span className="text-blue-400 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
+          <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
           Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
         </p>
         <div className="flex space-x-4">
-          <Link to="/problems" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+          <Link to="/problems" className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg">
             Explore Solutions
           </Link>
           <Link to="/forum" className="bg-white text-blue-900 font-bold py-3 px-6 rounded-lg">
@@ -67,7 +67,7 @@ const Home = () => {
       <div ref={contentRef} className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
-            Find all CCC solutions <span className="bg-blue-200 px-2 py-1 rounded"> Since 1996, Completely Free</span>
+            Find all CCC solutions <span className="bg-blue-300 px-2 py-1 rounded"> Since 1996, Completely Free</span>
           </h2>
 
           {/* Feature Cards */}
@@ -102,15 +102,15 @@ const Home = () => {
           <div className="bg-white p-8 rounded-lg shadow-lg mb-20">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <p className="text-4xl font-bold text-blue-700">N/A</p>
+                <p className="text-4xl font-bold text-blue-800">N/A</p>
                 <p className="text-gray-600">Forum Users</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-blue-700">200+</p>
+                <p className="text-4xl font-bold text-blue-800">200+</p>
                 <p className="text-gray-600">CCC Solutions</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-blue-700">10,000+</p>
+                <p className="text-4xl font-bold text-blue-800">10,000+</p>
                 <p className="text-gray-600">Students Helped</p>
               </div>
             </div>
