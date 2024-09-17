@@ -131,7 +131,7 @@ const About = () => {
         </div>
 
         {/* Contributors Section */}
-        <div className="bg-white py-20 px-4">
+        <div className="bg-gray-100 py-20 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-7">Major Contributors</h2>
             <p className="text-lg text-center mb-10">
@@ -140,7 +140,7 @@ const About = () => {
             </p>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {contributors.map((contributor, index) => (
-                  <div key={index} className="bg-gray-100 rounded-lg p-4 hover:shadow-md transition duration-300">
+                  <div key={index} className="bg-white rounded-lg p-4 hover:shadow-md transition duration-300">
                     <div className="flex items-center mb-2">
                       <div
                           className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
@@ -159,7 +159,7 @@ const About = () => {
         </div>
 
         {/* Revampers Section */}
-        <div className="bg-gray-100 py-20 px-4">
+        <div className="bg-white py-20 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-7">The Revamp Team</h2>
             <div className="flex flex-wrap justify-center gap-8">
