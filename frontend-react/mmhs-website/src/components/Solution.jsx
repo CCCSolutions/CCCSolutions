@@ -60,7 +60,7 @@ const Problem = ({ contestYear, problemCode }) => {
 
     const fetchTestFiles = async (basePath, extension) => {
       const testCases = [];
-      for (let i = 1; i <= 15; i++) { // Increased to 15 test cases
+      for (let i = 1; i <= 15; i++) {
         const testCaseFile = `${basePath}/${problemCode}.${i}${extension}`;
         try {
           const response = await fetch(testCaseFile);
@@ -88,8 +88,12 @@ const Problem = ({ contestYear, problemCode }) => {
     return mapping[code.toLowerCase()];
   };
 
+  const isValidTestCase = (testCase) =>
+    !testCase.toLowerCase().startsWith("<!doctype html>");
+
   return (
-    <div className="w-full p-8 rounded-lg bg-white shadow-md"> {/* Set background to white */}
+    <div className="w-full p-8 rounded-lg bg-white shadow-md">
+      {/* Set background to white */}
       <h2 className="text-2xl font-semibold text-black mb-4">
         {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
       </h2>
@@ -103,58 +107,64 @@ const Problem = ({ contestYear, problemCode }) => {
 
       <div className="mb-6">
         <h3 className="text-lg font-medium text-black mb-2">Solution:</h3>
-        <SyntaxHighlighter
-          language="cpp"
-          style={solarizedlight}
-          showLineNumbers
-        >
+        <SyntaxHighlighter language="cpp" style={solarizedlight} showLineNumbers>
           {solution}
         </SyntaxHighlighter>
       </div>
 
       {testCases.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-medium text-black mb-4">
-            Test Cases:
-          </h3>
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-black mb-4">Test Cases:</h3>
+            <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
+              {/* Horizontal scrollable section for test case buttons */}
+              <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
+                {/* Horizontal scroll with custom scrollbar */}
+                {testCases.map((_, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => setActiveTab(idx)}
+                        className={`px-4 py-2 flex-shrink-0 ${
+                            activeTab === idx
+                                ? "bg-blue-800 text-white"
+                                : "bg-gray-200 text-black"
+                        } rounded-lg`}
+                    >
+                      Case {idx + 1}
+                    </button>
+                ))}
+              </div>
 
-          {/* Horizontal scrollable section for test case buttons */}
-          <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400"> {/* Horizontal scroll with custom scrollbar */}
-            {testCases.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveTab(idx)}
-                className={`px-4 py-2 flex-shrink-0 ${
-                  activeTab === idx
-                    ? "bg-blue-800 text-white" // Active tab color
-                    : "bg-gray-200 text-black" // Inactive tabs
-                } rounded-lg`}
-              >
-                Case {idx + 1}
-              </button>
-            ))}
+              {/* Display active test case */}
+              <div className="p-4 bg-white rounded-lg">
+                {isValidTestCase(testCases[activeTab].input) &&
+                isValidTestCase(testCases[activeTab].output) ? (
+                    <>
+                      <p className="text-black mb-2">
+                        <strong>Input:</strong>
+                      </p>
+                      <textarea
+                          className="w-full h-20 p-2 mb-4 bg-gray-100 text-black border border-gray-300 rounded-md resize-none"
+                          readOnly
+                          value={testCases[activeTab].input}
+                      />
+                      <p className="text-black mb-2">
+                        <strong>Output:</strong>
+                      </p>
+                      <textarea
+                          className="w-full h-20 p-2 bg-gray-100 text-black border border-gray-300 rounded-md resize-none"
+                          readOnly
+                          value={testCases[activeTab].output}
+                      />
+                    </>
+                ) : (
+                    <p className="text-red-600 font-bold text-center">
+                      Test Case Not Available
+                    </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Display active test case */}
-          <div className="p-4 bg-gray-100 rounded-lg"> {/* Light gray background */}
-            <p className="text-black mb-2">
-              <strong>Input:</strong>
-            </p>
-            <textarea
-              className="w-full h-20 p-2 mb-4 bg-white text-black border border-gray-300 rounded-md resize-none" // Disable resizer
-              readOnly
-              value={testCases[activeTab].input}
-            />
-            <p className="text-black mb-2">
-              <strong>Output:</strong>
-            </p>
-            <textarea
-              className="w-full h-20 p-2 bg-white text-black border border-gray-300 rounded-md resize-none" // Disable resizer
-              readOnly
-              value={testCases[activeTab].output}
-            />
-          </div>
-        </div>
       )}
     </div>
   );
