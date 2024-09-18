@@ -1,0 +1,6 @@
+Link from http://ccc.uwaterloo.ca to http://abc.def/ghi
+Link from http://abc.def/ghi to http://www.www.www.com
+Link from http://abc.def/ghi to http://xxx
+
+Can surf from http://ccc.uwaterloo.ca to http://www.www.www.com
+Can't surf from http://www.www.www.com to http://ccc.uwaterloo.ca
