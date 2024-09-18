@@ -64,7 +64,7 @@ const About = () => {
           <h2 className="text-4xl font-bold text-center mb-10 text-blue-900">Our Journey</h2>
           <div className="space-y-8">
             {[{
-              year: 1996,
+              year: 2001,
               title: "The Beginning",
               content: "Chris Robart of Milliken Mills High School started offering CCC solutions using Turing and Ready: Java."
             }, {

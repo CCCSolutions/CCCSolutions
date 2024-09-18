@@ -110,8 +110,8 @@ const Home = () => {
                 <p className="text-gray-600">CCC Solutions</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-blue-800">10,000+</p>
-                <p className="text-gray-600">Students Helped</p>
+                <p className="text-4xl font-bold text-blue-800">23 years</p>
+                <p className="text-gray-600">Providing Solutions</p>
               </div>
             </div>
           </div>
