@@ -42,7 +42,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="mailto:willi64645@gmail.com,test@gmail.com,test2@gmail.com"
+              href="mailto:willi64645@gmail.com"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
