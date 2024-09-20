@@ -51,10 +51,10 @@ const Home = () => {
           <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
-          Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
+          The <strong>most comprehensive solution repository</strong> for the Canadian Computing Competition.
         </p>
         <div className="flex space-x-4">
-          <Link to="/problems" className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg">
+          <Link to="/solutions" className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg">
             Explore Solutions
           </Link>
           <Link to="/forum" className="bg-white text-blue-900 font-bold py-3 px-6 rounded-lg">
