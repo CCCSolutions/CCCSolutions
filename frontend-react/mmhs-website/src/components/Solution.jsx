@@ -3,46 +3,45 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const Problem = ({ contestYear, problemCode }) => {
-  const [solution, setSolution] = useState("Loading...");
+  const [solutions, setSolutions] = useState([]); // Store multiple solutions
   const [testCases, setTestCases] = useState([]);
-  const [activeTab, setActiveTab] = useState(0); // To manage active tab
+  const [activeTab, setActiveTab] = useState(0); // To manage active test case tab
   const [actualProblemCode, setActualProblemCode] = useState(problemCode);
 
   useEffect(() => {
-    const fetchSolution = async () => {
+    const fetchSolutions = async () => {
       const alternativeCode = getAlternativeCode(problemCode);
-      let solutionText = null;
       let foundCode = problemCode;
+      const solutionsArray = [];
 
       for (const code of [problemCode, alternativeCode]) {
         if (!code) continue;
         const basePath = `/past_contests/${contestYear}/${code}`;
-        try {
-          const response = await fetch(`${basePath}/solution.txt`);
-          const text = await response.text();
-          if (!text.toLowerCase().includes("<!doctype html>")) {
-            solutionText = text;
-            foundCode = code;
-            break;
+
+        for (let i = 1; i <= 5; i++) { // Fetch up to solution5.txt
+          try {
+            const response = await fetch(`${basePath}/solution${i === 1 ? "" : i}.txt`);
+            const text = await response.text();
+            if (!text.toLowerCase().includes("<!doctype html>")) {
+              solutionsArray.push(text);
+              foundCode = code;
+            }
+          } catch (error) {
+            console.error(`Error fetching solution${i} for ${code}:`, error);
           }
-        } catch (error) {
-          console.error(`Error fetching solution for ${code}:`, error);
         }
       }
 
-      if (solutionText) {
-        setSolution(solutionText);
+      if (solutionsArray.length > 0) {
+        setSolutions(solutionsArray);
         setActualProblemCode(foundCode);
       } else {
-        setSolution(
-          "Solution does not currently exist. If you have a solution, please upload your solution along with commented explanation on our forum. Thank you!"
-        );
+        setSolutions([
+          "Solution does not currently exist. If you have a solution, please upload your solution along with commented explanation on our forum. Thank you!",
+        ]);
       }
     };
 
-
-    // i literally give up trying to make the test cases dynamic based on problems i can never get it to work
-    // if someone else wants to do that it would be much appreciated
     const fetchTestCases = async () => {
       const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
 
@@ -78,7 +77,7 @@ const Problem = ({ contestYear, problemCode }) => {
       return testCases;
     };
 
-    fetchSolution();
+    fetchSolutions();
     fetchTestCases();
   }, [contestYear, problemCode]);
 
@@ -92,79 +91,86 @@ const Problem = ({ contestYear, problemCode }) => {
   };
 
   const isValidTestCase = (testCase) =>
-    !testCase.toLowerCase().startsWith("<!doctype html>");
-return (
-  <div className="w-full p-8 rounded-lg bg-white shadow-md">
-    <h2 className="text-2xl font-semibold text-black mb-4">
-      {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
-    </h2>
+      !testCase.toLowerCase().startsWith("<!doctype html>");
 
-    {actualProblemCode !== problemCode && (
-      <p className="text-sm text-gray-600 mb-4">
-        Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
-        equivalent to {problemCode.toUpperCase()}.
-      </p>
-    )}
+  return (
+      <div className="w-full p-8 rounded-lg bg-white shadow-md">
+        {testCases.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-black mb-4">Test Cases:</h3>
+              <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
+                <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
+                  {testCases.map((_, idx) => (
+                      <button
+                          key={idx}
+                          onClick={() => setActiveTab(idx)}
+                          className={`px-4 py-2 flex-shrink-0 ${
+                              activeTab === idx
+                                  ? "bg-blue-800 text-white"
+                                  : "bg-gray-200 text-black"
+                          } rounded-lg`}
+                      >
+                        Case {idx + 1}
+                      </button>
+                  ))}
+                </div>
 
-    <div className="mb-6">
-      <h3 className="text-lg font-medium text-black mb-2">Solution:</h3>
-      <SyntaxHighlighter language="cpp" style={solarizedlight} showLineNumbers>
-        {solution}
-      </SyntaxHighlighter>
-    </div>
+                <div className="p-4 bg-white rounded-lg">
+                  {isValidTestCase(testCases[activeTab].input) &&
+                  isValidTestCase(testCases[activeTab].output) ? (
+                      <>
+                        <p className="text-black mb-2">
+                          <strong>Input:</strong>
+                        </p>
+                        <textarea
+                            className="w-full h-20 p-2 mb-4 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            readOnly
+                            value={testCases[activeTab].input}
+                        />
+                        <p className="text-black mb-2">
+                          <strong>Output:</strong>
+                        </p>
+                        <textarea
+                            className="w-full h-20 p-2 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            readOnly
+                            value={testCases[activeTab].output}
+                        />
+                      </>
+                  ) : (
+                      <p className="text-red-600 font-bold text-center">
+                        Test Case Not Available. If You Have Test Cases, Upload Them On The Forum
+                      </p>
+                  )}
+                </div>
+              </div>
+            </div>
+        )}
 
-    {testCases.length > 0 && (
-      <div className="mb-6">
-        <h3 className="text-lg font-medium text-black mb-4">Test Cases:</h3>
-        <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
-          <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
-            {testCases.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveTab(idx)}
-                className={`px-4 py-2 flex-shrink-0 ${
-                  activeTab === idx
-                    ? "bg-blue-800 text-white"
-                    : "bg-gray-200 text-black"
-                } rounded-lg`}
-              >
-                Case {idx + 1}
-              </button>
-            ))}
-          </div>
+        <h2 className="text-2xl font-semibold text-black mb-4">
+          {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
+        </h2>
 
-          <div className="p-4 bg-white rounded-lg">
-            {isValidTestCase(testCases[activeTab].input) &&
-            isValidTestCase(testCases[activeTab].output) ? (
-              <>
-                <p className="text-black mb-2">
-                  <strong>Input:</strong>
-                </p>
-                <textarea
-                  className="w-full h-20 p-2 mb-4 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  readOnly
-                  value={testCases[activeTab].input}
-                />
-                <p className="text-black mb-2">
-                  <strong>Output:</strong>
-                </p>
-                <textarea
-                  className="w-full h-20 p-2 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  readOnly
-                  value={testCases[activeTab].output}
-                />
-              </>
-            ) : (
-              <p className="text-red-600 font-bold text-center">
-                Test Case Not Available. If You Have Test Cases, Upload Them On The Forum
-              </p>
-            )}
-          </div>
+        {actualProblemCode !== problemCode && (
+            <p className="text-sm text-gray-600 mb-4">
+              Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
+              equivalent to {problemCode.toUpperCase()}.
+            </p>
+        )}
+
+        <div className="mb-6">
+          <h3 className="text-lg font-medium text-black mb-2">Solutions:</h3>
+          {solutions.map((solution, idx) => (
+              <div key={idx} className="mb-4">
+                <h4 className="text-md font-medium text-black mb-1">
+                  Solution {idx + 1}:
+                </h4>
+                <SyntaxHighlighter language="cpp" style={solarizedlight} showLineNumbers>
+                  {solution}
+                </SyntaxHighlighter>
+              </div>
+          ))}
         </div>
       </div>
-    )}
-  </div>
-);
+  );
 };
-
 export default Problem;

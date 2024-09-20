@@ -1,57 +1,99 @@
-// The "CCC2005s5PinballRanking" class.
-//
-// this is essentially a sorting problem
-// HOWEVER one can't use any sorting method. In
-// particular one can't use quick sort because each element
-// must be "inserted" into proper order, one at a time
-// so it's ranking can be determined. (The array is sorted
-// descending so that the rank = index.)
-//
-// This solution works but takes ~1:30 on a P4 1.2 Ghz machine, for 
-// the two worse data files 7 and 8. This could be solved by
-// first getting a rough sense of original order then sorting
-// the reverse way if necessary. But this smacks of cheating to me :-)
-//
-// This solution takes ~30 seconds on a P4 2.8 GHz machine, for 
-// the two worse data files 7 and 8.... So When Waterloo says 
-// "only 1 minute per test case" what is the base line machine?
-
-// For THIS solution, hardware (not software) determines the score !!!!
-
-
-import java.awt.*;
-import hsa.*;
-
-public class CCC2005s5PinballRanking
-{
-    static Console c;
-
-    public static void main (String[] args)
-    {
-	c = new Console ();
-	TextInputFile f = new TextInputFile ("s5.8.in");
-
-	int t, i, hold;
-	int[] s = new int [100001];
-	long sum = 0;
-
-	t = f.readInt ();
-	s [0] = Integer.MAX_VALUE;  // used as a sentinel so inner while
-				    // need not ask if i >= 0
-	for (int k = 1 ; k <= t ; k++)
-	{
-	    hold = f.readInt ();
-	    // use insertion sort: s decreasing
-	    i = k - 1;
-	    while (hold >= s [i])
-	    {
-		s [i + 1] = s [i];
-		i--;
-	    }
-	    s [i + 1] = hold;
-	    sum += i + 1;
-	}
-	double x = (double) (sum) / t;
-	c.println (x, 0, 2);
-    }
-}
+// The "CCC2005s5PinballRankingMerge" class.
+//
+// this solution is due to Sean Henderson of University of Toronto
+//
+// the insight is that rank for score x is essentially
+// the number of inversions from 0 to x (plus 1). An inversion
+// is when a[x] > a[y] when x < y.
+// so if the total inversions for the entire array is I
+// the average rankings is (I + N) / N
+//
+// The number of inversions of the array can be determined
+// by using merge sort. The idea is if you are merging
+// a[x,y) with a[y,z) then the number of inversions is the total
+// of the number of elements in a[x,y) each time one is taken
+// from a[y,z).
+//
+// For example suppose you were sorting:
+//  5 8 2 5 7 1
+//
+// after 1 pass it would be
+//  5 8 2 5 1 7 with a total = 1 because there was 1 case
+//              where the 7 and 1 were out of order
+//
+// on the second pass 5 8 and 2 5 are merged together
+// in this case the total = 2 (5 8 versus 2) plus 1
+// (for the 8 versus 5)
+// total inversions so far is 4, and the array looks like
+//  2 5 5 8 1 7
+//
+// on the last pass the total = 4 (2558 vs 1) plus 1
+// (for the 8 vs 7)
+// giving a grand total inversions of 9.
+//
+// the average rankings is then (9+6)/6 = 2.5
+//
+// this is correct because the rankings found normally are:
+// (1 + 1 + 3 + 2 + 2 + 6) / 6 = 2.5
+
+import java.awt.*;
+import hsa.*;
+
+public class CCC2005s5PinballRankingMerge
+{
+    static Console c;
+    static double I;
+
+    public static void main (String[] args)
+    {
+	c = new Console ();
+	TextInputFile f = new TextInputFile ("s5.9.in");
+	I = 0;
+	int[] a = new int [100001];
+
+	int n;
+	n = f.readInt ();
+	for (int x = 0 ; x < n ; x++)
+	    a [x] = f.readInt ();
+	mergeSort (a, 0, n - 1);
+	c.println ((I + n) / n, 0, 2);
+    }
+
+
+    // this is an inclusive a[x,z] merge sort
+    public static void mergeSort (int[] a, int x, int z)
+    {
+	if (x < z)
+	{
+	    int y = (x + z) / 2;
+	    mergeSort (a, x, y);
+	    mergeSort (a, y + 1, z);
+	    I += merge (a, x, y, z);
+	}
+    }
+
+
+    public static double merge (int[] a, int x, int y, int z)
+    {
+	int[] newa = new int [z - x + 1];
+	int xx = x;
+	int yy = y + 1;
+	int k = 0;
+	double total = 0;
+	while (xx <= y && yy <= z)
+	    if (a [xx] <= a [yy])
+		newa [k++] = a [xx++];
+	    else
+	    {
+		newa [k++] = a [yy++];
+		total = total + (y + 1 - xx);
+	    }
+	while (xx <= y)
+	    newa [k++] = a [xx++];
+	while (yy <= z)
+	    newa [k++] = a [yy++];
+	for (xx = x ; xx <= z ; xx++)
+	    a [xx] = newa [xx - x];
+	return total;
+    }
+}
