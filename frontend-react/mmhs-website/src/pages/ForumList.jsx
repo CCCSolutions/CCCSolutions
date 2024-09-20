@@ -5,27 +5,47 @@ import ClickableCard from '../components/ClickableCard.jsx';
 const ForumList = () => {
   const [forums, setForums] = useState([]);
 
-  useEffect(() => { 
+  useEffect(() => {
     axios.get('http://localhost:8000/forum/')
-      .then(response => setForums(response.data))
-      .catch(error => console.error('Error fetching data:', error));
+        .then(response => setForums(response.data))
+        .catch(error => console.error('Error fetching data:', error));
   }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-4xl font-bold text-center text-gray-800 mb-10">
-        Forums
-      </h1>
-        <div className="text-xl text-center">
-            This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would like to help finish the forum, feel free to check out https://github.com/Tankman61/mmhs-website and make a pull request.
+    return (
+        <div>
+          {/* Header section */}
+          <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+            <div className="container mx-auto flex flex-col items-center text-center">
+              <h1 className="text-5xl font-bold mb-4">Forums</h1>
+              <p className="text-xl max-w-2xl mb-5">
+                This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would
+                like
+                to help finish the forum, feel free to check out{' '}
+                <a href="https://github.com/Tankman61/mmhs-website" className="underline">
+                  https://github.com/Tankman61/mmhs-website
+                </a>{' '}
+                and make a pull request.
+              </p>
+            </div>
+          </div>
+
+          {/* Forums Grid */}
+          <div className="bg-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            {forums.length > 0 ? (
+                forums.map((forum) => (
+                    <ClickableCard
+                        key={forum.id}
+                        title={forum.title}
+                        description={forum.description}
+                        link={`forum/${forum.id}`}
+                    />
+                ))
+            ) : (
+                <p>No forums available at the moment.</p>
+            )}
+          </div>
         </div>
-      <div className="bg-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-          {forums.map(forum => (
-              <ClickableCard title={forum.title} description={forum.description} link={`forum/${forum.id}`}/>
-          ))}
-      </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default ForumList;
