@@ -74,8 +74,8 @@ const Home = () => {
         <div ref={contentRef} className="py-20 px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-16">
-              Find all CCC solutions{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-indigo-500 px-2 py-1 rounded text-blue-950">
+              Find CCC solutions{' '}
+              <span className="bg-gradient-to-r from-amber-400 to-yellow-500 px-2 py-1 rounded text-cyan">
             From 1996 To Present
           </span>
             </h2>
@@ -102,12 +102,12 @@ const Home = () => {
               ].map((feature, index) => (
                   <div key={index} className="relative group">
                     <div
-                        className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-65 group-hover:opacity-90 transition duration-1000"></div>
+                        className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"></div>
                     <div
                         className="relative bg-white/95 backdrop-blur-sm rounded-xl p-6 flex items-start space-x-4 transform transition duration-300 hover:scale-102 hover:shadow-md">
                       {feature.icon}
                       <div>
-                        <h3 className="text-xl font-semibold mb-2 bg-clip-text text-transparent bg-blue-900">
+                        <h3 className="text-xl font-semibold mb-2 bg-clip-text text-transparent bg-blue-800">
                           {feature.title}
                         </h3>
                         <p className="text-gray-700">{feature.content}</p>
@@ -119,7 +119,7 @@ const Home = () => {
             {/* Statistics */}
             <div className="relative group">
               <div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-65 group-hover:opacity-90 transition duration-1000"></div>
+                  className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"></div>
               <div
                   className="relative bg-white/95 backdrop-blur-sm rounded-xl p-4 flex justify-around transform transition duration-300 hover:scale-102 hover:shadow-md">
                 <div className="grid md:grid-cols-3 gap-16">
@@ -133,7 +133,7 @@ const Home = () => {
                   </div>
                   <div className="text-center p-3">
                     <p className="text-4xl font-bold text-blue-800">23 years</p>
-                    <p className="text-gray-600">Providing Solutions</p>
+                    <p className="text-gray-600">Providing Answers</p>
                   </div>
                 </div>
               </div>
