@@ -18,13 +18,6 @@ const ForumList = () => {
             <div className="container mx-auto flex flex-col items-center text-center">
               <h1 className="text-5xl font-bold mb-4">Forums</h1>
               <p className="text-xl max-w-2xl mb-5">
-                This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would
-                like
-                to help finish the forum, feel free to check out{' '}
-                <a href="https://github.com/Tankman61/mmhs-website" className="underline">
-                  https://github.com/Tankman61/mmhs-website
-                </a>{' '}
-                and make a pull request.
               </p>
             </div>
           </div>
@@ -41,7 +34,13 @@ const ForumList = () => {
                     />
                 ))
             ) : (
-                <p>No forums available at the moment.</p>
+                <p>                This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would
+                like
+                to help finish the forum, feel free to check out{' '}
+                <a href="https://github.com/Tankman61/mmhs-website" className="underline">
+                  https://github.com/Tankman61/mmhs-website
+                </a>{' '}
+                and make a pull request.</p>
             )}
           </div>
         </div>
