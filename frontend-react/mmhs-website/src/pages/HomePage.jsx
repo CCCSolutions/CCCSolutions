@@ -30,6 +30,12 @@ const FileTextIconWrapper = styled(IconWrapper)`
 
 const GithubIconWrapper = styled(IconWrapper)`
     background: linear-gradient(135deg, #333, #666);
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: linear-gradient(135deg, #2196F3, #42A5F5);
+        transform: scale(1.05);
+    }
 `;
 
 const Home = () => {
