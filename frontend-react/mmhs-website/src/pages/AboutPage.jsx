@@ -1,6 +1,4 @@
 import React from 'react';
-import JohnLiao from '../assets/john_liao.jpg';
-import WilliamYang from '../assets/william_yang.jpg';
 
   const contributors = [
     { initials: "AJ", name: "Amlesh Jayakumar", school: "Waterloo Collegiate Institute", contributions: "2008 S5: 2009 S4, S5: 2012 S4, 2014 S4" },
@@ -40,7 +38,10 @@ import WilliamYang from '../assets/william_yang.jpg';
     { initials: "WC", name: "Wonjohn Choi", school: "St. Francis Xavier S.S.", contributions: "2010 J5" },
     { initials: "WHL", name: "Wen-Hao Lue", school: "Bayview Glen Private School", contributions: "2007 J5: 2009 S4" },
     { initials: "YL", name: "Yikuan Li", school: "Don Mills Collegiate Institute", contributions: "2014 S4" },
-    { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" }
+    { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" },
+    { initials: "WY", name: "William Yang", school: "Milliken Mills High School", contributions: "Website Revamp Lead"},
+    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website Revamp"},
+    { initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "Website Revamp"}
   ];
 
 const About = () => {
@@ -70,11 +71,11 @@ const About = () => {
             }, {
               year: 2011,
               title: "Transition to Python",
-              content: "Solutions were transitioned to Python, continuing the legacy of comprehensive CCC solutions."
+              content: "Solutions were transitioned to be coded primarily in Python."
             }, {
               year: 2024,
               title: "Ongoing Contributions",
-              content: "The repository has been modernized with a new forum feature added for users to submit new solutions for C++, Python, and Java."
+              content: "The repository has been modernized with a new forum feature added for users to submit new solutions."
             }].map((item, index) => (
               <div key={index} className="flex items-center bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                 <div className="w-16 h-16 bg-blue-800 text-white rounded-full flex items-center justify-center text-2xl font-bold">
@@ -143,33 +144,7 @@ const About = () => {
         </div>
       </div>
 
-      {/* Revampers Section */}
-      <div className="bg-gray-50 py-16 px-4 border-t">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-7 text-blue-900">The Revamp Team</h2>
-          <div className="flex flex-wrap justify-center gap-8">
-            {[{
-              name: "William Yang",
-              school: "Milliken Mills H.S.",
-              image: WilliamYang
-            }, {
-              name: "Daniel Zhang",
-              school: "Pinetree S.S.",
-              image: "https://media.licdn.com/dms/image/v2/D4E03AQHWDwWmAWQXzQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721608220428?e=1730332800&v=beta&t=zSJan6bXI4Mb6vJH9YmQ9yODA4GEq1O-R3SfBZG9SGg"
-            }, {
-              name: "John Liao",
-              school: "Lo-Ellen Park S.S.",
-              image: JohnLiao
-            }].map((member, index) => (
-              <div key={index} className="w-64 flex flex-col items-center bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                <img src={member.image} alt={member.name} className="w-32 h-32 rounded-full mb-4 object-cover"/>
-                <h3 className="text-xl font-semibold">{member.name}</h3>
-                <p>{member.school}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
 
     </div>
   );

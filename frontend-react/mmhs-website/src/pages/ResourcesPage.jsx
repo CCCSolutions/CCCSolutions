@@ -94,7 +94,7 @@ const Resources = () => {
       link: 'https://tjsct.wikidot.com/',
     },
     {
-      title: 'Don Mills Online Judge (aka DMOJ: Modern Online Judge)',
+      title: 'Don Mills Online Judge (DMOJ: Modern Online Judge)',
       link: 'https://dmoj.ca/',
     },
     {
