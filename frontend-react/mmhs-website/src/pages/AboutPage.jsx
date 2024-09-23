@@ -33,7 +33,7 @@ import React from 'react';
     { initials: "VL", name: "Victor Liu", school: "Dr. Norman Bethune C.I.", contributions: "2010 S5" },
     { initials: "VW", name: "Victor Wang", school: "Tecumseh Elementary", contributions: "2013 S2" },
     { initials: "VS", name: "Vassili Skarine", school: "Northview Heights S.S.", contributions: "2003 S4, S5: 2002 S4" },
-    { initials: "VSi", name: "Vincent Siao", school: "St George's School", contributions: "S010 S3" },
+    { initials: "VS", name: "Vincent Siao", school: "St George's School", contributions: "S010 S3" },
     { initials: "WZ", name: "Weiwei Zhong", school: "Glenforest Secondary School", contributions: "2015 S3" },
     { initials: "WC", name: "Wonjohn Choi", school: "St. Francis Xavier S.S.", contributions: "2010 J5" },
     { initials: "WHL", name: "Wen-Hao Lue", school: "Bayview Glen Private School", contributions: "2007 J5: 2009 S4" },
@@ -51,7 +51,7 @@ const About = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
-          <h1 className="text-5xl font-bold mb-4">About MMHS</h1>
+          <h1 className="text-5xl font-bold mb-4">About CCCSolutions</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
             Learn more about our journey, from humble beginnings to a comprehensive platform offering CCC solutions
             since 1996.
