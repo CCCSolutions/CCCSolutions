@@ -79,11 +79,12 @@ const Home = () => {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
             Find CCC solutions{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-yellow-500 px-2 py-1 rounded text-cyan">
+            <span className="bg-gradient-to-r from-blue-400/70 to-indigo-800/70 px-2 py-1 rounded">
               From 1996 To Present
             </span>
           </h2>
 
+          {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-8 mb-10">
             {[
               {
