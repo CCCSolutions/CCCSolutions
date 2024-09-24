@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import BackgroundImage from '../assets/mmhs.jpg';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
 
 // Styled components
@@ -30,12 +29,17 @@ const FileTextIconWrapper = styled(IconWrapper)`
 
 const GithubIconWrapper = styled(IconWrapper)`
   background: linear-gradient(135deg, #333, #666);
-  transition: all 0.3s ease;
+  transition: background 0.5s ease, transform 0.3s ease; // Add transform transition
 
   &:hover {
-    background-color: #42A5F5; 
+    background: linear-gradient(135deg, #42A5F5, #1E88E5); 
+    transform: scale(1.03); // This should work now
+    z-index: 1; // Ensure it stays above other elements
   }
 `;
+
+
+
 
 const Home = () => {
   const contentRef = useRef(null);
@@ -53,8 +57,7 @@ const Home = () => {
     <div className="bg-gray-100">
       {/* Hero Section */}
       <div
-        className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
-        style={{backgroundImage: `url(${BackgroundImage})`}}
+          className="relative bg-gradient-to-r from-indigo-950 to-indigo-950 text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC
@@ -65,14 +68,14 @@ const Home = () => {
         </p>
         <div className="flex space-x-4">
           <Link
-            to="/solutions"
-            className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
+              to="/solutions"
+              className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
           >
             Explore Solutions
           </Link>
           <Link
-            to="/forum"
-            className="bg-gradient-to-r from-white to-gray-100 text-blue-900 font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
+              to="/forum"
+              className="bg-gradient-to-r from-white to-gray-100 text-blue-900 font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
           >
             Visit Forum
           </Link>
@@ -84,7 +87,7 @@ const Home = () => {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
             Find CCC solutions{' '}
-            <span className="bg-gradient-to-r from-blue-400/70 to-indigo-800/70 px-2 py-1 rounded">
+            <span className="bg-gradient-to-r from-yellow-400 to-amber-400 px-2 py-1 rounded">
               From 1996 To Present
             </span>
           </h2>
