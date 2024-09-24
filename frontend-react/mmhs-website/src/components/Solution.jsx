@@ -4,10 +4,8 @@ import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const Problem = ({ contestYear, problemCode }) => {
   const [solutions, setSolutions] = useState([]);
-  const [testCases, setTestCases] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
   const [actualProblemCode, setActualProblemCode] = useState(problemCode);
-  const [testCaseData, setTestCaseData] = useState({ input: "", output: "" });
 
   useEffect(() => {
     const fetchSolutions = async () => {
@@ -19,7 +17,7 @@ const Problem = ({ contestYear, problemCode }) => {
         if (!code) continue;
         const basePath = `/past_contests/${contestYear}/${code}`;
 
-        for (let i = 1; i <= 15; i++) {
+        for (let i = 1; i <= 5; i++) {
           try {
             const response = await fetch(`${basePath}/solution${i === 1 ? "" : i}.txt`);
             const text = await response.text();
@@ -46,22 +44,6 @@ const Problem = ({ contestYear, problemCode }) => {
     fetchSolutions();
   }, [contestYear, problemCode]);
 
-  const fetchTestCase = async (idx) => {
-    const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
-
-    try {
-      const inputResponse = await fetch(`${basePath}/${problemCode}.${idx + 1}.in`);
-      const outputResponse = await fetch(`${basePath}/${problemCode}.${idx + 1}.out`);
-
-      const inputText = inputResponse.ok ? await inputResponse.text() : "No input found";
-      const outputText = outputResponse.ok ? await outputResponse.text() : "No output found";
-
-      setTestCaseData({ input: inputText, output: outputText });
-    } catch (error) {
-      console.error(`Error fetching test case ${idx + 1}:`, error);
-    }
-  };
-
   const getAlternativeCode = (code) => {
     const mapping = {
       j5: contestYear >= 2016 ? "s2" : "s3",
@@ -70,14 +52,6 @@ const Problem = ({ contestYear, problemCode }) => {
     };
     return mapping[code.toLowerCase()];
   };
-
-  const handleTabClick = (idx) => {
-    setActiveTab(idx);
-    fetchTestCase(idx);
-  };
-
-  const isValidTestCase = (testCase) =>
-    !testCase.toLowerCase().startsWith("<!doctype html>");
 
   return (
     <div className="bg-gray-200 min-h-screen p-8">
@@ -92,52 +66,6 @@ const Problem = ({ contestYear, problemCode }) => {
             equivalent to {problemCode.toUpperCase()}.
           </p>
         )}
-
-        <div className="mb-6">
-          <h3 className="text-lg font-medium text-black mb-4">Test Cases:</h3>
-          <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
-            <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
-              {Array.from({ length: 30 }, (_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleTabClick(idx)}
-                  className={`px-4 py-2 flex-shrink-0 ${
-                    activeTab === idx ? "bg-blue-800 text-white" : "bg-gray-200 text-black"
-                  } rounded-lg`}
-                >
-                  Case {idx + 1}
-                </button>
-              ))}
-            </div>
-
-            <div className="p-4 bg-white rounded-lg">
-              {isValidTestCase(testCaseData.input) && isValidTestCase(testCaseData.output) ? (
-                <>
-                  <p className="text-black mb-2">
-                    <strong>Input:</strong>
-                  </p>
-                  <textarea
-                    className="w-full h-20 p-2 mb-4 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    readOnly
-                    value={testCaseData.input}
-                  />
-                  <p className="text-black mb-2">
-                    <strong>Output:</strong>
-                  </p>
-                  <textarea
-                    className="w-full h-20 p-2 bg-gray-100 text-black border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    readOnly
-                    value={testCaseData.output}
-                  />
-                </>
-              ) : (
-                <p className="text-red-600 font-bold text-center">
-                  Test Case Not Available. If You Have Test Cases, Upload Them On The Forum
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
 
         <div className="mb-6">
           <h3 className="text-lg font-medium text-black mb-2">Solutions:</h3>
