@@ -29,12 +29,12 @@ const FileTextIconWrapper = styled(IconWrapper)`
 
 const GithubIconWrapper = styled(IconWrapper)`
   background: linear-gradient(135deg, #333, #666);
-  transition: background 0.5s ease, transform 0.3s ease; // Add transform transition
+  transition: background 0.5s ease, transform 0.3s ease;  
 
   &:hover {
     background: linear-gradient(135deg, #42A5F5, #1E88E5); 
-    transform: scale(1.03); // This should work now
-    z-index: 1; // Ensure it stays above other elements
+    transform: scale(1.03); 
+    z-index: 1;  
   }
 `;
 
@@ -47,7 +47,7 @@ const Home = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount((prevCount) => (prevCount < 10000 ? prevCount + 100 : 10000));
+      setCount((prevCount) => (prevCount < 1000 ? prevCount + 10 : 1000));
     }, 20);
 
     return () => clearInterval(interval);
@@ -57,10 +57,10 @@ const Home = () => {
     <div className="bg-gray-100">
       {/* Hero Section */}
       <div
-          className="relative bg-gradient-to-r from-indigo-950 to-indigo-950 text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
+          className="relative bg-gradient-to-r from-blue-800 to-indigo-900 text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC
+          <span className="text-blue-400 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC
           Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
@@ -69,7 +69,7 @@ const Home = () => {
         <div className="flex space-x-4">
           <Link
               to="/solutions"
-              className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
+              className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
           >
             Explore Solutions
           </Link>
