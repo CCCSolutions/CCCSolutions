@@ -34,13 +34,14 @@ const ForumList = () => {
                     />
                 ))
             ) : (
-                <p>                This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would
-                like
+                <div className="col-span-full text-center">
+                <p>                This Version Does Not Have Forums: Contact willi64645@gmail.com for solutions/test-cases. If you would like
                 to help finish the forum, feel free to check out{' '}
                 <a href="https://github.com/Tankman61/mmhs-website" className="underline">
                   https://github.com/Tankman61/mmhs-website
                 </a>{' '}
-                and make a pull request.</p>
+                and submit a pull request.</p>
+                </div>
             )}
           </div>
         </div>
