@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
+import { Helmet } from 'react-helmet';
 
 // Styled components
 const IconWrapper = styled.div`
@@ -55,6 +56,13 @@ const Home = () => {
 
   return (
     <div className="bg-gray-100">
+      {/* Helmet for SEO */}
+      <Helmet>
+        <meta name="keywords" content="
+          CCC Solutions, Canadian Computing Competition, Competitive Programming, Problem Solving, Algorithms, Data Structures, Programming Contests, Code Challenges, Solution Discussions, Forum, Programming Tutorials, Code Snippets, User Contributions, Problem Analysis, Practice Problems, Resources, CCC Resources, Discussion Threads, Community Support, Programming Languages, C++, Python, Java, Solutions Archive, CCC Solution Repository, Canadian Computing Competition Solutions, CCC Preparation, CCC Strategies, CCC Tips and Tricks, CCC Student Resources, CCC Past Problems, CCC Contest Solutions
+        " />
+        <title>Home | CCC Solution Repository</title>
+      </Helmet>
       {/* Hero Section */}
       <div
           className="relative bg-gradient-to-r from-blue-800 to-indigo-900 text-white min-h-screen flex flex-col justify-center items-center text-center px-4"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Helmet } from "react-helmet";
 
 const Problem = ({ contestYear, problemCode }) => {
   const [solutions, setSolutions] = useState([]);
@@ -86,8 +87,15 @@ const Problem = ({ contestYear, problemCode }) => {
   const isValidTestCase = (testCase) =>
     !testCase.toLowerCase().startsWith("<!doctype html>");
 
+  const keywords = `CCC ${actualProblemCode} Solution, CCC ${problemCode}`;
+
   return (
     <div className="bg-gray-200 min-h-screen p-8">
+      {/*Keywords for SEO*/}
+      <Helmet>
+        <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
+        <meta name="keywords" content={keywords} />
+      </Helmet>
       <div className="w-full p-8 rounded-lg bg-white shadow-md">
         <h2 className="text-2xl font-semibold text-black mb-4">
           {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
