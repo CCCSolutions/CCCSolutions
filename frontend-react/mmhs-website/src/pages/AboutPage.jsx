@@ -96,8 +96,8 @@ const About = () => {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-6 text-blue-900">A Special Thanks</h2>
           <p className="text-lg text-center mb-8 max-w-2xl m-auto">
-            We are incredibly grateful for two teachers from MMHS who have been key in creating and maintaining this
-            website. Enjoy your retirement!
+            We are incredibly grateful for two teachers from MMHS who have been instrumental in the initial development,
+            maintenance, and solution creation for this website. Enjoy your retirement!
           </p>
           <div className="flex flex-wrap justify-center gap-8">
             {[{
