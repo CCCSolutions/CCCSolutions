@@ -2,7 +2,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  from = "https://www.cccsolutions.netlify.app/*"
-  to = "https://cccsolutions.ca"
-  status = 301
-  force = true
