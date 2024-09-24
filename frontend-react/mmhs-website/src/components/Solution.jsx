@@ -46,6 +46,13 @@ const Problem = ({ contestYear, problemCode }) => {
     fetchSolutions();
   }, [contestYear, problemCode]);
 
+  useEffect(() => {
+    document.title = `Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`;
+    return () => {
+      document.title = "CCCSolutions";
+    };
+  }, [contestYear, actualProblemCode]);
+
   const fetchTestCase = async (idx) => {
     const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
 
