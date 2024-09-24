@@ -51,7 +51,7 @@ const About = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
-          <h1 className="text-5xl font-bold mb-4">About CCCSolutions</h1>
+          <h1 className="text-5xl font-bold mb-4">About CCC Solutions</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
             Learn more about our journey, from humble beginnings to a comprehensive platform offering CCC solutions
             since 1996.
