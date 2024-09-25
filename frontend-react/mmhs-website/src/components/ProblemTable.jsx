@@ -81,11 +81,11 @@ const ProblemsTable = ({ problems }) => {
                 <div className="relative group">
                   <Info className="w-4 h-4 text-gray-500 cursor-pointer" />
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-slate-200 rounded z-10 whitespace-nowrap">
-                    <div className="mb-1"><strong>Easy</strong> - Simple syntax</div>
-                    <div className="mb-1"><strong>Normal</strong> - Typical problem</div>
-                    <div className="mb-1"><strong>Hard</strong> - Requires some thinking</div>
-                    <div className="mb-1"><strong>Insane</strong> - Deep observation</div>
-                    <div><strong>Wicked</strong> - Almost impossible</div>
+                    <div className="mb-1"><strong>Easy</strong> - an average grade 11 student should get this</div>
+                    <div className="mb-1"><strong>Normal</strong> - an average grade 12 student should get this</div>
+                    <div className="mb-1"><strong>Hard</strong> - a good grade 12 student MIGHT get this</div>
+                    <div className="mb-1"><strong>Insane</strong> - the best grade 12 student MIGHT get this, given enough time</div>
+                    <div><strong>Wicked</strong> - the teacher will get this after many days, or maybe never :-)</div>
                   </div>
                 </div>
               </div>
