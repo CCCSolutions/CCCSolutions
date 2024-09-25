@@ -20,7 +20,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="https://github.com/Tankman61/mmhs-website"
+              href="https://github.com/Tankman61/CCCSolutions"
               target="_blank"
               rel="noopener noreferrer"
               color="blue-gray"
