@@ -91,10 +91,14 @@ const Problem = ({ contestYear, problemCode }) => {
 
   return (
     <div className="bg-gray-200 min-h-screen p-8">
-      {/*Keywords for SEO*/}
+      {/*Keywords for SEO + meta tags*/}
       <Helmet>
         <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
-        <meta name="keywords" content={keywords} />
+        <meta name="keywords" content={keywords}/>
+        <meta property="og:title" content={`Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`}/>
+        <meta property="og:description"
+              content="The most comprehensive solution repository for the Canadian Computing Competition, with solutions to the CCC from 1996 to present."/>
+        <meta property="og:url" content={window.location.href}/>
       </Helmet>
       <div className="w-full p-8 rounded-lg bg-white shadow-md">
         <h2 className="text-2xl font-semibold text-black mb-4">
@@ -102,8 +106,8 @@ const Problem = ({ contestYear, problemCode }) => {
         </h2>
 
         {actualProblemCode !== problemCode && (
-          <p className="text-sm text-gray-600 mb-4">
-            Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
+            <p className="text-sm text-gray-600 mb-4">
+              Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
             equivalent to {problemCode.toUpperCase()}.
           </p>
         )}
