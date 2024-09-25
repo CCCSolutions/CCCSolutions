@@ -94,6 +94,7 @@ const Problem = ({ contestYear, problemCode }) => {
       {/*Keywords for SEO + meta tags*/}
       <Helmet>
         <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
+        <meta name="theme-color" content="#1e3a8a"/>
         <meta name="keywords" content={keywords}/>
         <meta property="og:title" content={`Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`}/>
         <meta property="og:description"
