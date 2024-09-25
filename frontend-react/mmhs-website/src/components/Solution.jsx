@@ -147,7 +147,7 @@ const Problem = ({ contestYear, problemCode }) => {
                 </>
               ) : (
                 <p className="text-red-600 font-bold text-center">
-                  Test Case Irretrievable Or Not Available.
+                  Test case irretrievable or unavailable
                 </p>
               )}
             </div>
