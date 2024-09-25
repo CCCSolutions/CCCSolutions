@@ -94,12 +94,12 @@ const Problem = ({ contestYear, problemCode }) => {
       {/*Keywords for SEO + meta tags*/}
       <Helmet>
         <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
-        <meta name="theme-color" content="#1e3a8a"/>
         <meta name="keywords" content={keywords}/>
         <meta property="og:title" content={`Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`}/>
         <meta property="og:description"
               content="The most comprehensive solution repository for the Canadian Computing Competition, with solutions to the CCC from 1996 to present."/>
         <meta property="og:url" content={window.location.href}/>
+        <meta name="theme-color" content="#1e3a8a"/>
       </Helmet>
       <div className="w-full p-8 rounded-lg bg-white shadow-md">
         <h2 className="text-2xl font-semibold text-black mb-4">
