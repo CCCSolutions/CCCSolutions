@@ -12,7 +12,7 @@ const ForumList = () => {
   }, []);
 
     return (
-        <div>
+        <div className="min-h-screen flex-col">
           {/* Header section */}
           <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
             <div className="container mx-auto flex flex-col items-center text-center">
