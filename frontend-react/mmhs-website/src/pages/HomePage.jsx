@@ -59,7 +59,7 @@ const Home = () => {
       {/* Helmet for SEO */}
       <Helmet>
         <meta name="keywords" content="
-          CCC Solutions, Canadian Computing Competition, Competitive Programming, Problem Solving, Algorithms, Data Structures, Programming Contests, Code Challenges, Solution Discussions, Forum, Programming Tutorials, Code Snippets, User Contributions, Problem Analysis, Practice Problems, Resources, CCC Resources, Discussion Threads, Community Support, Programming Languages, C++, Python, Java, Solutions Archive, CCC Solution Repository, Canadian Computing Competition Solutions, CCC Preparation, CCC Strategies, CCC Tips and Tricks, CCC Student Resources, CCC Past Problems, CCC Contest Solutions
+          CCC Solutions, University of Waterloo, Canadian Computing Competition, Competitive Programming, Problem Solving, Algorithms, Data Structures, Programming Contests, Code Challenges, Solution Discussions, Forum, Programming Tutorials, Code Snippets, User Contributions, Problem Analysis, Practice Problems, Resources, CCC Resources, Discussion Threads, Community Support, Programming Languages, C++, Python, Java, Solutions Archive, CCC Solution Repository, Canadian Computing Competition Solutions, CCC Preparation, CCC Strategies, CCC Tips and Tricks, CCC Student Resources, CCC Past Problems, CCC Contest Solutions
         " />
         <title>Home | CCC Solution Repository</title>
       </Helmet>
