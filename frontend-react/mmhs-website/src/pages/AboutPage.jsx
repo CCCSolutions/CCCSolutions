@@ -1,4 +1,6 @@
 import React from 'react';
+import JohnLiao from '../assets/john_liao.jpg';
+import WilliamYang from '../assets/william_yang.jpg';
 
   const contributors = [
     { initials: "AJ", name: "Amlesh Jayakumar", school: "Waterloo Collegiate Institute", contributions: "2008 S5: 2009 S4, S5: 2012 S4, 2014 S4" },
@@ -33,15 +35,12 @@ import React from 'react';
     { initials: "VL", name: "Victor Liu", school: "Dr. Norman Bethune C.I.", contributions: "2010 S5" },
     { initials: "VW", name: "Victor Wang", school: "Tecumseh Elementary", contributions: "2013 S2" },
     { initials: "VS", name: "Vassili Skarine", school: "Northview Heights S.S.", contributions: "2003 S4, S5: 2002 S4" },
-    { initials: "VS", name: "Vincent Siao", school: "St George's School", contributions: "S010 S3" },
+    { initials: "VSi", name: "Vincent Siao", school: "St George's School", contributions: "S010 S3" },
     { initials: "WZ", name: "Weiwei Zhong", school: "Glenforest Secondary School", contributions: "2015 S3" },
     { initials: "WC", name: "Wonjohn Choi", school: "St. Francis Xavier S.S.", contributions: "2010 J5" },
     { initials: "WHL", name: "Wen-Hao Lue", school: "Bayview Glen Private School", contributions: "2007 J5: 2009 S4" },
     { initials: "YL", name: "Yikuan Li", school: "Don Mills Collegiate Institute", contributions: "2014 S4" },
-    { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" },
-    { initials: "WY", name: "William Yang", school: "Milliken Mills High School", contributions: "Website Revamp Lead"},
-    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website Revamp"},
-    { initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "Website Revamp"}
+    { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" }
   ];
 
 const About = () => {
@@ -51,9 +50,9 @@ const About = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
-          <h1 className="text-5xl font-bold mb-4">About CCC Solutions</h1>
+          <h1 className="text-5xl font-bold mb-4">About MMHS</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
-            Learn more about our journey, from humble beginnings to a comprehensive platform offering CCC solutions
+            Learn more about our journey in becoming a comprehensive platform offering CCC solutions
             since 1996.
           </p>
         </div>
@@ -61,7 +60,7 @@ const About = () => {
 
       {/* Timeline Section */}
       <div className="bg-white py-16 px-4 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto px-8">
           <h2 className="text-4xl font-bold text-center mb-10 text-blue-900">Our Journey</h2>
           <div className="space-y-8">
             {[{
@@ -71,11 +70,11 @@ const About = () => {
             }, {
               year: 2011,
               title: "Transition to Python",
-              content: "Solutions were transitioned to be coded primarily in Python."
+              content: "Solutions were transitioned to Python, continuing the legacy of comprehensive CCC solutions."
             }, {
               year: 2024,
               title: "Ongoing Contributions",
-              content: "The repository has been modernized with a new forum feature added for users to submit new solutions."
+              content: "The repository has been modernized with a new forum feature added for users to submit new solutions for C++, Python, and Java."
             }].map((item, index) => (
               <div key={index} className="flex items-center bg-gray-50 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                 <div className="w-16 h-16 bg-blue-800 text-white rounded-full flex items-center justify-center text-2xl font-bold">
@@ -96,8 +95,8 @@ const About = () => {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-6 text-blue-900">A Special Thanks</h2>
           <p className="text-lg text-center mb-8 max-w-2xl m-auto">
-            We are incredibly grateful for two teachers from MMHS who have been instrumental in the initial development,
-            maintenance, and solution creation for this website. Enjoy your retirement!
+            We are incredibly grateful for two teachers from MMHS who have been key in creating and maintaining this
+            website. Enjoy your retirement!
           </p>
           <div className="flex flex-wrap justify-center gap-8">
             {[{
@@ -127,7 +126,7 @@ const About = () => {
             We are grateful for the following individuals who have helped contribute solutions to
             this website:
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 m-8">
             {contributors.map((contributor, index) => (
               <div key={index} className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
                 <div className="flex items-center mb-2">
@@ -144,7 +143,33 @@ const About = () => {
         </div>
       </div>
 
-
+      {/* Revampers Section */}
+      <div className="py-16 px-4 border-t bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-7 text-blue-900">The Revamp Team</h2>
+          <div className="flex flex-wrap justify-center gap-8">
+            {[{
+              name: "William Yang",
+              school: "Milliken Mills H.S.",
+              image: WilliamYang
+            }, {
+              name: "Daniel Zhang",
+              school: "Pinetree S.S.",
+              image: "https://media.licdn.com/dms/image/v2/D4E03AQHWDwWmAWQXzQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721608220428?e=1730332800&v=beta&t=zSJan6bXI4Mb6vJH9YmQ9yODA4GEq1O-R3SfBZG9SGg"
+            }, {
+              name: "John Liao",
+              school: "Lo-Ellen Park S.S.",
+              image: JohnLiao
+            }].map((member, index) => (
+              <div key={index} className="w-64 flex flex-col items-center bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+                <img src={member.image} alt={member.name} className="w-32 h-32 rounded-full mb-4 object-cover"/>
+                <h3 className="text-xl font-semibold">{member.name}</h3>
+                <p>{member.school}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
     </div>
   );

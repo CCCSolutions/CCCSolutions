@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
+import BackgroundImage from '../assets/mmhs.jpg'
 
 // Styled components
 const IconWrapper = styled.div`
@@ -55,7 +56,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100">
+    <div>
       {/* Helmet for SEO */}
       <Helmet>
         <meta name="keywords" content="
@@ -63,31 +64,28 @@ const Home = () => {
         " />
         <title>Home | CCC Solution Repository</title>
       </Helmet>
+
+      <div className="bg-gray-100">
       {/* Hero Section */}
       <div
-          className="relative bg-gradient-to-r from-blue-800 to-indigo-900 text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
+        className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
+        style={{ backgroundImage: `url(${BackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          <span className="text-blue-400 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC
-          Solutions
+          <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
-          The <strong>most comprehensive solution repository</strong> for the Canadian Computing Competition.
+          Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
         </p>
         <div className="flex space-x-4">
-          <Link
-              to="/solutions"
-              className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
-          >
+          <Link to="/solutions" className="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg">
             Explore Solutions
           </Link>
-          <Link
-              to="/forum"
-              className="bg-gradient-to-r from-white to-gray-100 text-blue-900 font-bold py-3 px-6 rounded-lg transition transform duration-300 hover:scale-102 hover:shadow-md"
-          >
+          <Link to="/forum" className="bg-white text-indigo-600 font-bold py-3 px-6 rounded-lg">
             Visit Forum
           </Link>
         </div>
+      </div>
       </div>
 
       {/* Content Section */}
@@ -101,7 +99,7 @@ const Home = () => {
           </h2>
 
           {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-8 mb-10">
+          <div className="grid md:grid-cols-3 gap-8 mb-10 m-16">
             {[
               {
                 title: 'Interactive Forum',
@@ -115,7 +113,7 @@ const Home = () => {
               },
               {
                 title: 'Open Source',
-                content: 'Check out our GitHub repository. Feel free to contribute and suggest improvements.',
+                content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
                 icon: <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
                   <GithubIconWrapper><GithubOutlined/></GithubIconWrapper>
                 </a>,
@@ -141,7 +139,7 @@ const Home = () => {
           </div>
 
           {/* Statistics */}
-          <div className="relative group">
+          <div className="relative group mx-16">
             <div
                 className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
             ></div>
