@@ -117,7 +117,7 @@ const ProblemsTable = ({ problems }) => {
                 <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
                   <a
                     href={problem.link}
-                    className="truncate text-blue-600 hover:underline"
+                    className="truncate text-blue-600 font-semibold hover:underline"
                     style={{ maxWidth: '20rem' }}
                   >
                     {problem.name}
