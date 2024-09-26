@@ -115,7 +115,7 @@ const Home = () => {
               },
               {
                 title: 'Open Source',
-                content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
+                content: 'Check out our GitHub repository. Feel free to contribute and suggest improvements.',
                 icon: <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
                   <GithubIconWrapper><GithubOutlined/></GithubIconWrapper>
                 </a>,
