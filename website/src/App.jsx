@@ -10,6 +10,7 @@ import FooterWithLogo from "./components/Footer.jsx";
 import About from "./pages/AboutPage.jsx";
 import Forum from "./pages/ForumsPage.jsx";
 import PostPage from "./pages/PostPage.jsx";
+import AuthForm from "./components/Login.jsx";
 import CreatePost from "./pages/CreatePostPage.jsx";
 import Resources from "./pages/ResourcesPage.jsx";
 
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/forum" element={<Forum/>} />
             <Route path="/forum/:id" element={<PostPage />} />
             <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/login" element={<AuthForm />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

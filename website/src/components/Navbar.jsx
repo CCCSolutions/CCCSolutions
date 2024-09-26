@@ -4,7 +4,7 @@ import logoImage from '../assets/mmhs_logo.png';
 
 const Navbar = () => {
   return (
-    <nav className="bg-white p-4 shadow-lg">
+    <nav className="bg-white p-6 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <img

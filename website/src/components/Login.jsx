@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
-export default function AuthForm({ onLoginSuccess }) {
+export default function AuthForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -24,7 +24,6 @@ export default function AuthForm({ onLoginSuccess }) {
         const authData = await pb.collection('users').authWithPassword(username, password);
         console.log(authData);
         setSuccess('Login successful!');
-        onLoginSuccess(); // Notify parent component of successful login
         navigate('/forum'); // Redirect to the forum page after login
       } else {
         // Registration logic
@@ -42,7 +41,6 @@ export default function AuthForm({ onLoginSuccess }) {
         // Automatically log in the newly created user
         const authData = await pb.collection('users').authWithPassword(username, password);
         console.log(authData);
-        onLoginSuccess(); // Notify parent component of successful login
         navigate('/forum'); // Redirect to the forum page after login
       }
     } catch (error) {
