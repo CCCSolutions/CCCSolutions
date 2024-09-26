@@ -120,7 +120,7 @@ const Resources = () => {
         <div className="container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Resources</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
-            A list of resources for CCC preparation
+            A list of useful resources to prepare for the CCC.
           </p>
         </div>
       </div>

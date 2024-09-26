@@ -69,7 +69,7 @@ const ProblemsTable = ({ problems }) => {
   };
 
   return (
-    <div className="light-mode overflow-x-auto m-8">
+    <div className="light-mode overflow-x-auto m-8 px-8">
       <table className="w-full text-gray-700 bg-white">
         <thead>
           <tr className="bg-gray-100 border-b border-gray-200">
