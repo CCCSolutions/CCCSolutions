@@ -115,6 +115,7 @@ const Resources = () => {
 
   return (
     <div className="bg-gray-100">
+      <title>Resources</title>
       {/* Hero Section with Gradient */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">

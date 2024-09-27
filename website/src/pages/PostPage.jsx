@@ -97,6 +97,7 @@ export default function PostPage() {
 
   return (
     <div className="container mx-auto p-6">
+      <title>New Post</title>
       <Link to="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
 
       <div className="bg-white shadow-md p-6 rounded-lg">

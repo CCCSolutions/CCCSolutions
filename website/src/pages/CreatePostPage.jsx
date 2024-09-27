@@ -52,32 +52,33 @@ export default function CreatePost() {
   };
 
   return (
-    <div className='m-16'>
+      <div className='m-16'>
+        <title>Create Post</title>
         <h2 className='text-2xl mb-4'>New Post</h2>
-        
+
         {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error message */}
-        
+
         <form onSubmit={handleCreatePost} className="space-y-2">
           <input
-            type="text"
-            value={newPostTitle}
-            onChange={(e) => setNewPostTitle(e.target.value)}
-            placeholder="Post Title"
-            className="w-full p-2 border rounded"
-            required
+              type="text"
+              value={newPostTitle}
+              onChange={(e) => setNewPostTitle(e.target.value)}
+              placeholder="Post Title"
+              className="w-full p-2 border rounded"
+              required
           />
           <textarea
-            value={newPostBody}
-            onChange={(e) => setNewPostBody(e.target.value)}
-            placeholder="Post Body"
-            className="w-full p-2 border rounded"
-            rows="3"
-            required
+              value={newPostBody}
+              onChange={(e) => setNewPostBody(e.target.value)}
+              placeholder="Post Body"
+              className="w-full p-2 border rounded"
+              rows="3"
+              required
           />
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
             Create Post
           </button>
         </form>
-    </div>
+      </div>
   );
 }

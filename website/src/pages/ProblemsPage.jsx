@@ -385,6 +385,7 @@ const problems = [
 const Solutions = () => {
   return (
     <div>
+		<title>Solutions</title>
 		<div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
 			<div className="container mx-auto text-center">
 				<h1 className="text-5xl font-bold mb-4">Curated Solutions</h1>

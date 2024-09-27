@@ -51,6 +51,7 @@ export default function ForumPage() {
 
   return (
     <div>
+      <title>Forums</title>
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white p-12 flex justify-between items-center">
         <div className="container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
