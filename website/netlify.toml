@@ -1,5 +1,15 @@
-[[redirects]]
-  from = "/*"
+[[
+redirects
+]]
+  from = "https://cccsolutions.netlify.app/*"
   to = "https://cccsolutions.ca/:splat"
   status = 301
   force = true
+
+# Serve index.html for all routes on Netlify subdomain (for single-page applications)
+[[
+redirects
+]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
