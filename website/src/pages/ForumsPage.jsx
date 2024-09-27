@@ -107,7 +107,7 @@ export default function ForumPage() {
         ) : (
           <div className="space-y-4">
             {posts.map(post => (
-              <div key={post.id} className="border p-4 rounded shadow-md transition hover:shadow-lg">
+              <div key={post.id} className="border p-4 rounded shadow-md transition hover:shadow-lg bg-white">
                 <h2 className="text-xl font-semibold">
                   <Link to={`/forum/${post.id}`} className="hover:underline">
                     {post.title}
