@@ -17,16 +17,16 @@ import Resources from "./pages/ResourcesPage.jsx";
 const App = () => {
   return (
     <Router>
-      <div className="app-container">
+      <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main>
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/solutions" element={<Solutions />} />
             <Route path="/contest/:contestYear/:problemCode" element={<ProblemWrapper />} />
-            <Route path="/about" element = {<About />} />
-            <Route path="/resources" element = {<Resources />} />
-            <Route path="/forum" element={<Forum/>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/forum" element={<Forum />} />
             <Route path="/forum/:id" element={<PostPage />} />
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/login" element={<AuthForm />} />
@@ -44,15 +44,5 @@ const ProblemWrapper = () => {
   const { contestYear, problemCode } = useParams();
   return <Problem contestYear={contestYear} problemCode={problemCode} />;
 };
-
-const ForumWrapper = () => {
-  const { forumId } = useParams();
-  return <Forum forumId={forumId}/>;
-}
-
-const ThreadWrapper = () => {
-  const { forumId } = useParams();
-  return <Thread forumId={forumId}/>;
-}
 
 export default App;
