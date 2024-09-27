@@ -1,10 +1,5 @@
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "https://cccsolutions.netlify.app/*"
   to = "https://cccsolutions.ca/:splat"
   status = 301
   force = true

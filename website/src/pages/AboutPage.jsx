@@ -39,9 +39,9 @@ import React from 'react';
     { initials: "WHL", name: "Wen-Hao Lue", school: "Bayview Glen Private School", contributions: "2007 J5: 2009 S4" },
     { initials: "YL", name: "Yikuan Li", school: "Don Mills Collegiate Institute", contributions: "2014 S4" },
     { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" },
-    { initials: "WY", name: "William Yang", school: "Milliken Mills High School", contributions: "website revamp"},
-    { initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "website revamp"},
-    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "website revamp"}
+    { initials: "WY", name: "William Yang", school: "Milliken Mills High School", contributions: "Website revamp"},
+    { initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "Website revamp"},
+    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website revamp"}
   ];
 
 const About = () => {
