@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
 export default function ForumPage() {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('new');
-  const [user, setUser] = useState(null); // Add user state
+  const [user, setUser] = useState(pb.authStore.model);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const loggedInUser = pb.authStore.model;
-    setUser(loggedInUser);
-
     fetchPosts();
   }, [sortBy]);
 
   const fetchPosts = async () => {
     try {
-      setLoading(true); // Start loading
+      setLoading(true);
       const sortField = sortBy === 'new' ? '-created' : '-upvotes';
       const resultList = await pb.collection('posts').getList(1, 50, {
         sort: sortField,
@@ -33,7 +28,7 @@ export default function ForumPage() {
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
-      setLoading(false); // Stop loading when done
+      setLoading(false);
     }
   };
 
@@ -43,15 +38,19 @@ export default function ForumPage() {
       const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
 
       await pb.collection('posts').update(postId, { upvotes: updatedVotes });
-      fetchPosts(); // Refresh posts after voting
+      fetchPosts();
     } catch (error) {
       console.error('Error voting on post:', error);
     }
   };
 
+  const handleLogout = () => {
+    pb.authStore.clear();
+    setUser(null);
+  };
+
   return (
     <div>
-      {/* Header section with "Logged in as" */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white p-12 flex justify-between items-center">
         <div className="container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
@@ -62,15 +61,24 @@ export default function ForumPage() {
       </div>
 
       <div className="text-right pr-12 pt-8">
-          {user ? (
-            <p className="text-sm">Logged in as <span className="font-semibold">{user.username}</span> | <span className="cursor-pointer underline" onClick={() => pb.authStore.clear()}>Logout</span></p>
-          ) : (
-            <p className="text-sm italic">Not logged in | <span className="cursor-pointer underline" onClick={() => navigate('/login')}>Login</span></p>
-          )}
+        {user ? (
+          <p className="text-sm">
+            Logged in as <span className="font-semibold">{user.username}</span> |{' '}
+            <span className="cursor-pointer underline" onClick={handleLogout}>
+              Logout
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm italic">
+            Not logged in |{' '}
+            <span className="cursor-pointer underline" onClick={() => navigate('/login')}>
+              Login
+            </span>
+          </p>
+        )}
       </div>
 
       <div className="p-12">
-        {/* Sorting and Create Post button */}
         <div className="flex justify-between mb-4">
           <div className="flex items-center">
             <span className="mr-4">Sort by:</span>
@@ -93,7 +101,6 @@ export default function ForumPage() {
           </Link>
         </div>
 
-        {/* Loading indicator */}
         {loading ? (
           <div className="text-center">Loading posts...</div>
         ) : (
@@ -108,7 +115,7 @@ export default function ForumPage() {
                 <p className="text-gray-600">{post.body.substring(0, 100)}...</p>
                 <div className="mt-2 flex justify-between items-center">
                   <span className="text-sm text-gray-500">
-                    By {post.expand?.author || 'Unknown'} on {new Date(post.created).toLocaleDateString()}
+                    By {post.expand?.author?.username || 'Unknown'} on {new Date(post.created).toLocaleDateString()}
                   </span>
                   <div className="flex items-center space-x-2">
                     <button onClick={() => handleVote(post.id, 'upvote')} className="text-green-500">▲</button>
