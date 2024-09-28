@@ -1,0 +1,59 @@
+// CCC 2017 Senior 3: Nailed It!
+
+// by John Liao, Lo-Ellen Park S.S.
+
+// The basic idea of this solution is to loop through all the possible heights (2 to 4000) and count the lengths.
+// This solution is possible given the fact that there is a limit of 2000 on the height of the boards. 
+// To count the boards with height h, you must consider the pairs (1, h - 1), (2, h - 2), ....
+
+// Runtime: technically O(1), but it's a high constant
+// Memory: O(N)
+
+#include<iostream>
+#include<vector>
+#include<cmath>
+
+using namespace std;
+
+int main() {
+    int N; cin >> N;
+    vector<int> occur(2000, 0);
+
+    for (int i = 0; i < N; i++) {
+        int L; cin >> L;
+
+        occur[L - 1] += 1;
+    }
+
+    int maxlen = 0; 
+    int count = 0;
+
+    for (int height = 2; height <= 4000; height++) {
+        int len = 0;
+
+        // find all fences with height by considering pairs
+        for (int i = 1; i < (height + 1) / 2; i++) {
+            len += min(occur[i - 1], (height - i - 1 < 2000) ? occur[height - i - 1] : 0);
+        }
+
+        if (height % 2 == 0) {
+            // If the height is even, then the pairing can be (h/2, h/2)
+            len += occur[height / 2 - 1] / 2;
+        }
+
+
+
+        if (len == 0) {
+            continue;
+        } else if (len > maxlen) {
+            maxlen = len;
+            count = 1;
+        } else if (len == maxlen) {
+            count ++;
+        } 
+    }
+
+    cout << maxlen << " " << count << endl;
+
+    return 0;
+}

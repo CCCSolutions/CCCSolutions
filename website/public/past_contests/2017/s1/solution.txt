@@ -1,0 +1,39 @@
+// CCC 2017 Senior 1: Sum Game
+
+// by John Liao, Lo-Ellen Park S.S.
+
+// This problem asks to keep track of the last time the two teams have the same sum. 
+// We use totalSum to record the difference between the sums of the two teams. 
+// When totalSum reaches 0, we know that the two teams have the same sum. 
+
+// Runtime: O(N) complexity
+// Memory: O(N) complexity
+
+#include<iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int N, totalSum = 0, lastequal = 0;
+
+    cin >> N;
+
+    vector<int> A(N);
+    for (int i = 0; i < N; i++) {
+        cin >> A[i];
+    }
+
+
+    for (int i = 0; i < N; i++) {
+        int b; cin >> b;
+
+        totalSum += A[i] - b;
+
+        if (totalSum == 0) lastequal = i + 1;
+    }
+
+    cout << lastequal << endl;
+
+    return 0;
+}
