@@ -5,7 +5,7 @@ import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icon
 import { Helmet } from 'react-helmet';
 import BackgroundImage from '../assets/mmhs.jpg'
 
-// Styled components
+// Styled components (i got lazy)
 const IconWrapper = styled.div`
     font-size: 2rem;
     margin-right: 20px;
@@ -72,10 +72,10 @@ const Home = () => {
         style={{ backgroundImage: `url(${BackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          <span className="text-blue-500 tabular-nums">{count.toLocaleString()}</span>+ Students Helped with CCC Solutions
+          <span className="text-blue-500">{count.toLocaleString()}</span>+ Students Helped With CCC Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
-          Empowering students with <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
+          Providing <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
         </p>
         <div className="flex space-x-4">
           <Link to="/solutions" className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg">
