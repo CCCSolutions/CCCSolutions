@@ -1,0 +1,45 @@
+// CCC 2017 Senior 2: High Tide, Low Tide
+
+// by John Liao, Lo-Ellen Park S.S.
+
+// To rearrange the numbers alternatingly and increasingly, we sort the numbers from lowest to highest,
+// then, starting from the center, alternatingly return the small and higher numbers. 
+
+// Runtime: O(N logN)   due to sorting
+// Memory: O(N)
+
+#include<iostream>
+#include<vector>
+#include<algorithm>
+
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N; 
+
+    vector<int> data(N);
+
+    for (int i = 0; i < N; i++) {
+        cin >> data[i];
+    }
+
+    sort(data.begin(), data.end());
+
+    int i = (N - 1) / 2, j = (N - 1) / 2 + 1;
+    while (i >= 0) {
+        cout << data[i] << " ";
+
+        if (j < N) {
+            cout << data[j] << " ";
+        }
+
+        i--; 
+        j++; 
+    }
+
+    cout << endl;
+
+    return 0;
+}
+
