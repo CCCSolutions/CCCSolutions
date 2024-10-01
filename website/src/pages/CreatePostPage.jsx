@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
 export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
-  const [error, setError] = useState(null); // For handling errors
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
       navigate('/login');
     }
-  }, []);
-  
+  }, [navigate]);
+
   const handleCreatePost = async (e) => {
     e.preventDefault();
 
-    // Check if the user is logged in
     if (!pb.authStore.isValid) {
       setError("You need to log in to create a post.");
       navigate('/login');
@@ -30,21 +31,17 @@ export default function CreatePost() {
       const data = {
         title: newPostTitle,
         body: newPostBody,
-        author: pb.authStore.model.id, // Use the logged-in user's ID
+        author: pb.authStore.model.id,
         upvotes: 0,
       };
 
-      // Create the post and get the created post's ID
       const createdPost = await pb.collection('posts').create(data);
 
-      // Redirect to the new post page using its ID
       navigate(`/forum/${createdPost.id}`);
 
-      // Clear the input fields
       setNewPostTitle('');
       setNewPostBody('');
-      setError(null); // Reset error if successful
-      
+      setError(null);
     } catch (error) {
       console.error('Error creating post:', error);
       setError("An error occurred while creating the post.");
@@ -52,33 +49,46 @@ export default function CreatePost() {
   };
 
   return (
-      <div className='m-16'>
-        <title>Create Post</title>
-        <h2 className='text-2xl mb-4'>New Post</h2>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>} {/* Display error message */}
-
-        <form onSubmit={handleCreatePost} className="space-y-2">
+    <div className="font-poppins container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Create New Post</h1>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+          <p>{error}</p>
+        </div>
+      )}
+      <form onSubmit={handleCreatePost} className="max-w-4xl mx-auto">
+        <div className="mb-4">
+          <label htmlFor="postTitle" className="block text-gray-700 text-sm font-bold mb-2">
+            Post Title
+          </label>
           <input
-              type="text"
-              value={newPostTitle}
-              onChange={(e) => setNewPostTitle(e.target.value)}
-              placeholder="Post Title"
-              className="w-full p-2 border rounded"
-              required
+            id="postTitle"
+            type="text"
+            value={newPostTitle}
+            onChange={(e) => setNewPostTitle(e.target.value)}
+            placeholder="Enter your post title"
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-          <textarea
-              value={newPostBody}
-              onChange={(e) => setNewPostBody(e.target.value)}
-              placeholder="Post Body"
-              className="w-full p-2 border rounded"
-              rows="3"
-              required
+        </div>
+        <div className="mb-4">
+          <label htmlFor="postBody" className="block text-gray-700 text-sm font-bold mb-2">
+            Post Content
+          </label>
+          <ReactQuill
+            theme="snow"
+            value={newPostBody}
+            onChange={setNewPostBody}
+            className="bg-white"
           />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Create Post
-          </button>
-        </form>
-      </div>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition"
+        >
+          Create Post
+        </button>
+      </form>
+    </div>
   );
 }
