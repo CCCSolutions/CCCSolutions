@@ -114,7 +114,7 @@ const Problem = ({ contestYear, problemCode }) => {
           )}
 
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-black mb-4">Test Cases:</h3>
+            <h3 className="text-lg font-semibold text-black mb-4">Test Cases:</h3>
             <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
               <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
                 {Array.from({length: 30}, (_, idx) => (
@@ -160,7 +160,7 @@ const Problem = ({ contestYear, problemCode }) => {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-black mb-2">Solutions:</h3>
+            <h3 className="text-lg font-bold text-black mb-2">Solutions:</h3>
             {solutions.map((solution, idx) => (
                 <div key={idx} className="mb-4">
                   <h4 className="text-md font-medium text-black mb-1">
