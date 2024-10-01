@@ -1,0 +1,125 @@
+//By Timothy Shnayder, Newmarket High School
+
+#include <bits/stdc++.h>
+#define pii pair<int, int>
+#define vpii vector<pair<int, int>>
+#define vi vector<int>
+#define pb push_back
+#define ms(a, x) memset(a, x, sizeof(a))
+#define fs first
+#define sn second
+const int INF = 0x3f3f3f3f;
+using namespace std;
+/*
+ sqrt decomp
+store passengers in every block
+
+when operating
+we only need to worry about the passengers in the right most of block
+all the ones to the left wont affect sum value
+*/
+
+const int MAXBLOCKS = 390;
+const int MAXN = 150001;
+int N, M, Q;
+int len;
+int numBlocks;
+
+int decomp[MAXBLOCKS]; // decomp[i] = sum of passengers in ith block
+vi lines[MAXN]; // lines and the index of them in the array
+int whichLine[MAXN];
+int posInLine[MAXN];
+int arr[MAXN];
+int shift[MAXN]; // how many times each line has been shifted (operated)
+vi rightBounds[MAXN];
+
+
+//finds the stations in lines which are the furtherst right in their respective block
+void initRBound() {
+	for(int bl = 0; bl < N; bl+=len) {
+		int br = min(bl+len-1,N-1);
+		for(int j = br; j >= bl; j--) {
+			int line = whichLine[j];
+			if(rightBounds[line].size() == 0) {
+				rightBounds[line].push_back(j);
+				continue;
+			}
+			if(rightBounds[line].back()/len != j/len) {
+				rightBounds[line].push_back(j);
+			}
+		}
+	}
+}
+
+
+//get the current value at a station (adjusted for shifts)
+int getVal(int i) {
+	int line = whichLine[i];
+	int mod = lines[line].size();
+	return arr[lines[line][((posInLine[i]-shift[line]%mod)+mod)%mod]];
+}
+
+//basic sqrt decomposition query
+//add up all full blocks and and one by one add up any stray ones on the side
+int query(int l, int r) {
+	int ans = 0;
+	for(int i = l; i <= r;) {
+		if(i%len == 0 && i+len-1<=r) {
+			ans+=decomp[i/len];
+			i+=len;
+		}else{
+			ans+=getVal(i);
+			i++;
+		}
+	}
+	return ans;
+}
+
+//operates line x
+//goes through all right bounds and moves that passenger value from that block, to the next block in line
+void operate(int x) {
+	for(int i = 0; i < rightBounds[x].size(); i++) {
+		int curBlock = rightBounds[x][i];
+		int nextBlock = rightBounds[x][(i+1)%rightBounds[x].size()];
+		int curVal=getVal(curBlock);
+		decomp[curBlock/len]-=curVal;
+		decomp[nextBlock/len]+=curVal;
+	}
+
+	shift[x]++;
+	shift[x]%=lines[x].size();
+}
+
+int main() {
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+	cin >> N >> M >> Q;
+	len = sqrt(N);
+	numBlocks = N/len;
+	for(int i = 0 ; i < N; i++) {
+		int x; cin >> x;
+		posInLine[i]=lines[x].size();
+		lines[x].push_back(i);
+		whichLine[i] = x;
+	}
+	for(int i = 0 ; i < N; i++) {
+		int x; cin >> x;
+		arr[i] = x;
+		decomp[i/len]+=x;
+	}
+
+	initRBound();
+	while(Q--) {
+		int dir; cin >> dir;
+		if(dir == 1) {
+			int l, r; cin >> l >> r;
+			l--; r--;
+			cout << query(l, r) << '\n';
+		}else {
+			int x; cin >> x;
+			operate(x);
+		}
+	}
+	return 0;
+}
