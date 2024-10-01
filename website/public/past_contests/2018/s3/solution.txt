@@ -1,0 +1,132 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc18s3
+
+import sys
+from collections import deque
+input = sys.stdin.readline
+
+def output(graph):
+    for row in graph:
+        print(*row)
+
+def good(R, C):
+    return 0 <= R < r and 0 <= C < c
+
+def isConve(R, C):
+    return graph[R][C] in {"L", "R", "U", "D"}
+
+def canGo(R, C):
+    return isConve(R, C) or graph[R][C] == "."
+
+def cv(R, C):
+    dirn = {"L": [0, -1], "R": [0, 1], "U": [-1, 0], "D": [1, 0]}
+    return dirn[graph[R][C]]
+
+def conveyor(start):
+    cur = start
+    curR = start[0]
+    curC = start[1]
+    d = cv(curR, curC)
+    while True:
+        nxtR, nxtC = curR + d[0], curC + d[1]
+        if good(nxtR, nxtC) and isConve(nxtR, nxtC) and not vis[nxtR][nxtC]:
+            vis[nxtR][nxtC] = True
+            dis[nxtR][nxtC] = dis[curR][curC]
+            curR, curC = nxtR, nxtC
+            d = cv(curR, curC)
+        else:
+            break
+    return [nxtR, nxtC]
+
+# Taking in input
+r, c = map(int, input().split())
+graph = [list(input().strip()) for i in range(r)]
+start = []
+
+# Finding start
+# Start is converted to "."
+flg = False
+for i in range(r):
+    for j in range(c):
+        if graph[i][j] == "S":
+            start = [i, j]
+            graph[i][j] = "."
+            flg = True
+            break
+    if flg:
+        break
+
+# Converting blocked spaces to be "F"
+for i in range(r):
+    for j in range(c):
+        if graph[i][j] == "C":
+            #left
+            for s in range(j-1, -1, -1):
+                if graph[i][s] == "W":
+                    break
+                if graph[i][s] == ".":
+                    graph[i][s] = "F"
+            #right
+            for s in range(j+1, c):
+                if graph[i][s] == "W":
+                    break
+                if graph[i][s] == ".":
+                    graph[i][s] = "F"
+            # up
+            for s in range(i - 1, -1, -1):
+                if graph[s][j] == "W":
+                    break
+                if graph[s][j] == ".":
+                    graph[s][j] = "F"
+            # right
+            for s in range(i + 1, r):
+                if graph[s][j] == "W":
+                    break
+                if graph[s][j] == ".":
+                    graph[s][j] = "F"
+
+# If start is blocked then epic-fail
+if graph[start[0]][start[1]] == "F":
+    cnt = -1
+    for i in range(r):
+        for j in range(c):
+            if graph[i][j] == "." or graph[i][j] == "F":
+                cnt += 1
+    for i in range(cnt):
+        print(-1)
+    sys.exit(0)
+
+# BFS
+dis = [[float("inf")] * c for i in range(r)]
+vis = [[False] * c for i in range(r)]
+q = deque([start])
+vis[start[0]][start[1]] = True
+dis[start[0]][start[1]] = 0
+while q:
+    cur = q.popleft()
+    curR = cur[0]
+    curC = cur[1]
+    if graph[curR][curC] == "." or graph[curR][curC] == "S":
+        for d in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
+            nxtR = curR + d[0]
+            nxtC = curC + d[1]
+            if good(nxtR, nxtC) and  not vis[nxtR][nxtC]:
+                if graph[nxtR][nxtC] == ".":
+                    vis[nxtR][nxtC] = True
+                    dis[nxtR][nxtC] = dis[curR][curC] + 1
+                    q.append([nxtR, nxtC])
+                elif isConve(nxtR, nxtC):
+                    vis[nxtR][nxtC] = True
+                    dis[nxtR][nxtC] = dis[curR][curC] + 1
+                    offR, offC = conveyor([nxtR, nxtC])
+                    if good(offR, offC) and not vis[offR][offC] and canGo(offR, offC):
+                        vis[offR][offC] = True
+                        dis[offR][offC] = dis[nxtR][nxtC]
+                        q.append([offR, offC])
+
+for i in range(r):
+    for j in range(c):
+        if (graph[i][j] == "." or graph[i][j] == "F") and start != [i, j]:
+            print(dis[i][j] if vis[i][j] else -1)

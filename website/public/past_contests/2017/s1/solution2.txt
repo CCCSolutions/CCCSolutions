@@ -1,0 +1,23 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc17s1
+
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+a, b = list(map(int, input().split())), list(map(int, input().split()))
+x, y = [0]*n, [0]*n
+
+x[0], y[0] = a[0], b[0]
+
+for i in range(1, n):
+    x[i], y[i] = x[i-1] + a[i], y[i-1] + b[i]
+
+for i in range(n-1, -1, -1):
+    if x[i] == y[i]:
+        print(i+1)
+        sys.exit(0)
+
+print(0)

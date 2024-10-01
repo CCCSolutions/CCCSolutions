@@ -1,0 +1,24 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc19s2
+
+import sys
+input = sys.stdin.readline
+
+T = int(input())
+
+max = int(2e6)
+
+primes = [True]*(max+2)
+for i in range(2, max+1):
+    if primes[i]:
+        for j in range(i*i, max+1, i):
+            primes[j] = False
+
+for _ in range(T):
+    N = int(input())
+    for i in range(2, N+1):
+        if primes[i] and primes[2*N-i]:
+            print(i, 2*N-i)
+            break

@@ -1,0 +1,26 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc20s2
+
+import sys
+from collections import deque
+input = sys.stdin.readline
+
+r, c = int(input()), int(input())
+mx = int(1e6)
+graph = [[] for i in range(mx+1)]
+grid = [list(map(int, input().split())) for i in range(r)]
+for i in range(r):
+    for j in range(c):
+        graph[(i+1)*(j+1)].append(grid[i][j])
+vis = [False] * (mx+1)
+vis[1] = True
+q = deque([1])
+while q:
+    cur = q.popleft()
+    for nxt in graph[cur]:
+        if not vis[nxt]:
+            vis[nxt] = True
+            q.append(nxt)
+print("yes" if vis[r*c] else "no")

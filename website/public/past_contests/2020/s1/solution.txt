@@ -1,0 +1,34 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+import sys
+input = sys.stdin.readline
+
+N = int(input())
+
+obs1 = {}
+
+for _ in range(N):
+    input1 = input().split()
+    time = int(input1[0])
+    pos = int(input1[1])
+    obs1[time] = pos
+
+times = list(obs1.keys())
+times.sort()
+obs = {}
+
+for i in range(N):
+    obs[times[i]] = obs1[times[i]]
+
+max = 0
+
+for i in range(N-1):
+    tdiff = times[i+1]-times[i]
+    key1 = times[i]
+    key2 = times[i+1]
+    pdiff = obs[key2] - obs[key1]
+    speed = abs(pdiff/tdiff)
+    if speed > max:
+        max = speed
+print(max)

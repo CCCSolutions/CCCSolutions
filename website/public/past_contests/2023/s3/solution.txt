@@ -1,0 +1,103 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc23s3
+
+import sys
+input = sys.stdin.readline
+
+n, m, r, c = map(int, input().split())
+
+def output(graph):
+    for item in graph:
+        print("".join(item))
+
+graph = [["a"] * m for i in range(n)]
+if r == n and c == m:
+    output(graph)
+    sys.exit(0)
+if r == 0 and c == 0:
+    for i in range(1, m):
+        graph[0][i] = "b"
+    for i in range(1, n):
+        graph[i][0] = "b"
+    output(graph)
+    sys.exit(0)
+
+# Test case 2
+if n == 2 and m == 2:
+    if (r == 1 and c == 2) or (r == 2 and c == 1):
+        print("IMPOSSIBLE")
+        sys.exit(0)
+
+for i in range(r):
+    for j in range(m):
+        graph[i][j] = "b"
+for i in range(n):
+    for j in range(c):
+        graph[i][j] = "b"
+if r == 0:
+    for i in range(c, m):
+        graph[0][i] = "c"
+if c == 0:
+    for i in range(r, n):
+        graph[i][0] = "c"
+if r == n and c == 0:
+    for i in range(m):
+        graph[0][i] = "a"
+if c == m and r == 0:
+    for i in range(n):
+        graph[i][0] = "a"
+if r == n and c != m:
+    for i in range(m):
+        graph[0][i] = "a"
+    if m % 2 == 0:
+        if c % 2 == 1:
+            print("IMPOSSIBLE")
+            sys.exit(0)
+        else:
+            for j in range(c//2):
+                for row in range(1, n):
+                    graph[row][j] = "a"
+                    graph[row][m-j-1] = "a"
+    else:
+        if c % 2 == 0:
+            for j in range(c//2):
+                for row in range(1, n):
+                    graph[row][j] = "a"
+                    graph[row][m-j-1] = "a"
+        else:
+            for j in range(m//2, m//2-c//2-1, -1):
+                for row in range(1, n):
+                    graph[row][j] = "a"
+                    graph[row][m-j-1] = "a"
+    output(graph)
+    sys.exit(0)
+
+if r != n and c == m:
+    for i in range(n):
+        graph[i][0] = "a"
+    if n % 2 == 0:
+        if r % 2 == 1:
+            print("IMPOSSIBLE")
+            sys.exit(0)
+        else:
+            for j in range(r//2):
+                for row in range(1, m):
+                    graph[j][row] = "a"
+                    graph[n-j-1][row] = "a"
+    else:
+        if r % 2 == 0:
+            for j in range(r//2):
+                for row in range(1, m):
+                    graph[j][row] = "a"
+                    graph[n-j-1][row] = "a"
+        else:
+            for j in range(n//2, n//2-r//2-1, -1):
+                for row in range(1, m):
+                    graph[j][row] = "a"
+                    graph[n-j-1][row] = "a"
+    output(graph)
+    sys.exit(0)
+
+output(graph)

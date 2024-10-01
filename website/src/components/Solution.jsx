@@ -87,7 +87,7 @@ const Problem = ({ contestYear, problemCode }) => {
   const isValidTestCase = (testCase) =>
     !testCase.toLowerCase().startsWith("<!doctype html>");
 
-  const keywords = `CCC ${actualProblemCode} Solution, CCC ${problemCode}`;
+  const keywords = `CCC ${actualProblemCode} Solution, CCC ${problemCode},CCC ${actualProblemCode} Solutions, Solution ${actualProblemCode}, Solution ${actualProblemCode} CCC, Solutions ${actualProblemCode}, Solutions ${actualProblemCode} CCC`;
 
   return (
       <div className="bg-gray-200 min-h-screen p-8">

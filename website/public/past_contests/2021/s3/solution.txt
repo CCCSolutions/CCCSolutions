@@ -1,0 +1,27 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+import sys
+input = sys.stdin.readline
+
+def f(x):
+    sum = 0
+    for person in ppl:
+        p, w, d = person
+        sum += (max(abs(x-p)-d, 0))*w
+    return sum
+
+n = int(input())
+ppl = [list(map(int, input().split())) for i in range(n)]
+lo = 0
+hi = int(1e9)
+ans = float("inf")
+while lo <= hi:
+    mid = (lo+hi)//2
+    if f(mid) < f(mid+1):
+        ans = min(ans, f(mid))
+        hi = mid-1
+    else:
+        ans = min(ans, f(mid+1))
+        lo = mid+2
+print(ans)

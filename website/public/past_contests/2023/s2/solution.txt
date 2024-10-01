@@ -1,0 +1,42 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc23s2
+
+import os
+import sys
+if dict(os.environ).get("is_local", None) == "1":
+    INPUT = open("input.txt", "r")
+    input = lambda: INPUT.readline().strip("\r\n")
+else:
+    input = lambda: sys.stdin.readline().strip("\r\n")
+
+def good(l, r):
+    return 0 <= l < n and 0 <= r < n
+
+n = int(input())
+height = list(map(int, input().split()))
+ans = [float("inf")]*n
+
+if n == 1:
+    print(0)
+    sys.exit()
+
+for i in range(n-1):
+    l = i
+    r = i
+    val = 0
+    while good(l, r):
+        val += abs(height[l] - height[r])
+        ans[r-l] = min(ans[r-l], val)
+        l -= 1
+        r += 1
+    l = i
+    r = i+1
+    val = 0
+    while good(l, r):
+        val += abs(height[l] - height[r])
+        ans[r-l] = min(ans[r-l], val)
+        l -= 1
+        r += 1
+print(*ans)

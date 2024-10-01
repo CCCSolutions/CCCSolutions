@@ -1,0 +1,22 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc18s1
+
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+
+v = []
+
+for i in range(n):
+    v.append(int(input()))
+v.sort()
+
+ans = float("inf")
+for i in range(1, n-1):
+    left = (v[i] + v[i-1])/2
+    right = (v[i] + v[i+1])/2
+    ans = min(ans, right-left)
+print(ans)

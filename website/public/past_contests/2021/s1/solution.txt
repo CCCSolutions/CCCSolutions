@@ -1,0 +1,20 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc21s1
+
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+h = list(map(float, input().split()))
+w = list(map(float, input().split()))
+ans = 0
+
+for i in range(n):
+    l = h[i]
+    r = h[i+1]
+    b = w[i]
+    ans += (l+r)*b*(0.5)
+
+print(ans)
