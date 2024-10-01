@@ -1,0 +1,18 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+import sys
+input = sys.stdin.readline
+
+dis = list(map(int, input().split()))
+
+cities = [0]*5
+
+for i in range(4):
+    cities[i+1] = cities[i] + dis[i]
+
+for i in range(5):
+    cur = cities[i]
+    for j in range(4):
+        print(abs(cities[j] - cur), end = " ")
+    print(cities[-1] - cur)

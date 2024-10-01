@@ -41,7 +41,8 @@ import React from 'react';
     { initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" },
     { initials: "WY", name: "William Yang", school: "Milliken Mills High School", contributions: "Website revamp"},
     { initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "Website revamp"},
-    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website revamp"}
+    { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website revamp, 2017 S1-S3"},
+    { initials: "OZ", name: "Oscar Zhou", school: "Abbey Park High School", contributions: "Various solutions from 2016-2024"}
   ];
 
 const About = () => {

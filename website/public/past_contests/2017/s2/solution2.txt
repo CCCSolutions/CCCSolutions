@@ -1,0 +1,37 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc17s2
+
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+
+x = list(map(int, input().split()))
+x.sort()
+
+lo = []
+hi = []
+
+if n % 2 == 0:
+    lo = x[:n//2]
+    hi = x[n//2:]
+
+else:
+    lo = x[:n//2+1]
+    hi = x[n//2+1:]
+
+lo.sort(reverse=True)
+hi.sort()
+
+ans = []
+
+for i in range(0, n // 2):
+    ans.append(lo[i])
+    ans.append(hi[i])
+
+if n % 2 == 1:
+    ans.append(lo[-1])
+
+print(*ans, sep = " ")

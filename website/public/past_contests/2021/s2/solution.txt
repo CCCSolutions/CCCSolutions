@@ -1,0 +1,22 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc21s2
+
+import sys
+input = sys.stdin.readline
+
+r, c, k = int(input()), int(input()), int(input())
+kr = [0] * (r+1)
+kc = [0] * (c+1)
+for i in range(k):
+    a, b = input().strip().split()
+    b = int(b)
+    if a == "R":
+        kr[b] = abs(kr[b] - 1)
+    else:
+        kc[b] = abs(kc[b] - 1)
+sr = sum(kr)
+sc = sum(kc)
+ans = sr*c + sc*r - 2*sr*sc
+print(ans)

@@ -1,0 +1,33 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc20j4
+
+import sys
+input = sys.stdin.readline
+
+t, s = input().strip(), input().strip()
+c = []
+for i in range(len(s)):
+    str = s[i:] + s[:i]
+    c.append(str)
+ans = False
+
+def contains(a, b):
+    if len(a) < len(b):
+        return False
+
+    for i in range(len(a)-len(b)+1):
+        if a[i:i+len(b)] == b:
+            return True
+
+    return False
+
+for str in c:
+    if contains(t, str):
+        ans = True
+
+if ans:
+    print("yes")
+else:
+    print("no")

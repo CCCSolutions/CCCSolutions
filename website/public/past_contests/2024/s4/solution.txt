@@ -1,0 +1,35 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc24s4
+
+import sys
+sys.setrecursionlimit(int(2e6)+5)
+input = sys.stdin.readline
+
+def dfs(cur, red):
+    vis[cur] = True
+    for nxt in graph[cur]:
+        if not vis[nxt]:
+            if red:
+                ans[roadMap[(cur, nxt)]] = "R"
+            else:
+                ans[roadMap[(cur, nxt)]] = "B"
+            dfs(nxt, not red)
+
+n, m = map(int, input().split())
+graph = [[] for i in range(n+1)]
+roadMap = {}
+ans = ["G"]*m
+
+for i in range(m):
+    u, v = map(int, input().split())
+    graph[u].append(v)
+    graph[v].append(u)
+    roadMap[(u, v)] = i
+    roadMap[(v, u)] = i
+
+vis = [False]*(n+1)
+for u in range(1, n+1):
+    if not vis[u]: dfs(u, True)
+print("".join(ans))

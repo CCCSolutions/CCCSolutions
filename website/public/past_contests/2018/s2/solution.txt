@@ -1,0 +1,47 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc18s2
+
+import sys
+input = sys.stdin.readline
+
+N = int(input())
+orig = [list(map(int, input().split())) for i in range(N)]
+
+def rotate(orig):
+    temp = [[0]*N for i in range(N)]
+    for i in range(N):
+        for j in range(N):
+            temp[i][j] = orig[N-1-j][i]
+    return temp
+
+def output(grid):
+    for i in range(N):
+        for j in range(N-1):
+            print(grid[i][j], end = " ")
+        print(grid[i][-1])
+
+tl = orig[0][0]
+tr = orig[0][-1]
+bl = orig[-1][0]
+br = orig[-1][-1]
+
+lst = [tl, tr, bl, br]
+mini = min(lst)
+if mini == tl:
+    output(orig)
+
+elif mini == tr:
+    for i in range(3):
+        orig = rotate(orig)
+    output(orig)
+
+elif mini == bl:
+    orig = rotate(orig)
+    output(orig)
+
+else:
+    for i in range(2):
+        orig = rotate(orig)
+    output(orig)

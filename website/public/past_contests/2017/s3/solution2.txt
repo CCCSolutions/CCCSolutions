@@ -1,0 +1,21 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc17s3
+
+import sys
+from itertools import combinations
+input = sys.stdin.readline
+
+n = int(input())
+wood = [0]*2001
+for val in list(map(int, input().split())):
+    wood[val] += 1
+sum = [0]*4001
+vals = [i for i in range(1, 2001)]
+comb = list(combinations(vals, 2))
+for a, b in comb:
+    sum[a+b] += min(wood[a], wood[b])
+for i in range(1, 2001):
+    sum[2*i] += wood[i]//2
+print(max(sum), sum.count(max(sum)))

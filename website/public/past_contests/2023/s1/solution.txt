@@ -1,0 +1,25 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+import sys
+input = sys.stdin.readline
+c = int(input())
+r1 = list(map(int, input().split()))
+r2 = list(map(int, input().split()))
+total = 0
+count = 0
+for i in range(c):
+    if r1[i] == 1:
+        total += 3
+        if i != c-1:
+            if r1[i+1] == 1:
+                count += 2
+        if i % 2 == 0:
+            if r2[i] == 1:
+                count += 2
+    if r2[i] == 1:
+        total += 3
+        if i != c-1:
+            if r2[i + 1] == 1:
+                count += 2
+print(total-count)

@@ -1,0 +1,33 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc21j4
+
+import sys
+input = sys.stdin.readline
+
+x = input().strip()
+
+l = x.count("L")
+m = x.count("M")
+mcount = 0
+
+tot = 0
+
+for i in range(l):
+    if x[i] != "L":
+        tot += 1
+        if x[i] == "M":
+            mcount += 1
+
+for i in range(l, l+m):
+    cur = x[i]
+    if cur == "S":
+        tot += 1
+    elif cur == "L":
+        if mcount > 0:
+            mcount -= 1
+        else:
+            tot += 1
+
+print(tot)

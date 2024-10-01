@@ -1,0 +1,47 @@
+# By Oscar Zhou, Abbey Park High School
+# This solution still requires commented explanations. Please feel free to add them!
+
+# https://dmoj.ca/problem/ccc23j5
+
+import sys
+input = sys.stdin.readline
+
+def good(x, y):
+    return 0 <= x < r and 0 <= y < c
+
+def search(start, cur, turn, dirn):
+    if cur == length - 1:
+        return 1
+    cnt = 0
+    cr = start[0]
+    cc = start[1]
+    cd = d[dirn]
+    nr, nc = cr + cd[0], cc + cd[1]
+    if good(nr, nc) and graph[nr][nc] == word[cur+1]:
+        cnt += search([nr, nc], cur + 1, turn, dirn)
+    if not turn:
+        for turnD in [(dirn+2)%8, (dirn-2)%8]:
+            nd = d[turnD]
+            nr, nc = cr + nd[0], cc + nd[1]
+            if good(nr, nc) and graph[nr][nc] == word[cur+1]:
+                cnt += search([nr, nc], cur + 1, True, turnD)
+    return cnt
+
+d = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1]]
+
+word = input().strip()
+length = len(word)
+r, c = int(input()), int(input())
+graph = [input().strip().split() for i in range(r)]
+
+count = 0
+
+for i in range(r):
+    for j in range(c):
+        if graph[i][j] == word[0]:
+            for k in range(8):
+                dirn = d[k]
+                nr, nc = i + dirn[0], j + dirn[1]
+                if good(nr, nc) and graph[nr][nc] == word[1]:
+                    count += search([nr, nc], 1, False, k)
+print(count)
