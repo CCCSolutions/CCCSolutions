@@ -6,10 +6,16 @@ const ProblemsTable = ({ problems }) => {
   const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
+  // Now fetches solution statuses only for problems on the current page !!
   useEffect(() => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
-      for (const problem of problems) {
+      const currentProblems = problems.slice(
+        (currentPage - 1) * problemsPerPage,
+        currentPage * problemsPerPage
+      );
+
+      for (const problem of currentProblems) {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
         const alternativeCode = getAlternativeCode(code);
@@ -32,11 +38,11 @@ const ProblemsTable = ({ problems }) => {
 
         statuses[problem.name] = hasSolution ? 'Has Solution' : 'No Solution';
       }
-      setSolutionStatuses(statuses);
+      setSolutionStatuses((prev) => ({ ...prev, ...statuses }));
     };
 
     fetchSolutionStatuses();
-  }, [problems]);
+  }, [currentPage, problems]);
 
   const getYearAndCodeFromLink = (link) => {
     const parts = link.split('/');
@@ -49,7 +55,7 @@ const ProblemsTable = ({ problems }) => {
     const mapping = {
       'j5': 's3',
       'j4': 's2',
-      'j3': 's1'
+      'j3': 's1',
     };
     return mapping[code.toLowerCase()];
   };
