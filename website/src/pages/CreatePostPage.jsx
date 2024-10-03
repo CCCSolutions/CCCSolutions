@@ -48,6 +48,25 @@ export default function CreatePost() {
     }
   };
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      ['code-block'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean'],
+    ],
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image',
+    'code-block'
+  ];
+
   return (
     <div className="font-poppins container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Create New Post</h1>
@@ -79,6 +98,8 @@ export default function CreatePost() {
             theme="snow"
             value={newPostBody}
             onChange={setNewPostBody}
+            modules={modules}
+            formats={formats}
             className="bg-white"
           />
         </div>
