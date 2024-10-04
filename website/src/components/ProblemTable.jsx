@@ -6,6 +6,7 @@ const ProblemsTable = ({ problems }) => {
   const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
+  // Now fetches solution statuses only for problems on the current page !!
   useEffect(() => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
@@ -15,9 +16,9 @@ const ProblemsTable = ({ problems }) => {
       );
 
       for (const problem of currentProblems) {
-        const { name, link } = problem;
+        const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
-        const alternativeCode = getAlternativeCode(code, year);
+        const alternativeCode = getAlternativeCode(code,year);
         let hasSolution = false;
 
         for (const checkCode of [code, alternativeCode]) {
@@ -25,30 +26,19 @@ const ProblemsTable = ({ problems }) => {
           const basePath = `/past_contests/${year}/${checkCode}`;
           try {
             const response = await fetch(`${basePath}/solution.txt`);
-            if (response.ok) {
-              const text = await response.text();
-              if (!text.toLowerCase().includes('<!doctype html>')) {
-                // If this is the alternative code, verify the problem name
-                if (checkCode === alternativeCode) {
-                  const altProblemName = getAlternativeProblemName(name, code, alternativeCode);
-                  if (text.includes(altProblemName)) {
-                    hasSolution = true;
-                    break;
-                  }
-                } else {
-                  hasSolution = true;
-                  break;
-                }
-              }
+            const text = await response.text();
+            if (!text.toLowerCase().includes('<!doctype html>')) {
+              hasSolution = true;
+              break;
             }
           } catch (error) {
-            console.error(`Error fetching solution for ${year} ${checkCode}:`, error);
+            console.error(`Error fetching solution for ${checkCode}:`, error);
           }
         }
 
-        statuses[name] = hasSolution ? 'Has Solution' : 'No Solution';
+        statuses[problem.name] = hasSolution ? 'Has Solution' : 'No Solution';
       }
-      setSolutionStatuses(statuses);
+      setSolutionStatuses((prev) => ({ ...prev, ...statuses }));
     };
 
     fetchSolutionStatuses();
@@ -62,20 +52,14 @@ const ProblemsTable = ({ problems }) => {
   };
 
   const getAlternativeCode = (code, year) => {
-    const yearNum = parseInt(year);
+    if (year <2016) {
     const mapping = {
-      'j5': yearNum >= 2016 ? 's2' : 's3',
-      'j4': yearNum >= 2016 ? 's1' : 's2',
-      'j3': yearNum >= 2016 ? '' : 's1',
+      'j5': 's3',
+      'j4': 's2',
+      'j3': 's1',
     };
     return mapping[code.toLowerCase()];
-  };
-
-  const getAlternativeProblemName = (originalName, originalCode, alternativeCode) => {
-    const parts = originalName.split(' - ');
-    const year = parts[0].slice(0, 4);
-    const problemTitle = parts[1];
-    return `${year} ${alternativeCode.toUpperCase()} - ${problemTitle}`;
+    }
   };
 
   // Calculate the total number of pages
