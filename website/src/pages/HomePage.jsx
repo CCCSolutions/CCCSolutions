@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
 import BackgroundImage from '../assets/mmhs.jpg'
-import OtherBackgroundImage from '../assets/image.png'
+import OtherBackgroundImage from '../assets/image.jpg'
 
 // Styled components (i got lazy)
 const IconWrapper = styled.div`
