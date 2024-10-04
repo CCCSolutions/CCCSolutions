@@ -1,57 +1,58 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Book, BookOpen, Info } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Book, BookOpen, Info } from 'react-feather';
 
 const ProblemsTable = ({ problems }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
-  const fetchSolutionStatus = useCallback(async (problem) => {
-    const { name, link } = problem;
-    const [year, code] = getYearAndCodeFromLink(link);
-    const alternativeCode = getAlternativeCode(code, year);
+  useEffect(() => {
+    const fetchSolutionStatuses = async () => {
+      const statuses = {};
+      const currentProblems = problems.slice(
+        (currentPage - 1) * problemsPerPage,
+        currentPage * problemsPerPage
+      );
 
-    for (const checkCode of [code, alternativeCode]) {
-      if (!checkCode) continue;
-      const basePath = `/past_contests/${year}/${checkCode}`;
-      try {
-        const response = await fetch(`${basePath}/solution.txt`);
-        if (response.ok) {
-          const text = await response.text();
-          if (!text.toLowerCase().includes('<!doctype html>')) {
-            if (checkCode === alternativeCode) {
-              const altProblemName = getAlternativeProblemName(name, code, alternativeCode);
-              if (text.includes(altProblemName)) {
-                return true;
+      for (const problem of currentProblems) {
+        const { name, link } = problem;
+        const [year, code] = getYearAndCodeFromLink(link);
+        const alternativeCode = getAlternativeCode(code, year);
+        let hasSolution = false;
+
+        for (const checkCode of [code, alternativeCode]) {
+          if (!checkCode) continue;
+          const basePath = `/past_contests/${year}/${checkCode}`;
+          try {
+            const response = await fetch(`${basePath}/solution.txt`);
+            if (response.ok) {
+              const text = await response.text();
+              if (!text.toLowerCase().includes('<!doctype html>')) {
+                // If this is the alternative code, verify the problem name
+                if (checkCode === alternativeCode) {
+                  const altProblemName = getAlternativeProblemName(name, code, alternativeCode);
+                  if (text.includes(altProblemName)) {
+                    hasSolution = true;
+                    break;
+                  }
+                } else {
+                  hasSolution = true;
+                  break;
+                }
               }
-            } else {
-              return true;
             }
+          } catch (error) {
+            console.error(`Error fetching solution for ${year} ${checkCode}:`, error);
           }
         }
-      } catch (error) {
-        console.error(`Error fetching solution for ${year} ${checkCode}:`, error);
+
+        statuses[name] = hasSolution ? 'Has Solution' : 'No Solution';
       }
-    }
-    return false;
-  }, []);
-
-  useEffect(() => {
-    const loadSolutionStatuses = async () => {
-      const newStatuses = { ...solutionStatuses };
-      const promises = problems.map(async (problem) => {
-        if (newStatuses[problem.name] === undefined) {
-          const hasSolution = await fetchSolutionStatus(problem);
-          newStatuses[problem.name] = hasSolution ? 'Has Solution' : 'No Solution';
-        }
-      });
-
-      await Promise.all(promises);
-      setSolutionStatuses(newStatuses);
+      setSolutionStatuses(statuses);
     };
 
-    loadSolutionStatuses();
-  }, [problems, fetchSolutionStatus, solutionStatuses]);
+    fetchSolutionStatuses();
+  }, [currentPage, problems]);
 
   const getYearAndCodeFromLink = (link) => {
     const parts = link.split('/');
@@ -118,40 +119,44 @@ const ProblemsTable = ({ problems }) => {
         </thead>
         <tbody>
           {currentProblems.map((problem, index) => (
-            <tr key={index} className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-              <td className="py-3 whitespace-nowrap text-sm font-medium">
-                {solutionStatuses[problem.name] === 'Has Solution' ? (
-                  <div className="px-10 text-green-400">
-                    <BookOpen className="w-5 h-5" />
-                  </div>
-                ) : solutionStatuses[problem.name] === 'No Solution' ? (
-                  <div className="px-10 text-red-600">
-                    <Book className="w-5 h-5" />
-                  </div>
-                ) : (
-                  <div className="px-10">
-                    . . .
-                  </div>
-                )}
-              </td>
-              <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
-                <a
-                  href={problem.link}
-                  className="truncate text-blue-600 font-semibold hover:underline"
-                  style={{ maxWidth: '20rem' }}
-                >
-                  {problem.name}
-                </a>
-              </td>
-              <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
-                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
-                  {problem.difficulty}
-                </span>
-              </td>
-              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-sm font-medium">
-                {problem.tags.join(', ')}
-              </td>
-            </tr>
+            <React.Fragment key={index}>
+              <tr
+                className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
+              >
+                <td className="py-3 whitespace-nowrap text-sm font-medium">
+                  {solutionStatuses[problem.name] === 'Has Solution' ? (
+                    <div className="px-10 text-green-400">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                  ) : solutionStatuses[problem.name] === 'No Solution' ? (
+                    <div className="px-10 text-red-600">
+                      <Book className="w-5 h-5" />
+                    </div>
+                  ) : (
+                    <div className="px-10">
+                      . . .
+                    </div>
+                  )}
+                </td>
+                <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
+                  <a
+                    href={problem.link}
+                    className="truncate text-blue-600 font-semibold hover:underline"
+                    style={{ maxWidth: '20rem' }}
+                  >
+                    {problem.name}
+                  </a>
+                </td>
+                <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
+                  <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
+                    {problem.difficulty}
+                  </span>
+                </td>
+                <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-sm font-medium">
+                  {problem.tags.join(', ')}
+                </td>
+              </tr>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
