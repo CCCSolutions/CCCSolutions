@@ -70,7 +70,7 @@ const Home = () => {
       {/* Hero Section */}
       <div
         className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
-        style={{ backgroundImage: `url(${BackgroundImage})` }}
+        style={{ backgroundImage: `url(${OtherBackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           <span className="text-blue-500">{count.toLocaleString()}</span>+ Students Helped With CCC Solutions

@@ -12,25 +12,24 @@ const Problem = ({ contestYear, problemCode }) => {
 
   useEffect(() => {
     const fetchSolutions = async () => {
-      const alternativeCode = getAlternativeCode(problemCode);
+      const alternativeCode = getAlternativeCode(problemCode, contestYear);
       let foundCode = problemCode;
       const solutionsArray = [];
 
-      for (const code of [problemCode, alternativeCode]) {
-        if (!code) continue;
-        const basePath = `/past_contests/${contestYear}/${code}`;
+      // First, try to fetch solutions for the original problem code
+      const basePath = `/past_contests/${contestYear}/${problemCode}`;
+      let solutionsFound = await fetchSolutionsForCode(basePath, problemCode);
 
-        for (let i = 1; i <= 5; i++) {
-          try {
-            const response = await fetch(`${basePath}/solution${i === 1 ? "" : i}.txt`);
-            const text = await response.text();
-            if (!text.toLowerCase().includes("<!doctype html>")) {
-              solutionsArray.push(text);
-              foundCode = code;
-            }
-          } catch (error) {
-            console.error(`Error fetching solution${i} for ${code}:`, error);
-          }
+      if (solutionsFound.length > 0) {
+        solutionsArray.push(...solutionsFound);
+        foundCode = problemCode;
+      } else if (alternativeCode) {
+        // If no solutions found for original code, try the alternative code
+        const altBasePath = `/past_contests/${contestYear}/${alternativeCode}`;
+        solutionsFound = await fetchSolutionsForCode(altBasePath, alternativeCode);
+        if (solutionsFound.length > 0) {
+          solutionsArray.push(...solutionsFound);
+          foundCode = alternativeCode;
         }
       }
 
@@ -46,6 +45,32 @@ const Problem = ({ contestYear, problemCode }) => {
 
     fetchSolutions();
   }, [contestYear, problemCode]);
+
+  const fetchSolutionsForCode = async (basePath, code) => {
+    const solutionsArray = [];
+    for (let i = 1; i <= 5; i++) {
+      try {
+        const response = await fetch(`${basePath}/solution${i === 1 ? "" : i}.txt`);
+        if (response.ok) {
+          const text = await response.text();
+          if (!text.toLowerCase().includes("<!doctype html>")) {
+            // Check if the solution matches the problem name
+            if (solutionMatchesProblem(text, code)) {
+              solutionsArray.push(text);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching solution${i}:`, error);
+      }
+    }
+    return solutionsArray;
+  };
+
+  const solutionMatchesProblem = (solutionText, code) => {
+    const expectedProblemName = `${contestYear} ${code.toUpperCase()}`;
+    return solutionText.includes(expectedProblemName);
+  };
 
   useEffect(() => {
     document.title = `Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`;
@@ -70,11 +95,12 @@ const Problem = ({ contestYear, problemCode }) => {
     }
   };
 
-  const getAlternativeCode = (code) => {
+  const getAlternativeCode = (code, year) => {
+    const yearNum = parseInt(year);
     const mapping = {
-      j5: contestYear >= 2016 ? "s2" : "s3",
-      j4: contestYear >= 2016 ? "s1" : "s2",
-      j3: "s1",
+      j5: yearNum >= 2016 ? "s2" : "s3",
+      j4: yearNum >= 2016 ? "s1" : "s2",
+      j3: yearNum >= 2016 ? "" : "s1",
     };
     return mapping[code.toLowerCase()];
   };
@@ -90,28 +116,27 @@ const Problem = ({ contestYear, problemCode }) => {
   const keywords = `CCC ${actualProblemCode} Solution, CCC ${problemCode},CCC ${actualProblemCode} Solutions, Solution ${actualProblemCode}, Solution ${actualProblemCode} CCC, Solutions ${actualProblemCode}, Solutions ${actualProblemCode} CCC`;
 
   return (
-      <div className="bg-gray-200 min-h-screen p-8">
-        {/*Keywords for SEO + meta tags*/}
-        <Helmet>
-          <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
-          <meta name="keywords" content={keywords}/>
-          <meta property="og:title" content={`Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`}/>
-          <meta property="og:description"
-                content="The most comprehensive solution repository for the Canadian Computing Competition, with solutions to the CCC from 1996 to present."/>
-          <meta property="og:url" content={window.location.href}/>
-          <meta name="theme-color" content="#1e3a8a"/>
-        </Helmet>
-        <div className="w-full p-8 rounded-lg bg-white shadow-md">
-          <h2 className="text-2xl font-semibold text-black mb-4">
-            {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
-          </h2>
+    <div className="bg-gray-200 min-h-screen p-8">
+      <Helmet>
+        <title>Solution: CCC {contestYear} {actualProblemCode.toUpperCase()}</title>
+        <meta name="keywords" content={keywords}/>
+        <meta property="og:title" content={`Solution: CCC ${contestYear} ${actualProblemCode.toUpperCase()}`}/>
+        <meta property="og:description"
+              content="The most comprehensive solution repository for the Canadian Computing Competition, with solutions to the CCC from 1996 to present."/>
+        <meta property="og:url" content={window.location.href}/>
+        <meta name="theme-color" content="#1e3a8a"/>
+      </Helmet>
+      <div className="w-full p-8 rounded-lg bg-white shadow-md">
+        <h2 className="text-2xl font-semibold text-black mb-4">
+          {`CCC ${contestYear} ${problemCode.toUpperCase()}`}
+        </h2>
 
-          {actualProblemCode !== problemCode && (
-              <p className="text-sm text-gray-600 mb-4">
-                Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
-                equivalent to {problemCode.toUpperCase()}.
-              </p>
-          )}
+        {actualProblemCode !== problemCode && (
+          <p className="text-sm text-gray-600 mb-4">
+            Note: Showing solution for {actualProblemCode.toUpperCase()} as it's
+            equivalent to {problemCode.toUpperCase()}.
+          </p>
+        )}
 
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-black mb-4">Test Cases:</h3>
