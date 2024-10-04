@@ -18,26 +18,36 @@ const Problem = ({ contestYear, problemCode }) => {
 
       // Helper to check if solution matches problem
       const solutionMatchesProblem = (solutionText) => {
-        // You can refine this check, for example by looking for specific keywords or patterns
-        const lowerCaseSolution = solutionText.toLowerCase();
-        const codeRegex = new RegExp(`${actualProblemCode}`, 'i'); // Case insensitive match
-        return lowerCaseSolution.includes(actualProblemCode.toLowerCase()) || codeRegex.test(lowerCaseSolution);
+        // Temporarily allow all solutions to pass for debugging purposes
+        return true;
       };
 
       // Iterate over problem codes and alternative codes to fetch solutions
       for (const code of [problemCode, alternativeCode]) {
+        console.log(`Trying to fetch solutions for code: ${code}`);  // Debug log
+
         if (!code) continue;
         const basePath = `/past_contests/${contestYear}/${code}`;
 
         for (let i = 1; i <= 5; i++) {
           try {
-            const response = await fetch(`${basePath}/solution${i === 1 ? "" : i}.txt`);
-            const text = await response.text();
+            const fetchUrl = `${basePath}/solution${i === 1 ? "" : i}.txt`;
+            console.log(`Fetching from: ${fetchUrl}`);  // Debug log to check the URL
 
-            // Ensure we don't accidentally load HTML errors as solutions
+            const response = await fetch(fetchUrl);
+
+            if (!response.ok) {
+              console.log(`Failed to fetch solution: ${fetchUrl}, Status: ${response.status}`);  // Log failed fetch
+              continue;
+            }
+
+            const text = await response.text();
+            console.log(`Fetched content:`, text);  // Log fetched content
+
             if (!text.toLowerCase().includes("<!doctype html>") && solutionMatchesProblem(text)) {
               solutionsArray.push(text);
               foundCode = code;
+              break;  // Exit loop once a solution is found
             }
           } catch (error) {
             console.error(`Error fetching solution${i} for ${code}:`, error);
