@@ -1,3 +1,5 @@
+// Delete if we switch back
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -73,18 +75,16 @@ const Home = () => {
         style={{ backgroundImage: `url(${OtherBackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          The <span
-            className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
-most comprehensive</span> CCC solution repository
+          <span className="text-blue-500">{count.toLocaleString()}</span>+ Students Helped With CCC Solutions
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
-          Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
+          Providing <strong>comprehensive solutions</strong> for the Canadian Computing Competition.
         </p>
         <div className="flex space-x-4">
-          <Link to="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+          <Link to="/solutions" className="bg-blue-800 text-white font-bold py-3 px-6 rounded-lg">
             Explore Solutions
           </Link>
-          <Link to="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg">
+          <Link to="/forum" className="bg-white text-blue-800 font-bold py-3 px-6 rounded-lg">
             Visit Forum
           </Link>
         </div>
@@ -111,7 +111,7 @@ most comprehensive</span> CCC solution repository
               },
               {
                 title: 'Comprehensive Solutions',
-                content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
+                content: 'Access detailed explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
                 icon: <FileTextIconWrapper><FileTextOutlined/></FileTextIconWrapper>,
               },
               {
