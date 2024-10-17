@@ -1,0 +1,86 @@
+//By Timothy Shnayder, Newmarket Highschool
+
+//To solve this problem, we first do a rough filter, then remove the bad ones with a precise filter
+
+#include <iostream>
+#include <math.h>
+#include <unordered_map>
+#include <vector>
+#define int long long
+using namespace std;
+double n;
+
+
+vector<int> finalN;
+
+
+//first do a rough check to get the working numbers + some bad ones we will get rid of later
+void filter(double l, double r, int iteration){
+    if(iteration == 0){ // end of filters
+        for(int i = ceil(l); i <= floor(r); i++){
+            finalN.push_back(i);
+        }
+    }else{//not final iteration
+
+
+        //split into 3 sections seperated by these edge markers
+        double leftEdge = (r-l)/3 + l;
+        double rightEdge = 2*(r-l)/3 + l;
+
+
+        //search into left and right ones. Middle is discarded
+        filter(l, leftEdge, iteration-1);
+        filter(rightEdge, r, iteration-1);
+    }
+}
+
+
+//our goal is to to find if its in cantor without using doubles because it's inaccurate
+//if it reaches some int more than once, that means it will cycle and it is in the cantor
+//if it hits the middle, its bad
+bool preciseFilter(int x){
+    if(x == 0){
+        return true;
+    }
+    unordered_map<int, bool> cycle;
+
+
+    while(true){
+        if(x*3 <= n){//left side
+            x*=3;
+            if(cycle[x]){
+                return true;
+            }
+            cycle[x] = true;
+        }else if(x*3 >= n*2){//right side
+            x*=3;
+            x-=n*2;
+            if(cycle[x]){
+                return true;
+            }
+            cycle[x] = true;
+        }else{ //middle
+            return false;
+        }
+    }
+
+
+}
+
+
+signed main() {
+    cin >> n;
+
+
+    filter(0.0, n, 20);
+    for(auto i: finalN){
+        if(preciseFilter(i)){
+            cout << i << '\n';
+        }
+
+
+    }
+
+
+    return 0;
+}
