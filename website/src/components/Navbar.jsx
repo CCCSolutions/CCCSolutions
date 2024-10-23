@@ -32,10 +32,10 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <Link to="https://mmhs.ca" className="flex items-center">
             <img src={logoImage} alt="MMHS Logo" className="h-10 w-auto mr-3" />
             <span className="text-xl font-medium text-gray-900">Milliken Mills High School</span>
-          </div>
+          </Link>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
@@ -55,7 +55,7 @@ const Navbar = () => {
                   `}
                 >
                   {item.name}
-                  <span 
+                  <span
                     className={`
                       absolute bottom-0 left-0 w-full h-0.5 bg-blue-600
                       transform origin-bottom scale-x-0 transition-transform duration-300 ease-out
@@ -103,7 +103,7 @@ const Navbar = () => {
                 onClick={() => setIsOpen(false)}
               >
                 {item.name}
-                <span 
+                <span
                   className={`
                     absolute bottom-0 left-0 w-full h-0.5 bg-blue-600
                     transform ${location.pathname === item.path ? 'translate-x-0' : '-translate-x-full'}
