@@ -153,7 +153,7 @@ const About = () => {
   <div className="max-w-6xl mx-auto text-center">
     <h2 className="text-4xl font-bold text-blue-900 mb-6">About Milliken Mills High School</h2>
     <p className="text-xl mb-4">
-      Milliken Mills High School is a Public School Offering the IB Diploma Programme in Markham, Ontario, Canada.
+      Milliken Mills High School is a public school offering the IB Diploma Programme in Markham, Ontario, Canada.
     </p>
     <p className="text-lg">
       This site has been re-built and maintained with the help of the MMHS Computer Science club and several other contributors.
