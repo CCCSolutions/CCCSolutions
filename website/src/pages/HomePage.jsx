@@ -151,8 +151,8 @@ most comprehensive</span> CCC solution repository
             >
               <div className="grid md:grid-cols-3 gap-16">
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">N/A</p>
-                  <p className="text-gray-600">Forum Users</p>
+                  <p className="text-4xl font-bold text-blue-800">950+</p>
+                  <p className="text-gray-600">Active Users</p>
                 </div>
                 <div className="text-center p-3">
                   <p className="text-4xl font-bold text-blue-800">200+</p>
