@@ -9,42 +9,47 @@ const ProblemsTable = ({ problems }) => {
   const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
+  // Get the problems for the current page
+  const currentProblems = problems.slice(
+    (currentPage - 1) * problemsPerPage,
+    currentPage * problemsPerPage
+  );
+
+  // Effect to fetch only the displayed problem solutions
   useEffect(() => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
-      const currentProblems = problems.slice(
-        (currentPage - 1) * problemsPerPage,
-        currentPage * problemsPerPage
-      );
 
-      for (const problem of currentProblems) {
+      // Generate fetch requests for all problems on the current page
+      const fetchPromises = currentProblems.map(async (problem) => {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
         const alternativeCode = getAlternativeCode(code, year);
-        let hasSolution = false;
 
-        for (const checkCode of [code, alternativeCode]) {
-          if (!checkCode) continue;
-          const basePath = `/past_contests/${year}/${checkCode}`;
+        const pathsToCheck = [code, alternativeCode].filter(Boolean).map((checkCode) => `/past_contests/${year}/${checkCode}/solution.txt`);
+
+        for (const path of pathsToCheck) {
           try {
-            const response = await fetch(`${basePath}/solution.txt`);
+            const response = await fetch(path);
             const text = await response.text();
             if (!text.toLowerCase().includes('<!doctype html>')) {
-              hasSolution = true;
-              break;
+              statuses[problem.name] = 'Has Solution';
+              return;
             }
           } catch (error) {
-            console.error(`Error fetching solution for ${checkCode}:`, error);
+            console.error(`Error fetching solution for ${problem.name}:`, error);
           }
         }
 
-        statuses[problem.name] = hasSolution ? 'Has Solution' : 'No Solution';
-      }
+        statuses[problem.name] = 'No Solution';
+      });
+
+      await Promise.all(fetchPromises);
       setSolutionStatuses((prev) => ({ ...prev, ...statuses }));
     };
 
     fetchSolutionStatuses();
-  }, [currentPage, problems]);
+  }, [currentProblems]);
 
   useEffect(() => {
     setSearchParams({ page: currentPage });
@@ -59,21 +64,12 @@ const ProblemsTable = ({ problems }) => {
 
   const getAlternativeCode = (code, year) => {
     if (year < 2016) {
-      const mapping = {
-        j5: 's3',
-        j4: 's2',
-        j3: 's1',
-      };
+      const mapping = { j5: 's3', j4: 's2', j3: 's1' };
       return mapping[code.toLowerCase()];
     }
   };
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
-
-  const currentProblems = problems.slice(
-    (currentPage - 1) * problemsPerPage,
-    currentPage * problemsPerPage
-  );
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -141,27 +137,20 @@ const ProblemsTable = ({ problems }) => {
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
-        >
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50">
           Previous
         </button>
         <div className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
         </div>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
-        >
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50">
           Next
         </button>
       </div>
     </div>
   );
 };
+
 
 const getDifficultyClass = (difficulty) => {
   switch (difficulty.toLowerCase()) {
