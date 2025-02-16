@@ -1,0 +1,37 @@
+n = int(input())
+t = int(input())
+
+trees = []
+
+for i in range(t):
+    r, c = map(int, input().split())
+    trees.append([r, c])
+
+posleft = [1]
+postop = [1]
+
+for tr, tc in trees:
+    posleft.append(tc+1)
+    postop.append(tr+1)
+
+def getMax(treeR, treeC):
+    maxW = n-treeC+1
+    maxH = n-treeR+1
+
+    for tr, tc in trees:
+        if tr >= treeR and tc >= treeC:
+            tr -= treeR
+            tc -= treeC
+            if tr > tc:
+                maxH = min(maxH, tr)
+            else:
+                maxW = min(maxW, tc)
+    
+    return min(maxW, maxH)
+            
+ans = 0
+for treeR in postop:
+    for treeC in posleft:
+        ans = max(ans, getMax(treeR, treeC))
+
+print(ans)

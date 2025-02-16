@@ -1,0 +1,81 @@
+# By Daniel Zhang, Pinetree Secondary
+
+import sys, random
+from copy import deepcopy
+
+grid = [input().split() for i in range(3)]
+for i in range(3):
+    for j in range(3):
+        if grid[i][j] != 'X':
+            grid[i][j] = int(grid[i][j])
+
+def deduce(a, b, c):
+    if a != 'X' and b != 'X' and c != 'X':
+        return (None, None, None)
+    elif a != 'X' and b != 'X':
+        return a, b, b + b-a
+    elif a != 'X' and c != 'X':
+        return a, (a+c)//2, c
+    elif b != 'X' and c != 'X':
+        return b - (c-b), b, c
+    else:
+        return (None, None, None)
+
+def full(grid):
+    for r in grid:
+        if 'X' in r:
+            return False
+    return True
+
+def valid(grid):
+    def ok(a, b, c):
+        return c - b == b - a
+
+    # Check rows
+    for i in range(3):
+        if not ok(grid[i][0], grid[i][1], grid[i][2]):
+            return False
+
+    # Check columns
+    for j in range(3):
+        if not ok(grid[0][j], grid[1][j], grid[2][j]):
+            return False
+
+    return True
+
+def fill(grid):
+    cont = True
+    while cont:
+        cont = False
+        for i in range(3):
+            a, b, c = deduce(grid[i][0], grid[i][1], grid[i][2])
+            if a is not None:
+                grid[i][0], grid[i][1], grid[i][2] = a, b, c
+                cont = True
+            
+            a, b, c = deduce(grid[0][i], grid[1][i], grid[2][i])
+            if a is not None:
+                grid[0][i], grid[1][i], grid[2][i] = a, b, c
+                cont = True
+
+    return grid
+
+
+def backtrack(grid):
+    fill(grid)
+
+    if full(grid) and valid(grid):
+        for r in grid:
+            print(*r)
+        sys.exit()
+    
+    for i in range(3):
+        for j in range(3):
+            if grid[i][j] == 'X':
+                newgrid = deepcopy(grid)
+                newgrid[i][j] = 1
+                backtrack(newgrid)
+    
+
+while True:
+    backtrack(grid)

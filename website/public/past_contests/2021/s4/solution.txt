@@ -1,0 +1,69 @@
+// Daniel Zhang, Pinetree Secondary
+
+#include <iostream>
+#include <vector>
+#include <deque>
+#include <set>
+
+using namespace std;
+
+int main() {
+    int n, w, d;
+    cin >> n >> w >> d;
+
+    vector<vector<int>> graph(n + 1);
+
+    for (int i = 0; i < w; i++) {
+        int a, b;
+        cin >> a >> b;
+        graph[b].push_back(a);
+    }
+
+    vector<int> route(n);
+    for (int i = 0; i < n; i++) {
+        cin >> route[i];
+    }
+
+    vector<int> dist(n + 1, 9999999);
+    deque<pair<int, int>> queue;
+    vector<bool> vis(n, false);
+
+    queue.push_back({ n, 0 });
+
+    while (!queue.empty()) {
+        auto [node, time] = queue.front();
+        queue.pop_front();
+
+        dist[node] = time;
+        for (int neighbor : graph[node]) {
+            if (!vis[neighbor]) {
+                vis[neighbor] = true;
+                queue.push_back({ neighbor, time + 1 });
+            }
+        }
+    }
+
+    multiset<pair<int, int>> ms; //time, station off
+    for (int i = 0; i < n; i++) {
+        ms.insert({i + dist[route[i]], route[i]});
+    }
+    
+    for (int i = 0; i < d; i++) {
+        int x, y;
+        cin >> x >> y; x--; y--;
+        int sx = route[x];
+        int sy = route[y];
+        ms.erase({ x + dist[sx], sx });
+        ms.erase({ y + dist[sy], sy });
+        ms.insert({ y + dist[sx], sx });
+        ms.insert({ x + dist[sy], sy });
+        swap(route[x], route[y]);
+        cout << ms.begin()->first << endl;
+
+        //cout << "Multiset contents:" << endl;
+        //for (const auto& p : ms) {
+        //    cout << p.first << ", " << p.second << endl;
+        //}
+    }
+
+}

@@ -1,0 +1,56 @@
+# By Daniel Zhang, Pinetree Secondary
+
+import sys
+
+n = input()
+h = input()
+N = len(n)
+H = len(h)
+if (N > H):
+    print(0)
+    sys.exit()
+alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+
+p1 = 31
+mod1 = int(1e9) + 9
+p2 = 37
+mod2 = int(1e9) + 7
+
+
+def val(char):
+    return ord(char) - 96
+
+
+hashes = set()
+needle_count = {i:0 for i in alphabet}
+for c in n:
+    needle_count[c] += 1
+
+power1 = [1]
+power2 = [1]
+for i in range(1, N):
+    power1.append(power1[-1] * p1 % mod1)
+    power2.append(power2[-1] * p2 % mod2)
+
+cur_hash1 = cur_hash2 = 0
+cur_count = {i:0 for i in alphabet}
+for i in range(N):
+    cur_count[h[i]] += 1
+    cur_hash1 = (cur_hash1 + val(h[i]) * power1[N-i-1]) % mod1
+    cur_hash2 = (cur_hash2 + val(h[i]) * power2[N-i-1]) % mod2
+    
+if cur_count == needle_count:
+    hashes.add((cur_hash1, cur_hash2))
+
+
+for i in range(N, H):
+    rem_char = h[i-N]; new_char = h[i]
+    cur_count[rem_char] -= 1; cur_count[new_char] += 1
+    cur_hash1 -= val(rem_char) * power1[N-1]; cur_hash1 *= p1; cur_hash1 += val(new_char); cur_hash1 %= mod1
+    cur_hash2 -= val(rem_char) * power2[N-1]; cur_hash2 *= p2; cur_hash2 += val(new_char); cur_hash2 %= mod2
+    if cur_count == needle_count:
+        hashes.add((cur_hash1, cur_hash2))
+
+
+print(len(hashes))

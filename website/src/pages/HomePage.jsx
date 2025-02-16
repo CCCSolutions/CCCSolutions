@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
-import BackgroundImage from '../assets/mmhs.jpg'
-import OtherBackgroundImage from '../assets/image.webp'
+import BackgroundImage from '../assets/image.png'
 
 // Styled components (i got lazy)
 const IconWrapper = styled.div`
@@ -61,16 +60,22 @@ const Home = () => {
       {/* Helmet for SEO */}
       <Helmet>
         <meta name="keywords" content="
-          CCC problems, CCC practice, CCC Solutions, CCC Solution, CCCSolutions, cccsolutions, Canadian Computer Contest Solutions, Canadian Computing Competition Solutions, University of Waterloo, Canadian Computing Competition, Competitive Programming, Problem Solving, Algorithms, Data Structures, Programming Contests, Code Challenges, Solution Discussions, Forum, Programming Tutorials, Code Snippets, User Contributions, Problem Analysis, Practice Problems, Resources, CCC Resources, Discussion Threads, Community Support, Programming Languages, C++, Python, Java, Solutions Archive, CCC Solution Repository, Canadian Computing Competition Solutions, CCC Preparation, CCC Strategies, CCC Tips and Tricks, CCC Student Resources, CCC Past Problems, CCC Contest Solutions
+          CCC Solutions, CCC Solution Repository, Canadian Computing Competition Solutions, Canadian Computing Competition, CCC Preparation, CCC Past Problems, CCC Contest Solutions, University of Waterloo CCC, Competitive Programming, Algorithm Challenges, Data Structures, Problem Solving, Coding Solutions, Code Repository, CCC Problem Analysis, Programming Contests, Code Challenges, CCC Code Submissions, C++ CCC Solutions, Python CCC Solutions, Java CCC Solutions, CCC Strategy Guide, CCC Study Materials, CCC Exam Preparation, CCC Resources, Coding Forum, Solution Discussions, Programming Tutorials, Algorithm Techniques, CCC Tips and Tricks, CCC Best Practices, CCC Community Support, Competitive Coding Tips, CCC Coding Exercises, Problem-Solving Techniques, CCC Code Snippets, Coding Competitions, Coding Contest Training, Canadian Coding Contests
         " />
-        <title>Home | CCC Solution Repository</title>
+        <meta name="description" content="
+          Find comprehensive solutions to Canadian Computing Competition (CCC) problems. Explore a well-organized repository of CCC past problems, detailed problem analyses, and optimized programming solutions in C++, Python, and Java. Improve your competitive programming skills with CCC strategies, tips, and practice resources.
+        " />
+        <meta name="author" content="MMHS" />
+        <meta name="robots" content="index, follow" />
+        <title>CCC Solutions | Canadian Computing Competition Repository</title>
       </Helmet>
+
 
       <div className="bg-gray-100">
       {/* Hero Section */}
       <div
         className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
-        style={{ backgroundImage: `url(${OtherBackgroundImage})` }}
+        style={{ backgroundImage: `url(${BackgroundImage})` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           The <span
@@ -151,7 +156,7 @@ most comprehensive</span> CCC solution repository
             >
               <div className="grid md:grid-cols-3 gap-16">
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">1,200+</p>
+                  <p className="text-4xl font-bold text-blue-800">1,400+</p>
                   <p className="text-gray-600">Active Users</p>
                 </div>
                 <div className="text-center p-3">

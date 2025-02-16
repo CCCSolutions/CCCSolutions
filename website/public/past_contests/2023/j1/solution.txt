@@ -1,0 +1,15 @@
+# By Daniel Zhang, Pinetree Secondary
+
+import sys
+
+packages = int(input())
+collisions = int(input())
+
+points = 50 * packages
+points -= 10 * collisions
+if packages > collisions:
+    points += 500
+
+
+
+print(points)

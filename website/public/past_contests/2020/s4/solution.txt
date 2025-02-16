@@ -1,0 +1,38 @@
+# Daniel Zhang, Pinetree Secondary School
+
+
+import sys
+
+
+s = sys.stdin.readline().rstrip().lower()
+n = len(s)*2
+
+counts = {'a':0, 'b':0, 'c':0}
+for c in s:
+    counts[c] += 1
+
+S = s + s
+
+#psa setup
+psa = {'a':[0]*(n+1), 'b':[0]*(n+1), 'c':[0]*(n+1)}
+for i in range(1, n+1):
+    psa['a'][i], psa['b'][i], psa['c'][i] = psa['a'][i-1], psa['b'][i-1], psa['c'][i-1]
+    psa[S[i-1]][i] += 1
+
+ans = 999999999
+for o in ['abc', 'acb']:
+    f, s, t = o[0], o[1], o[2]
+    #print(o, counts)
+    for i in range(n//2):
+        f_section_end = i + counts[f] #exclusive
+        s_section_end = i + counts[f] + counts[s] #exclusive
+        t_section_end = i + counts[f] + counts[s] + counts[t] #
+        #print(f_section_end, s_section_end, t_section_end, "i:", i,end=" fins, sinf :")
+        num_s_in_f = psa[s][f_section_end] - psa[s][i] #number of the second letter in the first section
+        num_f_in_s = psa[f][s_section_end] - psa[f][f_section_end] #number of the first letter in second section
+        num_not_t_in_t = counts[t] - (psa[t][t_section_end] - psa[t][s_section_end])
+
+        ans = min(ans, num_not_t_in_t + max(num_f_in_s, num_s_in_f))
+
+
+print(ans)

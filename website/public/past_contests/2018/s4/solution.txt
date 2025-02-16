@@ -1,0 +1,72 @@
+# By Daniel Zhang, Pinetree Secondary School
+
+import math
+
+n = int(input())
+
+
+memo = {}
+#note that this is O(W) = O(10^9)
+#we can optimize by noticing that the same weight subtrees will get called many times
+#take recurse(4) for example
+#it can have k = 2, 3, 4 subtres
+
+#2 Subtrees: -> each subtree has weight 4//2 = 2 
+#3 subtrees: -> each subtree has weight 4//3 = 1
+#4 subtrees: -> each subtree has weight 4//4 = 1
+#as we can see, the number of PBT's of weight 4 is F(2) + F(1) + F(1)
+#the F(1) is called twice, we can isntead multiply F(1)
+#now it comes down to finding the number of F(i) for each i
+
+#for a value v, the range of i which satisfies it is n / v+1 <= i < n / v
+#after we get the count, we just need to find each valid value
+#to do this we can 'jump' to the next range
+
+#wuganggame's code (finally makes sense!)
+#d is the value of each subtree
+#r is the remaining, and so r/d is additional i-values that we have where W/i is still d
+#then we add one similar to next_i
+#   int k = 2;
+#   while (k <= n) {
+#     int d = n / k;
+#     int r = n % k;
+#     int count = r / d + 1;
+#     ans += count * f(d);
+#     k += count;
+#   }
+def recurse(w): #number of subtrees for a pbt of  weight w
+    if w == 1:
+        return 1
+    if w in memo:
+        return memo[w]
+
+    out = 0
+
+    i = 2
+    while i <= w:
+        v = w // i
+        numV = w // v - w // (v+1)
+        out += numV * recurse(v)
+        
+        #this is the key part, and also hardest to understand
+        #some v values won't show up
+        #for example in F(10) there is no 10//i = 4
+        #so we should skip that and go from 5 -> 3
+        #the current weight of each subtree is w // i
+        #so the number of times that V can fit into W is the largest i that produces this V
+        #example: W = 10, i = 4
+        #10//4 = 2 = V
+        # 10 // 2 is 5, so 5 is the maximum i for which W//i equals V
+        #thus, i+1 will result in a new V
+        #another example: W = 12, i = 3
+        #V = 12//3 = 4
+        #w // v = 3, and so next_i = 3+1 = 4
+        #so indeed 12//4 gives a new V value of 3, from the previous V value of 4
+        next_i = w // v + 1
+
+        i = next_i
+
+    memo[w] = out
+    return out
+
+print(recurse(n))

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Book, BookOpen, Info } from 'react-feather';
 
 const ProblemsTable = ({ problems }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPage = parseInt(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
 
-  // Now fetches solution statuses only for problems on the current page !!
   useEffect(() => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
@@ -18,7 +20,7 @@ const ProblemsTable = ({ problems }) => {
       for (const problem of currentProblems) {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
-        const alternativeCode = getAlternativeCode(code,year);
+        const alternativeCode = getAlternativeCode(code, year);
         let hasSolution = false;
 
         for (const checkCode of [code, alternativeCode]) {
@@ -44,6 +46,10 @@ const ProblemsTable = ({ problems }) => {
     fetchSolutionStatuses();
   }, [currentPage, problems]);
 
+  useEffect(() => {
+    setSearchParams({ page: currentPage });
+  }, [currentPage, setSearchParams]);
+
   const getYearAndCodeFromLink = (link) => {
     const parts = link.split('/');
     const year = parts[2];
@@ -52,27 +58,25 @@ const ProblemsTable = ({ problems }) => {
   };
 
   const getAlternativeCode = (code, year) => {
-    if (year <2016) {
-    const mapping = {
-      'j5': 's3',
-      'j4': 's2',
-      'j3': 's1',
-    };
-    return mapping[code.toLowerCase()];
+    if (year < 2016) {
+      const mapping = {
+        j5: 's3',
+        j4: 's2',
+        j3: 's1',
+      };
+      return mapping[code.toLowerCase()];
     }
   };
 
-  // Calculate the total number of pages
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 
-  // Calculate the current problems to display based on the current page
   const currentProblems = problems.slice(
     (currentPage - 1) * problemsPerPage,
     currentPage * problemsPerPage
   );
 
-  // Function to handle page change
   const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
@@ -103,44 +107,34 @@ const ProblemsTable = ({ problems }) => {
         </thead>
         <tbody>
           {currentProblems.map((problem, index) => (
-            <React.Fragment key={index}>
-              <tr
-                className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
-              >
-                <td className="py-3 whitespace-nowrap text-sm font-medium">
-                  {solutionStatuses[problem.name] === 'Has Solution' ? (
-                    <div className="px-10 text-green-400">
-                      <BookOpen className="w-5 h-5" />
-                    </div>
-                  ) : solutionStatuses[problem.name] === 'No Solution' ? (
-                    <div className="px-10 text-red-600">
-                      <Book className="w-5 h-5" />
-                    </div>
-                  ) : (
-                    <div className="px-10">
-                      . . .
-                    </div>
-                  )}
-                </td>
-                <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
-                  <a
-                    href={problem.link}
-                    className="truncate text-blue-600 font-semibold hover:underline"
-                    style={{ maxWidth: '20rem' }}
-                  >
-                    {problem.name}
-                  </a>
-                </td>
-                <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
-                  <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
-                    {problem.difficulty}
-                  </span>
-                </td>
-                <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-sm font-medium">
-                  {problem.tags.join(', ')}
-                </td>
-              </tr>
-            </React.Fragment>
+            <tr key={index} className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+              <td className="py-3 whitespace-nowrap text-sm font-medium">
+                {solutionStatuses[problem.name] === 'Has Solution' ? (
+                  <div className="px-10 text-green-400">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                ) : solutionStatuses[problem.name] === 'No Solution' ? (
+                  <div className="px-10 text-red-600">
+                    <Book className="w-5 h-5" />
+                  </div>
+                ) : (
+                  <div className="px-10">. . .</div>
+                )}
+              </td>
+              <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
+                <a href={problem.link} className="truncate text-blue-600 font-semibold hover:underline" style={{ maxWidth: '20rem' }}>
+                  {problem.name}
+                </a>
+              </td>
+              <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
+                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
+                  {problem.difficulty}
+                </span>
+              </td>
+              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-sm font-medium">
+                {problem.tags.join(', ')}
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>

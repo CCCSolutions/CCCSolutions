@@ -1,0 +1,26 @@
+# By Daniel Zhang, Pinetree Secondary
+
+n = int(input())
+scores = []
+for i in range(n):
+    scores.append(int(input()))
+
+gold = max(scores)
+for i in range(n):
+    if scores[i] == gold:
+        scores[i] = -1
+
+silver = max(scores)
+for i in range(n):
+    if scores[i] == silver:
+        scores[i] = -1
+        
+bronze = max(scores)
+c = 0
+
+for i in range(n):
+    if scores[i] == bronze:
+        c += 1
+
+
+print(f"{bronze} {c}")

@@ -1,0 +1,30 @@
+# By Daniel Zhang, Pinetree Secondary
+
+import sys
+
+n = int(input())
+
+people = []
+for i in range(n):
+    people.append(input())
+
+days = [0,0,0,0,0]
+for i in range(5):
+    c = 0
+    for p in people:
+        if p[i] == "Y":
+            c += 1
+    days[i] = c
+
+s = []
+
+m = max(days)
+for i in range(5):
+    if days[i] == m:
+        s.append(i+1)
+
+for n in range(len(s)):
+    if n == len(s)-1:
+        print(s[n])
+    else:
+        print(str(s[n]) + ",", end="")
