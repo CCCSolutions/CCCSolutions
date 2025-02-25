@@ -1,0 +1,8 @@
+# By Daniel Zhang, Pinetree Secondary
+
+b1, h1, b2, h2 = map(int, input().split())
+
+widest = max(b1, b2)
+highest = max(h1, h2)
+
+print(min(2 * (h1 + h2 + widest), 2 * (b1 + b2 + highest)))

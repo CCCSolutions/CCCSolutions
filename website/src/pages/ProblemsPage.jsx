@@ -5,6 +5,21 @@ import SearchBar from "../components/Searchbar.jsx";
 import { Helmet } from "react-helmet";
 
 const problems = [
+	// 2025 Junior
+	{ name: '2025 J1 - Roller Coaster Ride', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2025/j1' },
+	{ name: '2025 J2 - Donut Shop', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2025/j2' },
+	{ name: '2025 J3 - Product Codes', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2025/j3' },
+	{ name: '2025 J4 - Sunny Days', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2025/j4' },
+	{ name: '2025 J5 - Connecting Territories', difficulty: 'Normal', tags: ['dynamic programming'], link: '/contest/2025/j5' },
+
+	// 2025 Senior
+	{ name: '2025 S1 - Positioning Peter\'s Paintings', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2025/s1' },
+	{ name: '2025 S2 - Cryptogram Cracking Club', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2025/s2' },
+	{ name: '2025 S3 - Pretty Pens', difficulty: 'Hard', tags: ['ad hoc, data structures'], link: '/contest/2025/s3' },
+	{ name: '2025 S4 - Floor is Lava', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2025/s4' },
+	{ name: '2025 S5 - To-do List', difficulty: 'Insane', tags: ['data structures'], link: '/contest/2025/s5' },
+
+	
 	// 2024 Junior
 	{ name: '2024 J1 - Conveyor Belt Sushi', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2024/j1' },
 	{ name: '2024 J2 - Dusa And The Yobis', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2024/j2' },
@@ -14,7 +29,7 @@ const problems = [
 
 	// 2024 Senior
 	{ name: '2024 S1 - Hat Circle', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2024/s1' },
-	{ name: '2024 S2 - Heavy-Light Composition', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2024/s2' },
+	{ name: '2024 S2 - Heavy-Light Composition', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2024/s2' },
 	{ name: '2024 S3 - Swipe', difficulty: 'Hard', tags: ['ad hoc'], link: '/contest/2024/s3' },
 	{ name: '2024 S4 - Painting Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2024/s4' },
 	{ name: '2024 S5 - Chocolate Bar Partition', difficulty: 'Wicked', tags: ['dynamic programming'], link: '/contest/2024/s5' },
@@ -24,28 +39,28 @@ const problems = [
 	{ name: '2023 J2 - Chili Peppers', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2023/j2' },
 	{ name: '2023 J3 - Special Event', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2023/j3' },
 	{ name: '2023 J4 - Trianglane', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2023/s1' },
-	{ name: '2023 J5 - CCC Word Hunt', difficulty: 'Insane', tags: ['implementation'], link: '/contest/2023/j5' },
+	{ name: '2023 J5 - CCC Word Hunt', difficulty: 'Hard', tags: ['implementation'], link: '/contest/2023/j5' },
 
 	// 2023 Senior
 	{ name: '2023 S1 - Trianglane', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2023/s1' },
 	{ name: '2023 S2 - Symmetric Mountains', difficulty: 'Hard', tags: ['implementation'], link: '/contest/2023/s2' },
 	{ name: '2023 S3 - Palindromic Poster', difficulty: 'Hard', tags: ['ad hoc', 'constructive'], link: '/contest/2023/s3' },
 	{ name: '2023 S4 - Minimum Cost Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2023/s4' },
-	{ name: '2023 S5 - The Filter', difficulty: 'Wicked', tags: ['graph theory', 'intermediate math'], link: '/contest/2023/s5' },
+	{ name: '2023 S5 - The Filter', difficulty: 'Insane', tags: ['graph theory', 'intermediate math'], link: '/contest/2023/s5' },
 
 	// 2022 Junior
 	{ name: '2022 J1 - Cupcake Party', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2022/j1' },
 	{ name: '2022 J2 - Fergusonball Ratings', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2022/j2' },
 	{ name: '2022 J3 - Harp Tuning', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2022/j3' },
 	{ name: '2022 J4 - Good Groups', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2022/s2' },
-	{ name: '2022 J5 - Square Pool', difficulty: 'Insane', tags: ['brute force', 'implementation'], link: '/contest/2022/j5' },
+	{ name: '2022 J5 - Square Pool', difficulty: 'Hard', tags: ['brute force', 'implementation'], link: '/contest/2022/j5' },
 
 	// 2022 Senior
 	{ name: '2022 S1 - Good Fours and Good Fives', difficulty: 'Normal', tags: ['implementation', 'simple math'], link: '/contest/2022/s1' },
 	{ name: '2022 S2 - Good Groups', difficulty: 'Normal', tags: ['implementation'], link: '/contest/2022/s2' },
 	{ name: '2022 S3 - Good Samples', difficulty: 'Insane', tags: ['ad hoc', 'constructive', 'greedy algorithms'], link: '/contest/2022/s3' },
 	{ name: '2022 S4 - Good Triplets', difficulty: 'Insane', tags: ['ad hoc', 'simple math'], link: '/contest/2022/s4' },
-	{ name: '2022 S5 - Good Influencers', difficulty: 'Wicked', tags: ['dynamic programming', 'graph theory'], link: '/contest/2022/s5' },
+	{ name: '2022 S5 - Good Influencers', difficulty: 'Insane', tags: ['dynamic programming', 'graph theory'], link: '/contest/2022/s5' },
 
 	// 2021 Junior
 	{ name: '2021 J1 - Boiling Water', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2021/j1' },
@@ -72,7 +87,7 @@ const problems = [
 	{ name: '2020 S2 - Escape Room', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2020/s2' },
 	{ name: '2020 S3 - Searching for Strings', difficulty: 'Insane', tags: ['data structures', 'string algorithms'], link: '/contest/2020/s3' },
 	{ name: '2020 S4 - Swapping Seats', difficulty: 'Insane', tags: ['greedy algorithms'], link: '/contest/2020/s4' },
-	{ name: '2020 S5 - Josh\'s Double Bacon Deluxe', difficulty: 'Wicked', tags: ['dynamic programming', 'intermediate math'], link: '/contest/2020/s5' },
+	{ name: '2020 S5 - Josh\'s Double Bacon Deluxe', difficulty: 'Insane', tags: ['dynamic programming', 'intermediate math'], link: '/contest/2020/s5' },
 
 	// 2019 Junior
 	{ name: '2019 J1 - Winning Score', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2019/j1' },

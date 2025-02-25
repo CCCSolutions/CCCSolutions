@@ -1,0 +1,28 @@
+# By Daniel Zhang, Pinetree Secondary
+
+
+s = input().strip()
+c = int(input())
+blocks = []
+i = 0
+n = len(s)
+
+while i < n:
+    letter = s[i]
+    i += 1
+    j = i
+    while j < n and s[j].isdigit():
+        j += 1
+    blocks.append((letter, int(s[i:j])))
+    i = j
+
+total = 0
+for _, count in blocks:
+    total += count
+
+c %= total
+for letter, count in blocks:
+    if c < count:
+        print(letter)
+        break
+    c -= count

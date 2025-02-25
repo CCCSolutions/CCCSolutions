@@ -40,8 +40,17 @@ const GithubIconWrapper = styled(IconWrapper)`
   }
 `;
 
-
-
+// New Banner component
+const AnnouncementBanner = styled.div`
+  background: linear-gradient(90deg, #4E54C8, #8F94FB);
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-weight: 600;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+`;
 
 const Home = () => {
   const contentRef = useRef(null);
@@ -60,7 +69,7 @@ const Home = () => {
       {/* Helmet for SEO */}
       <Helmet>
         <meta name="keywords" content="
-          CCC Solutions, CCC Solution Repository, Canadian Computing Competition Solutions, Canadian Computing Competition, CCC Preparation, CCC Past Problems, CCC Contest Solutions, University of Waterloo CCC, Competitive Programming, Algorithm Challenges, Data Structures, Problem Solving, Coding Solutions, Code Repository, CCC Problem Analysis, Programming Contests, Code Challenges, CCC Code Submissions, C++ CCC Solutions, Python CCC Solutions, Java CCC Solutions, CCC Strategy Guide, CCC Study Materials, CCC Exam Preparation, CCC Resources, Coding Forum, Solution Discussions, Programming Tutorials, Algorithm Techniques, CCC Tips and Tricks, CCC Best Practices, CCC Community Support, Competitive Coding Tips, CCC Coding Exercises, Problem-Solving Techniques, CCC Code Snippets, Coding Competitions, Coding Contest Training, Canadian Coding Contests
+          CCC Solutions, CCC Solution Repository, Canadian Computing Competition Solutions, Canadian Computing Competition, CCC Preparation, CCC Past Problems, CCC Contest Solutions, ccc 2025 solutions, ccc 2025, s1, s2, s3, s4, s5, j1, j2, j3, j4, j5, University of Waterloo CCC, Competitive Programming, Data Structures, Problem Solving, CCC Problem Analysis, Programming Contests, CCC Code Submissions, C++ CCC Solutions, Python CCC Solutions, Java CCC Solutions, CCC Strategy Guide, CCC Study Materials, CCC Exam Preparation, CCC Resources, Coding Forum, Solution Discussions, Programming Tutorials, Algorithm Techniques, CCC Tips and Tricks, CCC Best Practices, CCC Community Support, Competitive Coding Tips, CCC Coding Exercises, Problem-Solving Techniques, CCC Code Snippets, Coding Competitions, Coding Contest Training, Canadian Coding Contests
         " />
         <meta name="description" content="
           Find comprehensive solutions to Canadian Computing Competition (CCC) problems. Explore a well-organized repository of CCC past problems, detailed problem analyses, and optimized programming solutions in C++, Python, and Java. Improve your competitive programming skills with CCC strategies, tips, and practice resources.
@@ -70,6 +79,12 @@ const Home = () => {
         <title>CCC Solutions | Canadian Computing Competition Repository</title>
       </Helmet>
 
+      {/* New Announcement Banner */}
+      <AnnouncementBanner>
+        <Link to="/solutions" className="text-white hover:underline">
+          2025 solutions are beginning to be released! Check the solutions page for more details.
+        </Link>
+      </AnnouncementBanner>
 
       <div className="bg-gray-100">
       {/* Hero Section */}
@@ -156,7 +171,7 @@ most comprehensive</span> CCC solution repository
             >
               <div className="grid md:grid-cols-3 gap-16">
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">1,400+</p>
+                  <p className="text-4xl font-bold text-blue-800">1,800+</p>
                   <p className="text-gray-600">Active Users</p>
                 </div>
                 <div className="text-center p-3">
