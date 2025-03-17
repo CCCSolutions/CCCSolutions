@@ -81,8 +81,8 @@ const Home = () => {
 
       {/* New Announcement Banner */}
       <AnnouncementBanner>
-        <Link to="/solutions" className="text-white hover:underline">
-          2025 solutions are beginning to be released! Check the solutions page for more details.
+        <Link to="/solutions" className="text-white">
+          2025 solutions are now fully released! View them <u>here</u>.
         </Link>
       </AnnouncementBanner>
 

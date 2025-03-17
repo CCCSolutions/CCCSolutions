@@ -16,20 +16,13 @@ const Problem = ({ contestYear, problemCode }) => {
       let foundCode = problemCode;
       const solutionsArray = [];
 
-      // Helper to check if solution matches problem
-      const solutionMatchesProblem = (solutionText) => {
-        // Temporarily allow all solutions to pass for debugging purposes
-        return true;
-      };
-
       // Iterate over problem codes and alternative codes to fetch solutions
       for (const code of [problemCode, alternativeCode]) {
         console.log(`Trying to fetch solutions for code: ${code}`);  // Debug log
 
-        if (!code) continue;
         const basePath = `/past_contests/${contestYear}/${code}`;
 
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 3; i++) {
           try {
             const fetchUrl = `${basePath}/solution${i === 1 ? "" : i}.txt`;
             console.log(`Fetching from: ${fetchUrl}`);  // Debug log to check the URL
@@ -44,10 +37,9 @@ const Problem = ({ contestYear, problemCode }) => {
             const text = await response.text();
             console.log(`Fetched content:`, text);  // Log fetched content
 
-            if (!text.toLowerCase().includes("<!doctype html>") && solutionMatchesProblem(text)) {
+            if (!text.toLowerCase().includes("<!doctype html>")) {
               solutionsArray.push(text);
               foundCode = code;
-              break;  // Exit loop once a solution is found
             }
           } catch (error) {
             console.error(`Error fetching solution${i} for ${code}:`, error);
@@ -136,6 +128,20 @@ const Problem = ({ contestYear, problemCode }) => {
         )}
 
         <div className="mb-6">
+          <h3 className="text-lg font-bold text-black mb-2">{solutions.length} solution(s) available:</h3>
+          {solutions.map((solution, idx) => (
+            <div key={idx} className="mb-4">
+              <h4 className="text-md font-medium text-black mb-1">
+                Solution {idx + 1}:
+              </h4>
+              <SyntaxHighlighter language="cpp" style={solarizedlight} showLineNumbers>
+                {solution}
+              </SyntaxHighlighter>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-6">
           <h3 className="text-lg font-semibold text-black mb-4">Test Cases:</h3>
           <div className="bg-gray-100 p-4 rounded-lg w-1/2 mx-auto">
             <div className="flex space-x-2 mb-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400">
@@ -180,19 +186,6 @@ const Problem = ({ contestYear, problemCode }) => {
           </div>
         </div>
 
-        <div className="mb-6">
-          <h3 className="text-lg font-bold text-black mb-2">Solutions:</h3>
-          {solutions.map((solution, idx) => (
-            <div key={idx} className="mb-4">
-              <h4 className="text-md font-medium text-black mb-1">
-                Solution {idx + 1}:
-              </h4>
-              <SyntaxHighlighter language="cpp" style={solarizedlight} showLineNumbers>
-                {solution}
-              </SyntaxHighlighter>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
