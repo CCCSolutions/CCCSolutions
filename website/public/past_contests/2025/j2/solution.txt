@@ -1,12 +1,18 @@
-n = int(input())  
-m = int(input())  
+#  By WATER on 2025-03-02
 
-for _ in range(m):
-    op = input()
-    x = int(input())
-    if op == "+":
-        n += x
-    else:
-        n -= x  
+D=int(input())
+E=int(input())
 
-print(n)
+
+for _ in range(E):
+    e=input()
+    Q=int(input())
+
+
+    if e=="+":
+        D+=Q
+    elif e=='-':
+        D-=Q
+
+
+print(D)
