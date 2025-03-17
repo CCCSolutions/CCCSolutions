@@ -1,0 +1,78 @@
+// By Daniel Zhang, Pinetree Secondary
+
+// Idea - maintain a segment tree where each node stores the latest time possible to complete all the tasks
+// in as little time as possible, which is the sum of the times of the tasks
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+typedef long long ll;
+
+struct Node {
+    ll begin, time;
+};
+
+const ll MAXN = 1000025;
+Node tree[4*MAXN];
+ll arr[MAXN];
+vector<pair<ll, ll>> hw;
+
+Node recalculate(ll node) {
+    Node l = tree[2 * node + 1], r = tree[2 * node + 2];
+    if(l.begin == INT_MAX) return r;  // left is empty
+    if(r.begin == INT_MAX) return l;  // right is empty
+
+    return {max(l.begin + l.time, r.begin) - l.time, l.time + r.time};
+}
+
+
+void update(ll node, ll left, ll right, ll index, ll value) {
+    if (left == right) {
+        if (value == 0) {
+            tree[node] = {INT_MAX, INT_MIN};
+        }
+        else tree[node] = {index, value};
+    }
+    else {
+        ll middle = (left + right) / 2;
+        if (index <= middle) update(node * 2 + 1, left, middle, index, value); // update left branch
+        else update(node * 2 + 2, middle + 1, right, index, value);
+        tree[node] = recalculate(node);
+    }
+}
+
+ll ans = 0;
+const ll mod = 1e6 + 3;
+
+signed main() {
+    ios::sync_with_stdio(0); cin.tie(0);
+
+    ll q; cin >> q;
+
+    for (ll i=0; i<4*MAXN; i++) tree[i] = {INT_MAX, INT_MIN};
+
+    for (ll i=0; i<q; i++) {
+        char command; cin >> command;
+        if (command == 'A') {
+            ll s, t; cin >> s >> t; 
+            s = (s + ans - 1 + mod) % mod; t = (t + ans) % mod;
+            arr[s] += t;
+            update(0, 0, MAXN, s, arr[s]);
+            hw.push_back({s, t});
+        }
+
+        else {
+            ll idx; cin >> idx; 
+            idx = (idx + ans - 1) % mod;
+            ll s = hw[idx].first;
+            ll t = hw[idx].second;
+            arr[s] -= t;
+            update(0, 0, MAXN, s, arr[s]);
+        }
+
+        ans = tree[0].begin + tree[0].time;
+        cout << ans << "\n";
+    }
+}
+

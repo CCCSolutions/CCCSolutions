@@ -1,0 +1,12 @@
+n = int(input())  
+m = int(input())  
+
+for _ in range(m):
+    op = input()
+    x = int(input())
+    if op == "+":
+        n += x
+    else:
+        n -= x  
+
+print(n)

@@ -1,0 +1,22 @@
+n = int(input())
+arr = [input() for _ in range(n)]
+
+left = 0
+rain = 0
+ans = 0
+
+for right in range(n):
+    if arr[right] == "P":
+        rain += 1
+
+    while rain > 1:
+        if arr[left] == "P":
+            rain -= 1
+        left += 1
+
+    ans = max(ans, right - left + 1)
+
+if 'P' not in arr:
+    ans -= 1
+
+print(ans)

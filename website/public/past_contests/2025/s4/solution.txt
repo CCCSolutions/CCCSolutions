@@ -1,0 +1,48 @@
+// Daniel Zhang
+// Dijkstra on edges instead of nodes
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+using ll = long long;
+using State = tuple<ll, ll, ll>;
+
+int vis[200001], edges[200001];
+vector<pair<ll, ll>> graph[200001];
+
+int main() {
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) {
+        int u, v, w; cin >> u >> v >> w;
+        graph[u].push_back({v, i});
+        graph[v].push_back({u, i});
+        edges[i] = w;
+    }
+    
+    priority_queue<State, vector<State>, greater<>> pq;
+    vector<ll> best(m + 1, LLONG_MAX);
+    
+    pq.push({0, 1, m});
+    
+    while (!pq.empty()) {
+        auto [c, a, i] = pq.top(); pq.pop();
+        
+        if (vis[i]) continue;
+        vis[i] = 1;
+        
+        if (a == n) {
+            cout << c;
+            return 0;
+        }
+        
+        for (auto [b, j] : graph[a]) {
+            if (vis[j]) continue;
+            ll new_c = c + abs(edges[i] - edges[j]);
+            if (new_c < best[j]) {
+                best[j] = new_c;
+                pq.push({new_c, b, j});
+            }
+        }
+    }
+}

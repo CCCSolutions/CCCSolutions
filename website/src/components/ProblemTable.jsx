@@ -6,9 +6,10 @@ const ProblemsTable = ({ problems }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialPage = parseInt(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const problemsPerPage = 20;
   const [solutionStatuses, setSolutionStatuses] = useState({});
-
+  
+  const problemsPerPage = 20;
+  
   // Get the problems for the current page
   const currentProblems = problems.slice(
     (currentPage - 1) * problemsPerPage,
@@ -20,13 +21,15 @@ const ProblemsTable = ({ problems }) => {
     const fetchSolutionStatuses = async () => {
       const statuses = {};
 
-      // Generate fetch requests for all problems on the current page
       const fetchPromises = currentProblems.map(async (problem) => {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
-        const alternativeCode = getAlternativeCode(code, year);
+        
+        // Only check for alternative code if year < 2025
+        const alternativeCode = year < 2025 ? getAlternativeCode(code, year) : null;
 
-        const pathsToCheck = [code, alternativeCode].filter(Boolean).map((checkCode) => `/past_contests/${year}/${checkCode}/solution.txt`);
+        const pathsToCheck = [code, alternativeCode].filter(Boolean)
+          .map((checkCode) => `/past_contests/${year}/${checkCode}/solution.txt`);
 
         for (const path of pathsToCheck) {
           try {
@@ -51,6 +54,7 @@ const ProblemsTable = ({ problems }) => {
     fetchSolutionStatuses();
   }, [currentProblems]);
 
+  // Update URL when page changes
   useEffect(() => {
     setSearchParams({ page: currentPage });
   }, [currentPage, setSearchParams]);
@@ -67,6 +71,7 @@ const ProblemsTable = ({ problems }) => {
       const mapping = { j5: 's3', j4: 's2', j3: 's1' };
       return mapping[code.toLowerCase()];
     }
+    return null;
   };
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
@@ -74,6 +79,23 @@ const ProblemsTable = ({ problems }) => {
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const getDifficultyClass = (difficulty) => {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return 'bg-green-100 text-green-800';
+      case 'normal':
+        return 'bg-blue-100 text-blue-800';
+      case 'hard':
+        return 'bg-orange-100 text-orange-800';
+      case 'insane':
+        return 'bg-red-100 text-red-800';
+      case 'wicked':
+        return 'bg-purple-100 text-purple-800 evil-purple-glow';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
@@ -137,36 +159,26 @@ const ProblemsTable = ({ problems }) => {
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50">
+        <button 
+          onClick={() => handlePageChange(currentPage - 1)} 
+          disabled={currentPage === 1} 
+          className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
+        >
           Previous
         </button>
         <div className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
         </div>
-        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50">
+        <button 
+          onClick={() => handlePageChange(currentPage + 1)} 
+          disabled={currentPage === totalPages} 
+          className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
+        >
           Next
         </button>
       </div>
     </div>
   );
-};
-
-
-const getDifficultyClass = (difficulty) => {
-  switch (difficulty.toLowerCase()) {
-    case 'easy':
-      return 'bg-green-100 text-green-800';
-    case 'normal':
-      return 'bg-blue-100 text-blue-800';
-    case 'hard':
-      return 'bg-orange-100 text-orange-800';
-    case 'insane':
-      return 'bg-red-100 text-red-800';
-    case 'wicked':
-      return 'bg-purple-100 text-purple-800 evil-purple-glow';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
 };
 
 export default ProblemsTable;

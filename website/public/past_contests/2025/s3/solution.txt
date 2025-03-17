@@ -1,0 +1,125 @@
+// This solution was submitted in-contest. 
+// However, it uses multisets which is exclusive to C++.
+// Please upload a solution in the forum if you have a more elegant way to solve this problem.
+
+
+#include <bits/stdc++.h>
+
+#define int long long
+#define pii pair<long long, long long>
+
+using namespace std;
+
+int n, m, q;
+
+set<pair<int, int>, greater<pair<int, int>>> colors[200001];
+
+int where[200001], pretty[200001]; //where[i] is which set the ith pen is in
+
+int totalsum = 0;
+
+set<pair<int, int>> row1, row2;
+
+pii colfirst, colsecond;
+
+
+void changeColor(int id, int c) {
+    int loc = where[id];
+    int score = pretty[id];
+
+
+    colfirst = *colors[loc].begin();
+    colsecond = *(++colors[loc].begin());
+    row1.erase(colfirst);
+    row2.erase(colsecond);
+    totalsum -= colfirst.first;
+
+    colfirst = *colors[c].begin();
+    colsecond = *(++colors[c].begin());
+    row1.erase(colfirst);
+    row2.erase(colsecond);
+    totalsum -= colfirst.first;
+
+
+
+
+    colors[loc].erase({score, id});
+    colors[c].insert({score, id});
+    where[id] = c;
+
+
+
+    colfirst = *colors[loc].begin();
+    colsecond = *(++colors[loc].begin());
+    row1.insert(colfirst);
+    row2.insert(colsecond);
+    totalsum += colfirst.first;
+
+    colfirst = *colors[c].begin();
+    colsecond = *(++colors[c].begin());
+    row1.insert(colfirst);
+    row2.insert(colsecond);
+    totalsum += colfirst.first;
+}
+
+void changePretty(int id, int p) {
+    int loc = where[id];
+    int score = pretty[id];
+
+
+    colfirst = *colors[loc].begin();
+    colsecond = *(++colors[loc].begin());
+    row1.erase(colfirst);
+    row2.erase(colsecond);
+    totalsum -= colfirst.first;
+
+
+    colors[loc].erase({score, id});
+    colors[loc].insert({p, id});
+    pretty[id] = p;
+
+    colfirst = *colors[loc].begin();
+    colsecond = *(++colors[loc].begin());
+    row1.insert(colfirst);
+    row2.insert(colsecond);
+    totalsum += colfirst.first;
+}
+
+
+signed main() {
+    cin >> n >> m >> q;
+    for (int i=1; i<=m; i++) {
+        colors[i].insert({0, 0}); //out of bounds
+    }
+
+    for (int i=1; i<=n; i++) {
+        int c, p; cin >> c >> p;
+        where[i] = c;
+        pretty[i] = p;
+        colors[c].insert({p, i});
+    }
+
+    for (int i=1; i<=m; i++) {
+        totalsum += colors[i].begin()->first;
+        row1.insert(*colors[i].begin());
+        row2.insert(*(++colors[i].begin()));
+    }
+
+    cout << max(totalsum, totalsum + (--row2.end())->first - row1.begin()->first) << endl;
+
+
+    while (q--) {
+        int typ; cin >> typ;
+        int id, x; cin >> id >> x;
+
+
+        if (typ == 1) {
+            changeColor(id, x);
+        }
+        else {
+            changePretty(id, x);
+        }
+
+        cout << max(totalsum, totalsum + (--row2.end())->first - row1.begin()->first) << endl;
+    }
+}
