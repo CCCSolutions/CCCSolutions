@@ -1,88 +1,10 @@
 import React from 'react';
 import { BookOutlined, GlobalOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
-
-const IconWrapper = styled.div`
-  font-size: 1.5rem;
-  margin-right: 15px;
-  border-radius: 8px;
-  background: ${(props) =>
-    props.background || 'linear-gradient(135deg, #8a59fa, #7f73ff)'};
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const BookIconWrapper = styled(IconWrapper)`
-  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-`;
-
-const WebIconWrapper = styled(IconWrapper)`
-  background: linear-gradient(135deg, #4e54c8, #8f94fb);
-`;
 
 const Resources = () => {
   const books = [
     {
-      title: 'Problems on Algorithms',
-      author: 'Ian Parberry and William Gasarch',
-      edition: '2nd Edition, July 2002',
-      link: 'http://www.eng.unt.edu/ian/books/free/',
-    },
-    {
-      title: 'Foundations of Computer Science',
-      author: 'Lawrence Paulson',
-      link: 'https://mmhs.ca/ccc/pdfbooks/Founds-FP.pdf',
-    },
-    {
-      title: 'Algorithms Course Materials',
-      author: 'Jeff Erickson',
-      link: 'http://compgeom.cs.uiuc.edu/~jeffe/teaching/algorithms/',
-    },
-    {
-      title: 'Data Structures',
-      author: 'Dave Mount',
-      course: 'CMSC 420 (Spring 2001)',
-      link: 'https://mmhs.ca/ccc/pdfbooks/420lects.pdf',
-    },
-    {
-      title: 'Design and Analysis of Computer Algorithms',
-      author: 'David M. Mount',
-      course: 'CMSC 451',
-      link: 'https://mmhs.ca/ccc/pdfbooks/451lects.pdf',
-    },
-    {
-      title: 'The Java Language Specification',
-      author: 'James Gosling, Bill Joy and Guy Steele',
-      link: 'https://mmhs.ca/ccc/pdfbooks/java.pdf',
-    },
-    {
-      title: 'Sorting and Searching Algorithms: A Cookbook',
-      author: 'Thomas Niemann',
-      link: 'https://mmhs.ca/ccc/pdfbooks/s_man.pdf',
-    },
-    {
-      title: 'Art of Programming Contest',
-      author: 'Ahmed Shamsul Arefin',
-      link: 'https://mmhs.ca/ccc/pdfbooks/Art_of_Programming_Contest_SE_for_uva.pdf',
-    },
-    {
-      title: 'How to Think Like a Computer Scientist',
-      author: 'Allen B. Downey',
-      link: 'https://mmhs.ca/ccc/pdfbooks/thinkCScpp.pdf',
-    },
-    {
-      title: 'Algorithms',
-      author: 'S. Dasgupta, C.H. Papadimitrou and U.V. Vazirani',
-      link: 'https://people.eecs.berkeley.edu/~vazirani/algorithms/all.pdf',
-    },
-    {
-      title: "Competitive Programmer's Handbook",
+      title: "📌 Competitive Programmer's Handbook",
       author: 'Antti Laaksonen',
       link: 'https://cses.fi/book/book.pdf',
     },
@@ -90,26 +12,19 @@ const Resources = () => {
 
   const websites = [
     {
-      title: 'The Wiki of the Senior Computer Team at TJHSST',
-      link: 'https://tjsct.wikidot.com/',
-    },
-    {
-      title: 'Don Mills Online Judge (DMOJ: Modern Online Judge)',
+      title: 'DMOJ: Modern Online Judge',
       link: 'https://dmoj.ca/',
+      description: 'A modern platform for programming contests with an extensive problem library and support for multiple programming languages.',
     },
     {
-      title: "The Lectures of TJHSST's Senior Computer Team",
-      link: 'https://activities.tjhsst.edu/sct/lectures.php',
+      title: 'Codeforces',
+      link: 'https://codeforces.com/',
+      description: 'One of the most popular competitive programming platforms featuring regular contests and a vast problem archive sorted by difficulty.',
     },
     {
-      title: 'The Algorithmist',
-      link: 'https://algorithmist.com/wiki/Main_Page',
-    },
-    {
-      title:
-        'Data Structures and Algorithms with Object-Oriented Design Patterns in Java',
-      author: 'Bruno R. Preiss',
-      link: 'unavailable',
+      title: 'USACO Guide',
+      link: 'https://usaco.guide',
+      description: 'Contains harder problems for those seeking a challenge, although mostly targeted towards C++ users.',
     },
   ];
 
@@ -130,9 +45,9 @@ const Resources = () => {
         {/* Books Section */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <BookIconWrapper>
+            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-red-500 to-orange-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
               <BookOutlined />
-            </BookIconWrapper>
+            </div>
             Books
           </h2>
           <ul className="space-y-4">
@@ -162,9 +77,9 @@ const Resources = () => {
         {/* Websites Section */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <WebIconWrapper>
+            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
               <GlobalOutlined />
-            </WebIconWrapper>
+            </div>
             Websites
           </h2>
           <ul className="space-y-4">
@@ -174,12 +89,15 @@ const Resources = () => {
                 {site.author && (
                   <p className="text-sm text-gray-600">by {site.author}</p>
                 )}
+                {site.description && (
+                  <p className="text-sm text-gray-700 mt-1">{site.description}</p>
+                )}
                 {site.link && (
                   <a
                     href={site.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline text-sm"
+                    className="text-blue-500 hover:underline text-sm mt-2 inline-block"
                   >
                     Visit Site
                   </a>

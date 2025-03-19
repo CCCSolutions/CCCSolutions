@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet';
 import BackgroundImage from '../assets/image.png'
+import { stats } from '../../constants';
 
 // Styled components (i got lazy)
 const IconWrapper = styled.div`
@@ -171,15 +172,15 @@ most comprehensive</span> CCC solution repository
             >
               <div className="grid md:grid-cols-3 gap-16">
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">1,800+</p>
+                  <p className="text-4xl font-bold text-blue-800">{stats.activeUsers}</p>
                   <p className="text-gray-600">Active Users</p>
                 </div>
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">200+</p>
+                  <p className="text-4xl font-bold text-blue-800">{stats.numSolutions}</p>
                   <p className="text-gray-600">CCC Solutions</p>
                 </div>
                 <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">23 years</p>
+                  <p className="text-4xl font-bold text-blue-800">{stats.history}</p>
                   <p className="text-gray-600">Providing Answers</p>
                 </div>
               </div>

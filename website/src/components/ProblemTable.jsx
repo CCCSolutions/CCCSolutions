@@ -24,11 +24,8 @@ const ProblemsTable = ({ problems }) => {
       const fetchPromises = currentProblems.map(async (problem) => {
         const { link } = problem;
         const [year, code] = getYearAndCodeFromLink(link);
-        
-        // Only check for alternative code if year < 2025
-        const alternativeCode = year < 2025 ? getAlternativeCode(code, year) : null;
 
-        const pathsToCheck = [code, alternativeCode].filter(Boolean)
+        const pathsToCheck = [code].filter(Boolean)
           .map((checkCode) => `/past_contests/${year}/${checkCode}/solution.txt`);
 
         for (const path of pathsToCheck) {
@@ -66,13 +63,6 @@ const ProblemsTable = ({ problems }) => {
     return [year, code];
   };
 
-  const getAlternativeCode = (code, year) => {
-    if (year < 2016) {
-      const mapping = { j5: 's3', j4: 's2', j3: 's1' };
-      return mapping[code.toLowerCase()];
-    }
-    return null;
-  };
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 

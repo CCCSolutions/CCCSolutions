@@ -42,7 +42,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="mailto:willi64645@gmail.com,test@gmail.com,test2@gmail.com"
+              href="mailto:willi64645@gmail.com"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
@@ -53,7 +53,7 @@ const FooterWithLogo = () => {
       </div>
       <hr className="my-8 border-gray-400" />
       <Typography color="blue-gray" className="text-center font-normal">
-        &copy; 2024 Milken Mills High School
+        &copy; 2025 Milken Mills High School
       </Typography>
     </footer>
   );

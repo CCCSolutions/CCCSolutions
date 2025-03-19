@@ -1,0 +1,23 @@
+for tc in range(int(input())):
+    up, total, sign, num = "", 0, 1, ""
+    s = input()
+    
+    for c in s:
+        if c.isdigit():
+            num += c
+        else:
+            if num:
+                total += sign * int(num)
+                num = ""
+            if c in "+-":
+                sign = 1 if c == "+" else -1
+            elif c.isupper():
+                up += c
+                sign = 1
+            else:
+                sign = 1
+
+    if num:
+        total += sign * int(num)
+
+    print(up + str(total))

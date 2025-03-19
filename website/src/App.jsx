@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-dom";
 
-import Problem from "./components/Solution.jsx";
+import Problem from "./pages/Solution.jsx";
 import Home from "./pages/HomePage.jsx";
 import Solutions from "./pages/ProblemsPage.jsx";
 import NotFound from "./pages/NotfoundPage.jsx";
