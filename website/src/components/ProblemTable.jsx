@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Book, BookOpen, Info } from 'react-feather';
+import { problems } from '../../constants';
 
-const ProblemsTable = ({ problems }) => {
+const ProblemsTable = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialPage = parseInt(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [solutionStatuses, setSolutionStatuses] = useState({});
   
   const problemsPerPage = 20;
   
@@ -16,53 +16,10 @@ const ProblemsTable = ({ problems }) => {
     currentPage * problemsPerPage
   );
 
-  // Effect to fetch only the displayed problem solutions
-  useEffect(() => {
-    const fetchSolutionStatuses = async () => {
-      const statuses = {};
-
-      const fetchPromises = currentProblems.map(async (problem) => {
-        const { link } = problem;
-        const [year, code] = getYearAndCodeFromLink(link);
-
-        const pathsToCheck = [code].filter(Boolean)
-          .map((checkCode) => `/past_contests/${year}/${checkCode}/solution.txt`);
-
-        for (const path of pathsToCheck) {
-          try {
-            const response = await fetch(path);
-            const text = await response.text();
-            if (!text.toLowerCase().includes('<!doctype html>')) {
-              statuses[problem.name] = 'Has Solution';
-              return;
-            }
-          } catch (error) {
-            console.error(`Error fetching solution for ${problem.name}:`, error);
-          }
-        }
-
-        statuses[problem.name] = 'No Solution';
-      });
-
-      await Promise.all(fetchPromises);
-      setSolutionStatuses((prev) => ({ ...prev, ...statuses }));
-    };
-
-    fetchSolutionStatuses();
-  }, [currentProblems]);
-
   // Update URL when page changes
   useEffect(() => {
     setSearchParams({ page: currentPage });
   }, [currentPage, setSearchParams]);
-
-  const getYearAndCodeFromLink = (link) => {
-    const parts = link.split('/');
-    const year = parts[2];
-    const code = parts[3].toLowerCase();
-    return [year, code];
-  };
-
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 
@@ -117,16 +74,14 @@ const ProblemsTable = ({ problems }) => {
           {currentProblems.map((problem, index) => (
             <tr key={index} className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
               <td className="py-3 whitespace-nowrap text-sm font-medium">
-                {solutionStatuses[problem.name] === 'Has Solution' ? (
+                {problem.hasSolution ? (
                   <div className="px-10 text-green-400">
                     <BookOpen className="w-5 h-5" />
                   </div>
-                ) : solutionStatuses[problem.name] === 'No Solution' ? (
+                ) : (
                   <div className="px-10 text-red-600">
                     <Book className="w-5 h-5" />
                   </div>
-                ) : (
-                  <div className="px-10">. . .</div>
                 )}
               </td>
               <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
