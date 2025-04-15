@@ -441,7 +441,7 @@ const contributors = [
 const stats = {
     activeUsers: "2,100+",
     numSolutions: "260+",
-    history: "30 years"
+    history: "20+ years"
 };
 
 export {problems, contributors, stats};
