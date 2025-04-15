@@ -112,8 +112,8 @@ const problems = [
 	{ name: '2018 S5 - Maximum Strategic Savings', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2018/s5', hasSolution: true },
 
 	// 2017 Junior
-	{ name: '2017 J1 - Quadrant Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2017/j1', hasSolution: false },
-	{ name: '2017 J2 - Shifty Sum', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2017/j2', hasSolution: false },
+	{ name: '2017 J1 - Quadrant Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2017/j1', hasSolution: true },
+	{ name: '2017 J2 - Shifty Sum', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2017/j2', hasSolution: true },
 	{ name: '2017 J3 - Exactly Electrical', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/j3', hasSolution: false },
 	{ name: '2017 J4 - Favourite Times', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2017/j4', hasSolution: false },
 	{ name: '2017 J5 - Nailed It!', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/s3', hasSolution: true},
@@ -126,9 +126,9 @@ const problems = [
 	{ name: '2017 S5 - RMT', difficulty: 'Wicked', tags: ['data structures'], link: '/contest/2017/s5', hasSolution: true },
 
 	// 2016 Junior
-	{ name: '2016 J1 - Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2016/j1', hasSolution: false },
-	{ name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2', hasSolution: false },
-	{ name: '2016 J3 - Hidden Palindrome', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2016/j3', hasSolution: false },
+	{ name: '2016 J1 - Tournament Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2016/j1', hasSolution: true },
+	{ name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2', hasSolution: true },
+	{ name: '2016 J3 - Hidden Palindrome', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2016/j3', hasSolution: true },
 	{ name: '2016 J4 - Arrival Time', difficulty: 'Normal', tags: ['strings', 'loops'], link: '/contest/2016/j4', hasSolution: true },
 	{ name: '2016 J5 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2', hasSolution: false },
 
@@ -434,7 +434,7 @@ const contributors = [
     { initials: "JL", name: "John Liao", school: "Lo-Ellen Park Secondary School", contributions: "Website revamp, 2017 S1-S3"},
     { initials: "OZ", name: "Oscar Zhou", school: "Abbey Park High School", contributions: "Various solutions from 2016-2024"},
     { initials: "TS", name: "Timothy Shnayder", school: "Newmarket High School", contributions: "2017, 2021, 2023 S5"},
-    { initials: "AC", name: "Advay Chandorkar", school: "Glenforest Secondary School", contributions: "2025 S4"},
+    { initials: "AC", name: "Advay Chandorkar", school: "Glenforest Secondary School", contributions: "2025 S4, 2016-2017 J1-J2, 2016 J3"},
     { initials: "W", name: "WATER", school: "N/A", contributions: "2025 J2"}
 ];
 

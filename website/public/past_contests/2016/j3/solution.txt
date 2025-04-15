@@ -1,0 +1,11 @@
+# Advay Chandorkar, Glenforest SS (advayc)
+# py3 solution for 16' j3
+t = input()
+n=len(t)
+c=[]
+for i in range(n):
+    for j in range(n):
+        x=t[i:j+1]
+        if x == x[::-1]:
+            c.append(len(x))
+print(max(c))
