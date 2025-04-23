@@ -1,0 +1,17 @@
+# Ethan Shen
+a = int(input())
+times = a // 720 * 31
+remaining = a % 720 + 1
+time = 1200
+while remaining:
+    if len(str(time)) == 3:
+        if int(str(time)[0]) - int(str(time)[1]) == int(str(time)[1]) - int(str(time)[2]):
+            times += 1
+    elif len(str(time)) == 4:
+        if int(str(time)[0]) - int(str(time)[1]) == int(str(time)[1]) - int(str(time)[2]) == int(str(time)[2]) - int(str(time)[3]):
+            times += 1
+    time += 1
+    remaining -= 1
+    if time % 100 >= 60:
+        time = (time + 40) % 1200
+print(times)
