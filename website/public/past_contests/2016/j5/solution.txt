@@ -1,0 +1,14 @@
+# Ethan Shen
+a = input()
+b = int(input())
+dmojistan = input().split()
+pegland = input().split()
+dmojistan = sorted([int(i) for i in dmojistan])
+ans = 0
+if a == '1':
+    pegland = sorted([int(i) for i in pegland])
+elif a == '2':
+    pegland = sorted([int(i) for i in pegland], reverse = True)
+for i in range(b):
+    ans += max(int(dmojistan[i]), int(pegland[i]))
+print(ans)
