@@ -1,0 +1,76 @@
+// Ethan Shen
+#include <bits/stdc++.h>
+using namespace std;
+#define int long long
+const int N = 5e5 + 100;
+struct s {
+    int x, y, l, c;
+} e[N];
+int p[N];
+vector<pair<int, int>> g[N];
+int dis[N];
+bool vis[N];
+int n, m, ans;
+
+int dijk(int st, int ed, int d) {
+    priority_queue<pair<int, int>> q;
+    memset(dis, 0x3f, sizeof(dis));
+    memset(vis, false, sizeof(vis));
+    dis[st] = 0;
+    q.push({0, st});
+    while (q.size()) {
+        int loc = q.top().second;
+        q.pop();
+        if (vis[loc]) continue;
+        vis[loc] = true;
+        for (auto i : g[loc]) {
+            int to = i.first;
+            int l = i.second;
+            if (vis[to]) continue;
+            if (dis[to] > dis[loc] + l) {
+                dis[to] = dis[loc] + l;
+                q.push({-dis[to], to});
+            }
+        }
+    }
+    return d < dis[ed];
+}
+
+int find(int x) {
+    if (x == p[x]) return x;
+    p[x] = find(p[x]);
+    return p[x];
+}
+
+bool cmp(s a, s b) {
+    if (a.l == b.l) return a.c < b.c;
+    return a.l < b.l;
+}
+
+signed main() {
+    cin >> n >> m;
+    for (int i = 0; i < m; i++) {
+        p[i] = i;
+    }
+    for (int i = 0; i < m; i++) {
+        cin >> e[i].x >> e[i].y >> e[i].l >> e[i].c;
+    }
+    sort(e, e + m, cmp);
+    for (int i = 0; i < m; i++) {
+        s it = e[i];
+        int rx = find(it.x);
+        int ry = find(it.y);
+        if (rx != ry) {
+            p[rx] = ry;
+            ans += it.c;
+            g[it.x].push_back({it.y, it.l});
+            g[it.y].push_back({it.x, it.l});
+        } else if (dijk(it.x, it.y, it.l)) {
+            ans += it.c;
+            g[it.x].push_back({it.y, it.l});
+            g[it.y].push_back({it.x, it.l});
+        }
+    }
+    cout << ans << endl;
+    return 0;
+}
