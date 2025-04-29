@@ -39,7 +39,7 @@ const problems = [
 	{ name: '2023 S1 - Trianglane', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2023/s1', hasSolution: true },
 	{ name: '2023 S2 - Symmetric Mountains', difficulty: 'Hard', tags: ['implementation'], link: '/contest/2023/s2', hasSolution: true },
 	{ name: '2023 S3 - Palindromic Poster', difficulty: 'Hard', tags: ['ad hoc', 'constructive'], link: '/contest/2023/s3', hasSolution: true },
-	{ name: '2023 S4 - Minimum Cost Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2023/s4', hasSolution: false },
+	{ name: '2023 S4 - Minimum Cost Roads', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2023/s4', hasSolution: true },
 	{ name: '2023 S5 - The Filter', difficulty: 'Insane', tags: ['graph theory', 'intermediate math'], link: '/contest/2023/s5', hasSolution: true },
 
 	// 2022 Junior
@@ -95,7 +95,7 @@ const problems = [
 	{ name: '2019 S2 - Pretty Average Primes', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2019/s2', hasSolution: true },
 	{ name: '2019 S3 - Arithmetic Square', difficulty: 'Normal', tags: ['constructive', 'implementation'], link: '/contest/2019/s3', hasSolution: true },
 	{ name: '2019 S4 - Tourism', difficulty: 'Wicked', tags: ['dynamic programming'], link: '/contest/2019/s4', hasSolution: true },
-	{ name: '2019 S5 - Triangle: The Data Structure', difficulty: 'Hard', tags: ['data structures'], link: '/contest/2019/s5', hasSolution: false },
+	{ name: '2019 S5 - Triangle: The Data Structure', difficulty: 'Hard', tags: ['data structures'], link: '/contest/2019/s5', hasSolution: true },
 
 	// 2018 Junior
 	{ name: '2018 J1 - Telemarketer or not?', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2018/j1', hasSolution: true },
@@ -114,8 +114,8 @@ const problems = [
 	// 2017 Junior
 	{ name: '2017 J1 - Quadrant Selection', difficulty: 'Easy', tags: ['implementation'], link: '/contest/2017/j1', hasSolution: true },
 	{ name: '2017 J2 - Shifty Sum', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2017/j2', hasSolution: true },
-	{ name: '2017 J3 - Exactly Electrical', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/j3', hasSolution: false },
-	{ name: '2017 J4 - Favourite Times', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2017/j4', hasSolution: false },
+	{ name: '2017 J3 - Exactly Electrical', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/j3', hasSolution: true },
+	{ name: '2017 J4 - Favourite Times', difficulty: 'Normal', tags: ['simple math'], link: '/contest/2017/j4', hasSolution: true },
 	{ name: '2017 J5 - Nailed It!', difficulty: 'Hard', tags: ['simple math'], link: '/contest/2017/s3', hasSolution: true},
 
 	// 2017 Senior
@@ -130,7 +130,7 @@ const problems = [
 	{ name: '2016 J2 - Magic Squares', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2016/j2', hasSolution: true },
 	{ name: '2016 J3 - Hidden Palindrome', difficulty: 'Normal', tags: ['string processing'], link: '/contest/2016/j3', hasSolution: true },
 	{ name: '2016 J4 - Arrival Time', difficulty: 'Normal', tags: ['strings', 'loops'], link: '/contest/2016/j4', hasSolution: true },
-	{ name: '2016 J5 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2', hasSolution: false },
+	{ name: '2016 J5 - Tandem Bicycle', difficulty: 'Normal', tags: ['greedy'], link: '/contest/2016/s2', hasSolution: true },
 
 	// 2016 Senior
 	{ name: '2016 S1 - Ragaman', difficulty: 'Easy', tags: ['decisions'], link: '/contest/2016/s1', hasSolution: true },
@@ -402,7 +402,8 @@ const contributors = [
     { initials: "DG", name: "Daniel Galperin", school: "Waterloo Collegiate Institute", contributions: "2009 S5" },
     { initials: "DH", name: "Daniel Hui", school: "Woburn Collegiate Institute", contributions: "2012 S4" },
     { initials: "DW", name: "Daniel Whitney", school: "Newmarket High School", contributions: "2015 S4, 2015 S5" },
-    { initials: "GV", name: "Goutam Venkatramanan", school: "Harry Ainlay High School", contributions: "2009 S1" },
+	{ initials: "ES", name: "Ethan Shen", school: "Orchard Park PS, London ON", contributions: "2023 S4, 2019 S5, 2017 J3, 2017 J4, 2016 S5" },
+	{ initials: "GV", name: "Goutam Venkatramanan", school: "Harry Ainlay High School", contributions: "2009 S1" },
     { initials: "HT", name: "Hubert Tong", school: "Queens University", contributions: "2008 S4: 2001 S5" },
     { initials: "JC", name: "Johnson Chen", school: "Nepean High School", contributions: "2013 J5, S3" },
     { initials: "JJ", name: "Jason Jackson", school: "Aurora High School", contributions: "2006 S3, S5: 2005 J5" },
