@@ -1,4 +1,4 @@
-// Ethan Shen
+// By Ethan Shen, Orchard Park PS
 #include <bits/stdc++.h>
 using namespace std;
 #define int long long
