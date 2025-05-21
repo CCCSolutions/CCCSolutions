@@ -20,7 +20,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="https://github.com/Tankman61/mmhs-website"
+              href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
               color="blue-gray"
@@ -32,7 +32,7 @@ const FooterWithLogo = () => {
           <li>
             <Typography
               as="a"
-              href="https://github.com/Tankman61/mmhs-website"
+              href="https://github.com/Tankman61/CCCSolutions"
               color="blue-gray"
               className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
