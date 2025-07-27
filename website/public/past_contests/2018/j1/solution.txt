@@ -1,32 +1,12 @@
 #Morgan Su, BayviewSS
-#Calculations and arrays
-pn=int(input())
-s=[]
-f=[]
-total=[]
-for i in range(pn):
-    s+=[int(input())]
-    f+=[int(input())]
+#Check whether input matches telemarketer criteria, and if so: print ignore
 
-counter=0
-truther=0
-star=0
+a=int(input())
+b=int(input())
+c=int(input())
+d=int(input())
 
-for i in range(pn):
-    score=s[counter]*5
-    score=score-f[counter]*3
-    total+=[score]
-
-    if score<=40:
-        truther+=1
-
-    if score>40:
-        star+=1
-
-    counter+=1
-
-if truther==0:
-    print(star, end="")
-    print("+")
+if b==c and (a==8 or a==9) and (d==8 or d==9):
+    print('ignore')
 else:
-    print(star)
+    print('answer')

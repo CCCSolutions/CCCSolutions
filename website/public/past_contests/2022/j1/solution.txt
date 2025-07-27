@@ -1,0 +1,11 @@
+#Morgan Su, BayviewSS
+#Using calculations to solve for remaining cupcakes
+r=int(input())
+s=int(input())
+
+numr=r*8
+nums=s*3
+total=numr+nums
+new=total-28
+
+print(new)

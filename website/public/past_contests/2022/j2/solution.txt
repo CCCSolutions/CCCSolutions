@@ -1,0 +1,32 @@
+#Morgan Su, BayviewSS
+#Calculations and arrays
+pn=int(input())
+s=[]
+f=[]
+total=[]
+for i in range(pn):
+    s+=[int(input())]
+    f+=[int(input())]
+
+counter=0
+truther=0
+star=0
+
+for i in range(pn):
+    score=s[counter]*5
+    score=score-f[counter]*3
+    total+=[score]
+
+    if score<=40:
+        truther+=1
+
+    if score>40:
+        star+=1
+
+    counter+=1
+
+if truther==0:
+    print(star, end="")
+    print("+")
+else:
+    print(star)

@@ -1,0 +1,13 @@
+#Morgan Su, BayviewSS
+#Comparing parking spot occupation with positions of C in either string
+N=int(input())
+dayOne=input()
+dayTwo=input()
+
+counter=0
+
+for i in range(N):
+    if dayOne[i]== 'C' and dayTwo[i]== 'C':
+        counter+=1
+
+print(counter)
