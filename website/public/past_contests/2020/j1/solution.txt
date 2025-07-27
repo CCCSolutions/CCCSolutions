@@ -1,0 +1,17 @@
+#Morgan Su, BayviewSS
+#Operations and if statements
+s=int(input())
+m=int(input())
+l=int(input())
+
+w=int(2*m)
+a=int(3*l)
+
+x=int(s)+int(w)+int(a)
+
+if x>10:
+        print('happy')
+elif x==10:
+        print('happy')
+elif x<10:
+        print('sad')
