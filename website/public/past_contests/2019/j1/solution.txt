@@ -1,0 +1,23 @@
+#Morgan Su, BayviewSS
+#If statements, operators and variables
+a=int(input())
+b=int(input())
+c=int(input())
+d=int(input())
+e=int(input())
+f=int(input())
+
+m=int(a*3)
+n=int(b*2)
+apple=m+n+c
+
+v=int(d*3)
+x=int(e*2)
+banana=v+x+f
+
+if banana==apple:
+    print('T')
+elif banana>apple:
+    print('B')
+elif apple>banana:
+    print('A')

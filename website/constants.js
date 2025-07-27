@@ -13,7 +13,7 @@ const problems = [
 	{ name: '2025 S4 - Floor is Lava', difficulty: 'Insane', tags: ['graph theory'], link: '/contest/2025/s4', hasSolution: true },
 	{ name: '2025 S5 - To-do List', difficulty: 'Insane', tags: ['data structures'], link: '/contest/2025/s5', hasSolution: true },
 
-	
+
 	// 2024 Junior
 	{ name: '2024 J1 - Conveyor Belt Sushi', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2024/j1', hasSolution: true },
 	{ name: '2024 J2 - Dusa And The Yobis', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2024/j2', hasSolution: true },
@@ -413,7 +413,8 @@ const contributors = [
     { initials: "KL", name: "Konstantin Lopyrev", school: "University of Waterloo", contributions: "2008 S3, S4, S5: 2007 J5, S5" },
     { initials: "ML", name: "Matthew Lai", school: "Steveston-London Secondary School", contributions: "2008 S5: 2007 S4" },
     { initials: "ML2", name: "Matthew Lee", school: "Galt Collegiate Institute", contributions: "2015 S3" },
-    { initials: "NB", name: "Nenad Bauk", school: "Richview Collegiate Institute", contributions: "2013 S2" },
+	{ initials: "MS", name: "Morgan Su", schools: "Bayview Secondary School", contributions: "2019 J1" },
+	{ initials: "NB", name: "Nenad Bauk", school: "Richview Collegiate Institute", contributions: "2013 S2" },
     { initials: "NV", name: "Nazar Viznytsya", school: "", contributions: "2016-2019" },
     { initials: "PS", name: "Peter Sun", school: "St. Francis Xavier S.S.", contributions: "2010 J5" },
     { initials: "RC", name: "Robin Cheng", school: "Pinetree Secondary", contributions: "2005 S5" },
