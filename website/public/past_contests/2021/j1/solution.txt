@@ -1,0 +1,14 @@
+#Morgan Su, BayviewSS
+#Calculations and comparing integers
+T=int(input())
+P=5*T-400
+
+if T<100:
+    print(P)
+    print(1)
+if T==100:
+    print(P)
+    print(0)
+if T>100:
+    print(P)
+    print(-1)
