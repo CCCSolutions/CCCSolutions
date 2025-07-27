@@ -1,0 +1,16 @@
+#Morgan Su, Bayview SS
+#Arrays
+num=int(input())
+name=[]
+bid=[]
+for i in range(num):
+    name+=[input()]
+    bid+=[int(input())]
+
+s=sorted(bid)
+length=len(s)
+max=(s[length-1])
+
+point=bid.index(max)
+
+print(name[point])
