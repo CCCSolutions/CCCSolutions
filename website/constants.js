@@ -442,8 +442,8 @@ const contributors = [
 ];
 
 const stats = {
-    activeUsers: "2,100+",
-    numSolutions: "260+",
+    activeUsers: "2,700+",
+    numSolutions: "270+",
     history: "20+ years"
 };
 
