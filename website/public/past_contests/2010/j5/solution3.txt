@@ -1,0 +1,81 @@
+import java.io.*;
+import java.util.*; 
+public class Main {
+  public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+      int startx = sc.nextInt();
+      int starty = sc.nextInt();
+      startx--;
+      starty--;
+      LinkedList<Integer> qx = new LinkedList<Integer>();
+      qx.add(startx);
+      LinkedList<Integer> qy = new LinkedList<Integer>();
+      qy.add(starty);
+      int mincost[][] = new int[8][8];
+      for(int i=0; i<8; i++){
+        Arrays.fill(mincost[i], Integer.MAX_VALUE);
+      }
+      mincost[starty][startx]=0;
+      while(!qx.isEmpty()){
+        int nextx = qx.poll();
+        int nexty = qy.poll();
+        // nextx+1 && nexty+2
+        if(nextx+1 <=7 && nexty+2 <=7 && mincost[nexty][nextx]<= mincost[nexty+2][nextx+1]){
+          mincost[nexty+2][nextx+1]=mincost[nexty][nextx]+1;
+          qx.add(nextx+1);
+          qy.add(nexty+2);
+        
+           
+        }
+        //nextx+2 && nexty+1
+        if(nextx+2 <=7 && nexty+1 <=7 && mincost[nexty][nextx] <= mincost[nexty+1][nextx+2]){
+          mincost[nexty+1][nextx+2]=mincost[nexty][nextx]+1;
+          qx.add(nextx+2);
+          qy.add(nexty+1);
+        }
+        //nextx+1 && nexty-2
+        if(nextx+1 <=7 && nexty-2 >=0 && mincost[nexty][nextx]<= mincost[nexty-2][nextx+1]){
+          mincost[nexty-2][nextx+1]=mincost[nexty][nextx]+1;
+          qx.add(nextx+1);
+          qy.add(nexty-2);
+        }
+        //nextx+2 && nexty-1
+        if(nextx+2 <=7 && nexty-1 >=0 && mincost[nexty][nextx]<= mincost[nexty-1][nextx+2]){
+          mincost[nexty-1][nextx+2]=mincost[nexty][nextx]+1;
+          qx.add(nextx+2);
+          qy.add(nexty-1);
+        }
+        //nextx-1 && nexty-2
+        if(nextx-1 >=0 && nexty-2 >=0 && mincost[nexty][nextx]<= mincost[nexty-2][nextx-1]){
+          mincost[nexty-2][nextx-1]=mincost[nexty][nextx]+1;
+          qx.add(nextx-1);
+          qy.add(nexty-2);
+        }
+        //nextx-2 && nexty-1
+        if(nextx-2 >=0 && nexty-1 >=0 && mincost[nexty][nextx] <= mincost[nexty-1][nextx-2]){
+          mincost[nexty-1][nextx-2]=mincost[nexty][nextx]+1;
+          qx.add(nextx-2);
+          qy.add(nexty-1);
+        }
+        //nextx-1 && nexty+2
+        if(nextx-1 >=0 && nexty+2 <=7 && mincost[nexty][nextx]<= mincost[nexty+2][nextx-1]){
+          mincost[nexty+2][nextx-1]=mincost[nexty][nextx]+1;
+          qx.add(nextx-1);
+          qy.add(nexty+2);
+        }
+        //nextx-2 && nexty+1
+        if(nextx-2 >=0 && nexty+1 <=7 && mincost[nexty][nextx]<= mincost[nexty+1][nextx-2]){
+          mincost[nexty+1][nextx-2]=mincost[nexty][nextx]+1;
+          qx.add(nextx-2);
+          qy.add(nexty+1);
+        }
+      }
+      int x = sc.nextInt();
+      int y = sc.nextInt();
+      x--;
+      y--;
+      System.out.println(mincost[y][x]);
+   
+ 
+  }
+}
