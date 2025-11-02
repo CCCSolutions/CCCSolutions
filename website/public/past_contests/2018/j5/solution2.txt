@@ -1,0 +1,112 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+
+
+public class Main{
+  public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+
+    //to check if all nodes are visited
+    //we can check if all nodes are NOT equal to Integer.MAX_VALUE
+ 
+
+
+    //input int N
+    //create integer linkedlist called Ending
+ 
+    //create arraymatrix with dimensions NxN
+
+    //use for loop to repeat N times
+      //input int Nev
+      //if Nev = 0 then add i into Ending
+      //create nested for loop and repeat Nev times
+        //input int ev
+        //ev -= 1
+        //store map[i][ev]=true
+    int N = sc.nextInt();
+    LinkedList<Integer> Ending = new LinkedList<Integer>();
+    boolean map[][] = new boolean[N][N];
+    for(int i =0; i<N; i++){
+     int Nev = sc.nextInt();
+      if(Nev==0){
+        Ending.add(i);
+      }
+      for(int a=0; a<Nev; a++){
+        int ev = sc.nextInt();
+        ev-=1;
+        map[i][ev]=true;
+        
+      }
+    }
+ 
+ 
+    
+    //create integer linkedlist called list
+    //add 0 to list
+    LinkedList<Integer> list = new LinkedList<Integer>();
+    list.add(0);
+    
+    // create a mincost array with dimension N
+    //fill mincost with Integer.MAX_VALUE
+    //set mincost[0]=1
+    
+    int [] mincost = new int[N];
+    Arrays.fill(mincost,Integer.MAX_VALUE);
+    mincost[0] = 1;
+
+    // create while loop with condition !list.isEmpty()
+    //create int next with value list.poll()
+    //use a for loop to check every neighbour of next
+        //if mincost[next]+1<mincost[i]
+        //add i into list
+        //set cost of i to be mincost[next]+1
+    
+    while (!list.isEmpty()){
+      
+      int next = list.poll();
+      
+      for(int i=0; i<N; i++){
+        if(mincost[next]+1 < mincost[i] && map[next][i]==true){
+          list.add(i);
+          mincost[i] = mincost[next]+1;
+        }
+      }
+      
+    }
+ 
+
+
+    //check every mincost for every node
+      //if mincost at a certain node i equal to Integer.MAXVALUE
+        //output "N"
+        //return
+    int min = Integer.MAX_VALUE;
+    while(!Ending.isEmpty()){
+      int tmp = Ending.poll();
+      if(mincost[tmp]<min){
+        min = mincost[tmp];
+      }
+    }
+    for (int i : mincost) {
+      if (i == Integer.MAX_VALUE){
+        System.out.println("N");
+        System.out.println(min);
+        return;
+      }
+    }
+          
+          
+    // find minimum cost between all ending nodes using Ending list
+    //output "Y"
+    //minimum
+    
+    
+    System.out.println("Y");
+    System.out.println(min);
+
+
+
+
+  }
+}
