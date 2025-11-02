@@ -1,0 +1,67 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+
+
+public class Solution {
+  public static void main(String[] args) {
+
+    //find the index of the minimum number inside of array
+    Scanner sc = new Scanner(System.in);
+    int min = Integer.MAX_VALUE;
+    int minr = 0;
+    int minc = 0;
+    
+    
+    int N = sc.nextInt();
+    int A[][] = new int[N][N];
+    for(int r =0 ; r<N; r++){
+      for(int c = 0 ; c<N; c++){
+        A[r][c]=sc.nextInt();
+        if(A[r][c]<min){
+          minr = r;
+          minc = c;
+          min=A[r][c];
+        }
+      }
+    }
+    
+    
+    
+    if(minr==0&&minc==0){//case 1
+      for(int r = 0; r<A.length; r++){
+        for(int c=  0; c<A[0].length; c++){
+          System.out.print(A[r][c]+" ");
+        }
+        System.out.println();
+      }
+    }else if(minr==0&&minc==N-1){//case 2
+      for(int c = A[0].length-1; c>=0; c--){
+        for(int r = 0; r<A.length; r++){
+          System.out.print(A[r][c]+" ");
+        }
+        System.out.println();
+      }
+    }else if(minr==N-1&&minc==N-1){//case 3
+      for(int r = A.length-1; r>=0; r--){
+        for(int c=  A[0].length-1; c>=0; c--){
+          System.out.print(A[r][c]+" ");
+        }
+        System.out.println();
+      }
+    }else{//case 4
+      for(int c = 0; c<A[0].length; c++){
+        for(int r = A.length-1; r>=0; r--){
+          System.out.print(A[r][c]+" ");
+        }
+        System.out.println();
+      }
+    }
+    
+    
+    
+    
+    
+    
+  }
+}
