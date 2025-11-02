@@ -408,6 +408,7 @@ const contributors = [
 	{ initials: "ES", name: "Ethan Shen", school: "Orchard Park PS, London ON", contributions: "2023 S4, 2019 S5, 2017 J3, 2017 J4, 2016 S5" },
 	{ initials: "GV", name: "Goutam Venkatramanan", school: "Harry Ainlay High School", contributions: "2009 S1" },
 	{ initials: "HT", name: "Hubert Tong", school: "Queens University", contributions: "2008 S4: 2001 S5" },
+	{ initials: "IL", name: "Ivan Li", school: "Markville Secondary School", contributions: "2010 J5: 2013 S4: 2018 J5: 2014 S1: 2014 S2: 2013 S1: 2013 S2: 2018 S2" },
 	{ initials: "JC", name: "Johnson Chen", school: "Nepean High School", contributions: "2013 J5, S3" },
 	{ initials: "JJ", name: "Jason Jackson", school: "Aurora High School", contributions: "2006 S3, S5: 2005 J5" },
 	{ initials: "JJ2", name: "Jacob Jackson", school: "University of Toronto Schools", contributions: "2014 S5" },
