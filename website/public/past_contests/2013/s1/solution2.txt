@@ -1,0 +1,36 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int year = sc.nextInt()+1;
+        while(true){
+           
+            char A[] = Integer.toString(year).toCharArray();
+            boolean distinct = false;
+            Arrays.sort(A);
+            for(int i=0; i<A.length-1; i++){
+                if(A[i]==A[i+1]){
+
+                    distinct = true;
+                }
+            }
+            if(distinct==false){
+                System.out.println(year);
+                return;
+            }
+            else{
+                year++;
+            }
+        }
+
+
+
+
+            
+        
+
+    }
+}
