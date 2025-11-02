@@ -1,0 +1,178 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+
+
+public class Main {
+  public static void main(String[] args) {
+      FastReader sc = new FastReader();
+
+ 
+      //input int N and M
+      //create an array matrix map with dimensions NxN
+
+      //repeat below M times
+          //input int bv and ev
+          //bv-=1
+          //ev-=1
+          //set bv and ev as a directional neighbour
+          //map[bv][ev]=true;
+
+      //input int p and q
+      //p-=1
+      //q-=1
+      int N = sc.nextInt();
+      int M = sc.nextInt();
+
+      ArrayList<Integer> map[] = new ArrayList[N];
+
+      for(int i = 0; i<N; i++){
+        map[i] = new ArrayList<Integer>();
+      }
+
+      //arraylist is faster when using .get
+      //arraylist=LInkedlist
+
+      for(int i=0; i<M; i++){
+        int bv = sc.nextInt();  
+        int ev = sc.nextInt();
+        bv-=1;
+        ev-=1;
+
+        map[bv].add(ev);
+      }
+      int p = sc.nextInt();
+      int q = sc.nextInt();
+      p-=1;
+      q-=1;
+
+
+      
+      //setting p is starting node and q is ending node
+
+
+      //create a linkedlist called list
+      //add p to list
+
+      LinkedList<Integer> list = new LinkedList<Integer>();
+      list.add(p);
+
+      //create mincost array with dimension N
+      //fill mincost array with Integer_MAXVALUE
+      //set mincost[p] to 0
+
+      int mincost[] = new int[N];
+      
+      Arrays.fill(mincost, Integer.MAX_VALUE);
+      mincost[p] = 0;
+        
+
+      //while loop with condition List.isEmpty()
+      //get next node inside of list using .poll and store into variable next
+      //use for loop to find every neighbour of next and check if the cost to traverse is less than the current mincost of the neighbour
+          //if so set mincost of neighbour to cost to traverse and add neighbour to list
+
+      while (!list.isEmpty()){
+        int next = list.poll();
+        
+        for(int i = 0; i<map[next].size(); i++){
+          int neighbour = map[next].get(i);
+          if(mincost[next]+1<mincost[neighbour]){
+            list.add(neighbour);
+            mincost[neighbour]=mincost[next]+1;
+          }
+        }
+      }
+                  
+      //if mincost[q]!=Integer.Integer_MAXVALUE then output "yes" and return
+
+      if(mincost[q]!=Integer.MAX_VALUE){
+        System.out.println("yes");
+        return;
+      }
+
+
+      
+      //setting q is starting node and p is ending node
+
+      list.add(q);
+
+
+      //fill mincost array with Integer.MAX_VALUE
+      //set mincost of q to 0
+      Arrays.fill(mincost, Integer.MAX_VALUE);
+      mincost[q]=0;
+        
+
+
+      //while loop with condition List.isEmpty()
+      //get next node inside of list using .poll and store into variable next
+      //use for loop to find every neighbour of next and check if the cost to traverse is less than the current mincost of the neighbour
+          //if so set mincost of neighbour to cost to traverse and add neighbour to list
+        while (!list.isEmpty()){
+        int next = list.poll();
+        
+        for(int i = 0; i<map[next].size(); i++){
+          int neighbour = map[next].get(i);
+          if(mincost[next]+1<mincost[neighbour]){
+            list.add(neighbour);
+            mincost[neighbour]=mincost[next]+1;
+          }
+        }
+      }
+
+
+
+
+      //if mincost[p]!=Integer.Integer_MAXVALUE then output "no" and return
+      if(mincost[p]!=Integer.MAX_VALUE){
+        System.out.println("no");
+        return;
+      }
+      //output "unknown"
+      System.out.println("unknown");
+
+  }
+
+public static class FastReader {
+        BufferedReader br;
+            StringTokenizer st;
+    
+            public FastReader() {
+                br = new BufferedReader(new InputStreamReader(System.in));
+            }
+    
+            String next() {
+                while (st == null || !st.hasMoreElements()) {
+                    try {
+                        st = new StringTokenizer(br.readLine());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return st.nextToken();
+            }
+    
+            int nextInt() {
+                return Integer.parseInt(next());
+            }
+            long nextLong() {
+                return Long.parseLong(next());
+            }
+    
+            double nextDouble() {
+                return Double.parseDouble(next());
+            }
+    
+            String nextLine() {
+                String str = null;
+                try {
+                    str = br.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return str;
+            }
+        }
+
+}
