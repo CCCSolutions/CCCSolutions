@@ -1,0 +1,46 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+    public class main{
+  public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        int w = sc.nextInt();
+        int n = sc.nextInt();
+        LinkedList<Integer> a = new LinkedList<Integer>();
+        int count = 0;
+        int b = 0;
+    
+      
+       while (count<n){
+          int temp = sc.nextInt();
+            a.add(temp);
+             b=b+temp;
+            if (a.size()>4){
+              int curr = a.poll();
+              b=b-curr;
+            
+             
+            }
+           
+
+            if(b>w){
+              
+            break;
+        }
+          if(b<=w){
+            count++;
+         
+          }
+         
+           
+        }
+         
+                    
+            
+                
+      
+        
+    System.out.println(count);
+  }
+}
