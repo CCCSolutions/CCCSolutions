@@ -1,0 +1,26 @@
+//Ivan Li, Markville secondary school
+import java.io.*;
+import java.util.*;
+public class ccc15j5{
+ 
+  public static int memo[][] = new int[251][251];
+ 
+  public static int solve(int n, int k){
+    if(k<0||n<1) return 0;
+    if(k==0) return 1;
+    if(memo[n][k]!=0) return memo[n][k];
+    return memo[n][k]=solve(n-1, k)+solve(n, k-n);
+  }
+ 
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+
+    int k  =sc.nextInt();
+    int n = sc.nextInt();
+ 
+    System.out.println(solve(n, k-n));
+
+  }
+
+}
