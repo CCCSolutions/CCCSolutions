@@ -7,14 +7,10 @@
 **2,800+ users**  
 [Fully open source](LICENSE)
 
----
-
 ## Check it out!
 
 Visit the live site here: [cccsolutions.ca](https://cccsolutions.ca/)  
 Forum, solutions, and contribution guides all in one place.
-
----
 
 ## Contributing
 
