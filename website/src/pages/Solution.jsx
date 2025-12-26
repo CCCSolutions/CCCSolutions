@@ -145,12 +145,73 @@ const Problem = ({ contestYear, problemCode }) => {
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <Helmet>
-        <title>{problemInfo?.name || `Solution: CCC ${contestYear} ${problemCode.toUpperCase()}`}</title>
-        <meta name="keywords" content={keywords} />
-        <meta property="og:title" content={problemInfo?.name || `Solution: CCC ${contestYear} ${problemCode.toUpperCase()}`} />
-        <meta property="og:description" content="The most comprehensive solution repository for the Canadian Computing Competition, with solutions to the CCC from 1996 to present." />
-        <meta property="og:url" content={window.location.href} />
+        <title>{problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} Solution | C++, Python & Java Code</title>
+        <meta name="description" content={`Complete solution to ${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} with detailed code. Includes test cases, algorithm explanation, and complexity analysis. Difficulty: ${problemInfo?.difficulty || 'N/A'}. Tags: ${problemInfo?.tags?.join(', ') || 'competitive programming'}.`} />
+        <meta name="keywords" content={`${keywords}, CCC ${contestYear} ${problemCode} solution, ${contestYear} ${problemCode.toUpperCase()} code, how to solve CCC ${contestYear} ${problemCode}, ${problemInfo?.name || ''} solution`} />
+        <meta name="author" content="CCCSolutions Community" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href={`https://cccsolutions.ca/contest/${contestYear}/${problemCode}`} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={`${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} Solution`} />
+        <meta property="og:description" content={`Complete solution with detailed code and test cases. Difficulty: ${problemInfo?.difficulty}. Topics: ${problemInfo?.tags?.join(', ')}.`} />
+        <meta property="og:url" content={`https://cccsolutions.ca/contest/${contestYear}/${problemCode}`} />
+        <meta property="og:type" content="article" />
         <meta name="theme-color" content="#1e3a8a" />
+
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cccsolutions.ca"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Solutions",
+              "item": "https://cccsolutions.ca/solutions"
+            },{
+              "@type": "ListItem",
+              "position": 3,
+              "name": `CCC ${contestYear}`,
+              "item": `https://cccsolutions.ca/solutions?year=${contestYear}`
+            },{
+              "@type": "ListItem",
+              "position": 4,
+              "name": problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`
+            }]
+          })}
+        </script>
+
+        {/* Article Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            "headline": problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`,
+            "description": `Solution to ${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} from the Canadian Computing Competition`,
+            "author": {
+              "@type": "Organization",
+              "name": "CCC Solutions Community"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "CCC Solutions",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://cccsolutions.ca/icon.png"
+              }
+            },
+            "datePublished": `${contestYear}-02-01`,
+            "dateModified": `${contestYear}-02-01`,
+            "proficiencyLevel": problemInfo?.difficulty || "Intermediate",
+            "dependencies": problemInfo?.tags?.join(', ') || "algorithms"
+          })}
+        </script>
       </Helmet>
 
       <div className="mx-auto">

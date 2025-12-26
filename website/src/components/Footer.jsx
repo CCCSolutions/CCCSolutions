@@ -5,7 +5,7 @@ const FooterWithLogo = () => {
   return (
     <footer className="w-full px-16 py-6 bg-white">
       <div className="flex flex-row flex-wrap items-center justify-center gap-x-12 text-center md:justify-between">
-        <img src={logoImage} alt="logo-ct" className="h-[75px]" />
+        <img src={logoImage} alt="Milliken Mills High School Logo" className="h-[75px]" />
         <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
           <li>
             <Typography
