@@ -1,0 +1,72 @@
+# CCC Solutions - Canadian Computing Competition Solution Repository
+
+> The most comprehensive Canadian Computing Competition (CCC) solution repository with 270+ solutions from 1996-2025
+
+## Quick Links
+- Home: https://cccsolutions.ca
+- All Solutions: https://cccsolutions.ca/solutions
+- Forum: https://cccsolutions.ca/forum
+- GitHub: https://github.com/Tankman61/CCCSolutions
+
+## What We Offer
+CCCSolutions is the definitive resource for Canadian Computing Competition preparation, featuring:
+- 270+ detailed solutions in C++, Python, and Java
+- Complete coverage of CCC contests from 1996 to 2025
+- Test cases and input/output files for verification
+- Multiple solution approaches for each problem
+- Difficulty ratings: Easy, Normal, Hard, Insane, Wicked
+- Algorithm classification: graph theory, dynamic programming, greedy algorithms, data structures, and more
+
+## How to Find Solutions
+1. Browse all solutions at https://cccsolutions.ca/solutions
+2. Search by year (e.g., "2025"), problem code (e.g., "s4", "j2"), or difficulty
+3. Each problem page includes multiple implementations, test cases, and algorithm tags
+4. Forum available for discussion at https://cccsolutions.ca/forum
+
+## Recent Contests (2025)
+### Junior Division
+- 2025 J1 - Roller Coaster Ride (Easy) - implementation, simple math
+- 2025 J2 - Donut Shop (Easy) - implementation, simple math
+- 2025 J3 - Product Codes (Easy) - implementation, simple math
+- 2025 J4 - Sunny Days (Normal) - implementation
+- 2025 J5 - Connecting Territories (Normal) - dynamic programming
+
+### Senior Division
+- 2025 S1 - Positioning Peter's Paintings (Easy) - implementation
+- 2025 S2 - Cryptogram Cracking Club (Normal) - simple math
+- 2025 S3 - Pretty Pens (Hard) - ad hoc, data structures
+- 2025 S4 - Floor is Lava (Insane) - graph theory
+- 2025 S5 - To-do List (Insane) - data structures
+
+## Algorithm Topics Covered
+### Graph Theory
+BFS, DFS, Dijkstra's algorithm, minimum spanning tree, topological sort, shortest path algorithms
+
+### Dynamic Programming
+Interval DP, tree DP, optimization, recursion with memoization
+
+### Data Structures
+Segment trees, disjoint sets (union-find), heaps, binary search trees, stacks, queues
+
+### Other Topics
+Greedy algorithms, ad hoc problem solving, string processing, computational geometry, number theory, combinatorics
+
+## Popular Solutions by Year
+- 2025: https://cccsolutions.ca/solutions (filter by 2025)
+- 2024: https://cccsolutions.ca/solutions (filter by 2024)
+- 2023: https://cccsolutions.ca/solutions (filter by 2023)
+
+## About the CCC
+The Canadian Computing Competition (CCC) is an annual programming contest organized by the Centre for Education in Mathematics and Computing (CEMC) at the University of Waterloo. It's open to students across Canada and internationally, with Junior and Senior divisions.
+
+## Contributing
+This is a community-driven project. Contributors include students from across Canada who have solved and shared their approaches to CCC problems. Visit our GitHub repository to contribute: https://github.com/Tankman61/CCCSolutions
+
+## Contact & Community
+- GitHub Issues: https://github.com/Tankman61/CCCSolutions/issues
+- Forum: https://cccsolutions.ca/forum
+- Active community of 2,700+ users
+
+---
+Last updated: 2025
+Maintained by the CCCSolutions community

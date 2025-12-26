@@ -11,6 +11,7 @@ const Problem = ({ contestYear, problemCode }) => {
   const [testCaseData, setTestCaseData] = useState({ input: "", output: "" });
   const [testCaseState, setTestCaseState] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [availableTestCases, setAvailableTestCases] = useState(10); // Will be determined dynamically
+  const [testCaseSizes, setTestCaseSizes] = useState({}); // Store file sizes: { "1": { inputKB: 50, outputKB: 10 }, ... }
   const [problemInfo, setProblemInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -130,21 +131,42 @@ const Problem = ({ contestYear, problemCode }) => {
     fetchTestCase(idx);
   };
 
-  // Determine number of available test cases
+  // Determine number of available test cases and their file sizes
   useEffect(() => {
     const checkTestCases = async () => {
       const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
       let count = 0;
+      const sizes = {};
 
       // Check up to 15 test cases by trying to fetch them
       for (let i = 1; i <= 15; i++) {
         try {
-          const response = await fetch(`${basePath}/${problemCode}.${i}.in`);
-          if (response.ok) {
-            const text = await response.text();
+          const inputResponse = await fetch(`${basePath}/${problemCode}.${i}.in`);
+          if (inputResponse.ok) {
+            const inputText = await inputResponse.text();
             // Make sure it's not an error page
-            if (!text.toLowerCase().includes('<!doctype html>')) {
+            if (!inputText.toLowerCase().includes('<!doctype html>')) {
               count = i;
+
+              // Store file size
+              const inputKB = (inputText.length / 1024).toFixed(1);
+
+              // Also check output file size
+              try {
+                const outputResponse = await fetch(`${basePath}/${problemCode}.${i}.out`);
+                if (outputResponse.ok) {
+                  const outputText = await outputResponse.text();
+                  const outputKB = (outputText.length / 1024).toFixed(1);
+
+                  sizes[i] = {
+                    inputKB: parseFloat(inputKB),
+                    outputKB: parseFloat(outputKB)
+                  };
+                }
+              } catch {
+                // If output check fails, just store input size
+                sizes[i] = { inputKB: parseFloat(inputKB), outputKB: 0 };
+              }
             } else {
               break; // Found error page, stop checking
             }
@@ -157,6 +179,7 @@ const Problem = ({ contestYear, problemCode }) => {
       }
 
       setAvailableTestCases(count > 0 ? count : 10); // Default to 10 if check fails
+      setTestCaseSizes(sizes);
     };
 
     checkTestCases();
@@ -422,7 +445,25 @@ const Problem = ({ contestYear, problemCode }) => {
                 ) : testCaseState === 'loading' ? (
                   <div className="text-center py-8">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <p className="mt-2 text-gray-600">Loading test case...</p>
+                    {(() => {
+                      const caseNum = activeTab + 1;
+                      const sizes = testCaseSizes[caseNum];
+                      if (sizes) {
+                        const maxSize = Math.max(sizes.inputKB, sizes.outputKB);
+                        if (maxSize > 50) {
+                          const sizeDisplay = maxSize > 1024
+                            ? `${(maxSize / 1024).toFixed(1)}MB`
+                            : `${maxSize.toFixed(1)}KB`;
+                          return (
+                            <div>
+                              <p className="mt-2 text-gray-600">Loading large test case ({sizeDisplay})...</p>
+                              <p className="mt-1 text-sm text-yellow-700">⚠️ This may take a moment</p>
+                            </div>
+                          );
+                        }
+                      }
+                      return <p className="mt-2 text-gray-600">Loading test case...</p>;
+                    })()}
                   </div>
                 ) : testCaseState === 'error' ? (
                   <div className="flex items-center justify-center py-8 text-red-600">

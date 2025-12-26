@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
+  <url>
+    <loc>https://cccsolutions.ca/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Main Pages -->
+  <url>
+    <loc>https://cccsolutions.ca/solutions</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cccsolutions.ca/forum</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cccsolutions.ca/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://cccsolutions.ca/resources</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- 2025 Problems -->
+  <url><loc>https://cccsolutions.ca/contest/2025/j1</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/j2</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/j3</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/j4</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/j5</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/s1</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/s2</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/s3</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/s4</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2025/s5</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- 2024 Problems -->
+  <url><loc>https://cccsolutions.ca/contest/2024/j1</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/j2</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/j3</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/j4</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/j5</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/s1</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/s2</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/s3</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/s4</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2024/s5</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- 2023 Problems -->
+  <url><loc>https://cccsolutions.ca/contest/2023/j1</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/j2</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/j3</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/s1</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/j5</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/s2</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/s3</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/s4</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2023/s5</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+
+  <!-- Additional years (sample - you have 270+ problems!) -->
+  <url><loc>https://cccsolutions.ca/contest/2022/j1</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/j2</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/j3</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/s2</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/j5</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/s1</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/s3</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cccsolutions.ca/contest/2022/s4</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
+
+  <!-- Note: This is a shortened version. You should generate all 270+ problem URLs programmatically -->
+  <!-- I've included recent years (2022-2025) as examples. The full sitemap should include all years from 1996-2025 -->
+
+</urlset>
