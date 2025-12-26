@@ -92,10 +92,12 @@ const Problem = ({ contestYear, problemCode }) => {
     setTestCaseState('loading');
     setTestCaseData({ input: "", output: "" });
     const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
+    const caseNum = idx + 1;
 
     try {
-      const inputResponse = await fetch(`${basePath}/${problemCode}.${idx + 1}.in`);
-      const outputResponse = await fetch(`${basePath}/${problemCode}.${idx + 1}.out`);
+      // All test cases are now sequential (1, 2, 3...)
+      const inputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.in`);
+      const outputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.out`);
 
       if (!inputResponse.ok || !outputResponse.ok) {
         setTestCaseState('error');
@@ -120,7 +122,7 @@ const Problem = ({ contestYear, problemCode }) => {
       setTestCaseData({ input: inputText, output: outputText });
       setTestCaseState('success');
     } catch (error) {
-      console.error(`Error fetching test case ${idx + 1}:`, error);
+      console.error(`Error fetching test case ${caseNum}:`, error);
       setTestCaseState('error');
       setTestCaseData({ input: null, output: null });
     }
@@ -138,8 +140,8 @@ const Problem = ({ contestYear, problemCode }) => {
       let count = 0;
       const sizes = {};
 
-      // Check up to 15 test cases by trying to fetch them
-      for (let i = 1; i <= 15; i++) {
+      // Check up to 20 test cases (all files now use sequential numbering)
+      for (let i = 1; i <= 20; i++) {
         try {
           const inputResponse = await fetch(`${basePath}/${problemCode}.${i}.in`);
           if (inputResponse.ok) {
@@ -223,23 +225,7 @@ const Problem = ({ contestYear, problemCode }) => {
       return "turing";
     }
 
-    // Check Java FIRST (before Python, since both use "import")
-    if (
-      /import java\./m.test(code) ||
-      /^\/\//m.test(trimmedCode) || // Java/C++ style comments at start
-      /package /m.test(code) ||
-      /public\s+class\s+\w+/m.test(code) ||
-      /public\s+static\s+void\s+main/m.test(code) ||
-      /System\.out\.print/m.test(code) ||
-      /Scanner/m.test(code) ||
-      /BufferedReader/m.test(code) ||
-      /String\[\]\s+args/m.test(code) ||
-      /Integer\.parseInt/m.test(code)
-    ) {
-      return "java";
-    }
-
-    // C++ indicators (check before Python too)
+    // Check C++ FIRST (has most specific patterns)
     if (
       /#include\s*</.test(code) ||
       /using\s+namespace\s+std/.test(code) ||
@@ -250,6 +236,21 @@ const Problem = ({ contestYear, problemCode }) => {
       /int\s+main\s*\(/m.test(code)
     ) {
       return "cpp";
+    }
+
+    // Check Java (after C++, since both use // comments)
+    if (
+      /import java\./m.test(code) ||
+      /package /m.test(code) ||
+      /public\s+class\s+\w+/m.test(code) ||
+      /public\s+static\s+void\s+main/m.test(code) ||
+      /System\.out\.print/m.test(code) ||
+      /Scanner/m.test(code) ||
+      /BufferedReader/m.test(code) ||
+      /String\[\]\s+args/m.test(code) ||
+      /Integer\.parseInt/m.test(code)
+    ) {
+      return "java";
     }
 
     // Python - check AFTER Java/C++
