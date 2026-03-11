@@ -8,17 +8,16 @@ import { problems } from "../../constants.js";
 const Solutions = () => {
   return (
     <div>
-		<title>Solutions</title>
 		<Helmet>
-			<title>Curated CCC Solutions | Canadian Computing Competition</title>
-			<meta name="keywords" content="
-			CCC Solutions, Canadian Computing Competition Solutions, CCC Problem Solutions, CCC Past Problems, CCC Contest Solutions, University of Waterloo CCC, Competitive Programming, Algorithm Challenges, Data Structures, Problem Solving, Coding Solutions, Code Repository, Programming Contests, CCC Code Submissions, C++ CCC Solutions, Python CCC Solutions, Java CCC Solutions, CCC Preparation, CCC Strategies, Coding Contest Training, Problem-Solving Techniques, Coding Competitions
-			" />
-			<meta name="description" content="
-			Explore curated solutions for past Canadian Computing Competition (CCC) problems. Browse through a comprehensive collection of CCC problem solutions in C++, Python, and Java. Enhance your competitive programming skills with structured solutions, problem analysis, and expert strategies.
-			" />
-			<meta name="author" content="MMHS" />
-			<meta name="robots" content="index, follow" />
+			<title>All CCC Solutions (1996-2025) | Browse 270+ Canadian Computing Competition Problems</title>
+			<meta name="description" content="Browse 270+ Canadian Computing Competition solutions from 1996-2025. Filter by year, difficulty (Easy to Wicked), or topic (graph theory, DP, greedy). Solutions in C++, Python & Java with test cases." />
+			<meta name="keywords" content="CCC solutions, Canadian Computing Competition problems, CCC all years, CCC 1996-2025, CCC past contests, CCC problem list, graph theory CCC, dynamic programming CCC, CCC difficulty, CCC Junior problems, CCC Senior problems, competitive programming solutions" />
+			<meta name="author" content="CCCSolutions Community" />
+			<meta name="robots" content="index, follow, max-image-preview:large" />
+			<link rel="canonical" href="https://cccsolutions.ca/solutions" />
+			<meta property="og:title" content="All CCC Solutions (1996-2025) | 270+ Problems" />
+			<meta property="og:description" content="Browse all Canadian Computing Competition solutions. Filter by year, difficulty, or algorithm topic." />
+			<meta property="og:url" content="https://cccsolutions.ca/solutions" />
 		</Helmet>
 
 		<div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">

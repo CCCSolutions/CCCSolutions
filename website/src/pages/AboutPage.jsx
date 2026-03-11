@@ -1,19 +1,28 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import DonSmithImage from '../assets/donsmith.jpeg';
 import { contributors } from '../../constants';
 
 const About = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
-      <title>About</title>
+      <Helmet>
+        <title>About CCC Solutions | Canadian Computing Competition Solution Repository Since 1996</title>
+        <meta name="description" content="Learn about CCC Solutions' 20+ year history providing comprehensive Canadian Computing Competition solutions. Founded at Milliken Mills High School in 2001, now serving 2,700+ students worldwide with 270+ CCC problem solutions." />
+        <meta name="keywords" content="about CCC Solutions, Canadian Computing Competition history, CCC repository, Milliken Mills High School, Chris Robart, Don Smith, CCC contributors, competitive programming community" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://cccsolutions.ca/about" />
+        <meta property="og:title" content="About CCC Solutions | 20+ Years of CCC Solutions" />
+        <meta property="og:description" content="The story behind the most comprehensive Canadian Computing Competition solution repository, serving students since 2001." />
+        <meta property="og:url" content="https://cccsolutions.ca/about" />
+      </Helmet>
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
-          <h1 className="text-5xl font-bold mb-4">About Us</h1>
+          <h1 className="text-5xl font-bold mb-4">About CCC Solutions</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
-            Learn more about our journey in becoming a comprehensive platform offering CCC solutions
-            since 1996.
+            Learn more about our journey in becoming the most comprehensive platform for Canadian Computing Competition (CCC) solutions since 1996.
           </p>
         </div>
       </div>

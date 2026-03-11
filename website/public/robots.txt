@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /create-post
+Disallow: /login
+
+# Sitemaps
+Sitemap: https://cccsolutions.ca/sitemap.xml
+
+# Crawl-delay (be nice to servers)
+Crawl-delay: 1
