@@ -69,15 +69,18 @@ const Home = () => {
     <div>
       {/* Helmet for SEO */}
       <Helmet>
-        <meta name="keywords" content="
-          CCC Solutions, CCC Solution Repository, Canadian Computing Competition Solutions, Canadian Computing Competition, CCC Preparation, CCC Past Problems, CCC Contest Solutions, ccc 2025 solutions, ccc 2025, s1, s2, s3, s4, s5, j1, j2, j3, j4, j5, University of Waterloo CCC, Competitive Programming, Data Structures, Problem Solving, CCC Problem Analysis, Programming Contests, CCC Code Submissions, C++ CCC Solutions, Python CCC Solutions, Java CCC Solutions, CCC Strategy Guide, CCC Study Materials, CCC Exam Preparation, CCC Resources, Coding Forum, Solution Discussions, Programming Tutorials, Algorithm Techniques, CCC Tips and Tricks, CCC Best Practices, CCC Community Support, Competitive Coding Tips, CCC Coding Exercises, Problem-Solving Techniques, CCC Code Snippets, Coding Competitions, Coding Contest Training, Canadian Coding Contests
-        " />
-        <meta name="description" content="
-          Find comprehensive solutions to Canadian Computing Competition (CCC) problems. Explore a well-organized repository of CCC past problems, detailed problem analyses, and optimized programming solutions in C++, Python, and Java. Improve your competitive programming skills with CCC strategies, tips, and practice resources.
-        " />
-        <meta name="author" content="MMHS" />
-        <meta name="robots" content="index, follow" />
-        <title>CCC Solutions | Canadian Computing Competition Repository</title>
+        <title>CCC Solutions 2025 | Complete Canadian Computing Competition Guide & Solutions</title>
+        <meta name="description" content="The ultimate Canadian Computing Competition resource: 270+ detailed solutions (1996-2025) in C++, Python & Java. Master CCC with test cases, multiple approaches, and expert explanations. Join 2,700+ students preparing for Waterloo CCC." />
+        <meta name="keywords" content="CCC, Canadian Computing Competition, CCC solutions, CCC 2025, CCC 2024, University of Waterloo CCC, Waterloo CEMC, competitive programming Canada, CCC preparation, CCC past problems, CCC contest solutions, CCC test cases, s1 s2 s3 s4 s5, j1 j2 j3 j4 j5, CCC Senior, CCC Junior, graph theory, dynamic programming, greedy algorithms, data structures, algorithm practice, coding competition, programming contest, CCC study guide, CCC tips, CCC strategies" />
+        <meta name="author" content="CCCSolutions Community" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <link rel="canonical" href="https://cccsolutions.ca" />
+
+        {/* Open Graph */}
+        <meta property="og:title" content="CCC Solutions 2025 | Complete Canadian Computing Competition Guide" />
+        <meta property="og:description" content="270+ detailed CCC solutions from 1996-2025. Master competitive programming with test cases, multiple approaches & expert explanations." />
+        <meta property="og:url" content="https://cccsolutions.ca" />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       {/* New Announcement Banner */}
