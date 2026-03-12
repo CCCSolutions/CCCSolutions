@@ -1,5 +1,0 @@
-# Redirect Netlify subdomain to primary domain
-https://cccsolutions.netlify.app/* https://cccsolutions.ca/:splat 301!
-
-# Serve index.html for all routes (for single-page applications)
-/*    /index.html   200
