@@ -5,6 +5,7 @@ import ProblemsTable from "../../components/ProblemTable";
 import SearchBar from "../../components/Searchbar";
 import { problems } from "../../constants";
 
+
 function SolutionsContent() {
   return (
     <div>
@@ -17,7 +18,7 @@ function SolutionsContent() {
           </div>
         </div>
       </div>
-      <ProblemsTable problems={problems} />
+      <ProblemsTable />
     </div>
   );
 }

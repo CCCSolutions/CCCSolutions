@@ -24,6 +24,12 @@ export default function PostPage() {
     fetchComments();
   }, [id]);
 
+  useEffect(() => {
+    if (post?.title) {
+      document.title = post.title;
+    }
+  }, [post?.title]);
+
   const checkAuthStatus = () => {
     const isAuth = pb.authStore.isValid;
     setIsLoggedIn(isAuth);
@@ -104,7 +110,6 @@ export default function PostPage() {
 
   return (
       <div className="font-poppins">
-        <title>{post.title}</title>
         <div className="container mx-auto px-4 py-8">
           <Link href="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
 
