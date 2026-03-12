@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
 import PocketBase from 'pocketbase';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -11,7 +13,7 @@ export default function AuthForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function AuthForm() {
         const authData = await pb.collection('users').authWithPassword(username, password);
         console.log(authData);
         setSuccess('Login successful!');
-        navigate('/forum'); // Redirect to the forum page after login
+        router.push('/forum');
       } else {
         // Registration logic
         const data = {
@@ -41,7 +43,7 @@ export default function AuthForm() {
         // Automatically log in the newly created user
         const authData = await pb.collection('users').authWithPassword(username, password);
         console.log(authData);
-        navigate('/forum'); // Redirect to the forum page after login
+        router.push('/forum');
       }
     } catch (error) {
       setError(isLogin ? 'Login failed. Please check your credentials.' : 'Registration failed. Please try again.');

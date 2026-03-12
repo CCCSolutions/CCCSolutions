@@ -1,11 +1,13 @@
+'use client';
+
 import { Typography } from "@material-tailwind/react";
-import logoImage from "../assets/mmhs_logo.png";
+import Image from "next/image";
 
 const FooterWithLogo = () => {
   return (
     <footer className="w-full px-16 py-6 bg-white">
       <div className="flex flex-row flex-wrap items-center justify-center gap-x-12 text-center md:justify-between">
-        <img src={logoImage} alt="Milliken Mills High School Logo" className="h-[75px]" />
+        <Image src="/images/mmhs_logo.png" alt="Milliken Mills High School Logo" width={75} height={75} className="h-[75px] w-auto" />
         <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
           <li>
             <Typography

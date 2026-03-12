@@ -1,8 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import PocketBase from 'pocketbase';
-import { Link, useNavigate } from 'react-router-dom';
-import ReactQuill from 'react-quill';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
@@ -13,7 +17,7 @@ export default function ForumPage() {
   const [sortBy, setSortBy] = useState('new');
   const [user, setUser] = useState(pb.authStore.model);
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     fetchPosts();
@@ -58,16 +62,6 @@ export default function ForumPage() {
 
   return (
     <div className="font-poppins">
-      <Helmet>
-        <title>CCC Forum | Ask Questions & Discuss Canadian Computing Competition Solutions</title>
-        <meta name="description" content="Join the CCC Solutions community forum. Ask questions, share solutions, and discuss Canadian Computing Competition problems with fellow competitive programmers. Active community of 2,700+ students." />
-        <meta name="keywords" content="CCC forum, Canadian Computing Competition forum, CCC discussion, CCC help, competitive programming community, CCC questions, algorithm discussion, programming help" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://cccsolutions.ca/forum" />
-        <meta property="og:title" content="CCC Forum | Discuss Solutions & Ask Questions" />
-        <meta property="og:description" content="Community forum for Canadian Computing Competition discussion, questions, and solution sharing." />
-        <meta property="og:url" content="https://cccsolutions.ca/forum" />
-      </Helmet>
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
@@ -89,7 +83,7 @@ export default function ForumPage() {
           ) : (
             <p className="text-sm italic">
               Not logged in |{' '}
-              <span className="cursor-pointer underline" onClick={() => navigate('/login')}>
+              <span className="cursor-pointer underline" onClick={() => router.push('/login')}>
                 Login
               </span>
             </p>
@@ -112,7 +106,7 @@ export default function ForumPage() {
             </div>
 
             <Link
-              to="/create-post"
+              href="/create-post"
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
             >
               Create New Post
@@ -126,7 +120,7 @@ export default function ForumPage() {
               {posts.map(post => (
                 <div key={post.id} className="border p-4 rounded shadow-md transition hover:shadow-lg bg-white">
                   <h2 className="text-xl font-semibold">
-                    <Link to={`/forum/${post.id}`} className="hover:underline">
+                    <Link href={`/forum/${post.id}`} className="hover:underline">
                       {post.title}
                     </Link>
                   </h2>

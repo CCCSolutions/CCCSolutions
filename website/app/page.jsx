@@ -1,10 +1,10 @@
+'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
-import { Helmet } from 'react-helmet';
-import BackgroundImage from '../assets/image.png'
-import { stats } from '../../constants';
+import { stats } from '../constants';
 
 // Styled components (i got lazy)
 const IconWrapper = styled.div`
@@ -32,12 +32,12 @@ const FileTextIconWrapper = styled(IconWrapper)`
 
 const GithubIconWrapper = styled(IconWrapper)`
   background: linear-gradient(135deg, #333, #666);
-  transition: background 0.5s ease, transform 0.3s ease;  
+  transition: background 0.5s ease, transform 0.3s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #42A5F5, #1E88E5); 
-    transform: scale(1.03); 
-    z-index: 1;  
+    background: linear-gradient(135deg, #42A5F5, #1E88E5);
+    transform: scale(1.03);
+    z-index: 1;
   }
 `;
 
@@ -67,25 +67,9 @@ const Home = () => {
 
   return (
     <div>
-      {/* Helmet for SEO */}
-      <Helmet>
-        <title>CCC Solutions 2025 | Complete Canadian Computing Competition Guide & Solutions</title>
-        <meta name="description" content="The ultimate Canadian Computing Competition resource: 270+ detailed solutions (1996-2025) in C++, Python & Java. Master CCC with test cases, multiple approaches, and expert explanations. Join 2,700+ students preparing for Waterloo CCC." />
-        <meta name="keywords" content="CCC, Canadian Computing Competition, CCC solutions, CCC 2025, CCC 2024, University of Waterloo CCC, Waterloo CEMC, competitive programming Canada, CCC preparation, CCC past problems, CCC contest solutions, CCC test cases, s1 s2 s3 s4 s5, j1 j2 j3 j4 j5, CCC Senior, CCC Junior, graph theory, dynamic programming, greedy algorithms, data structures, algorithm practice, coding competition, programming contest, CCC study guide, CCC tips, CCC strategies" />
-        <meta name="author" content="CCCSolutions Community" />
-        <meta name="robots" content="index, follow, max-image-preview:large" />
-        <link rel="canonical" href="https://cccsolutions.ca" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content="CCC Solutions 2025 | Complete Canadian Computing Competition Guide" />
-        <meta property="og:description" content="270+ detailed CCC solutions from 1996-2025. Master competitive programming with test cases, multiple approaches & expert explanations." />
-        <meta property="og:url" content="https://cccsolutions.ca" />
-        <meta property="og:type" content="website" />
-      </Helmet>
-
       {/* New Announcement Banner */}
       <AnnouncementBanner>
-        <Link to="/solutions" className="text-white">
+        <Link href="/solutions" className="text-white">
           2025 solutions are now fully released! View them <u>here</u>.
         </Link>
       </AnnouncementBanner>
@@ -94,7 +78,7 @@ const Home = () => {
       {/* Hero Section */}
       <div
         className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
-        style={{ backgroundImage: `url(${BackgroundImage})` }}
+        style={{ backgroundImage: `url(/images/image.png)` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           The <span
@@ -105,10 +89,10 @@ most comprehensive</span> CCC solution repository
           Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
         </p>
         <div className="flex space-x-4">
-          <Link to="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+          <Link href="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
             Explore Solutions
           </Link>
-          <Link to="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg">
+          <Link href="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg">
             Visit Forum
           </Link>
         </div>

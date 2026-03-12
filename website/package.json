@@ -2,12 +2,11 @@
   "name": "mmhs-website",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
@@ -17,33 +16,25 @@
     "highlight.js": "^11.10.0",
     "jszip": "3.10.1",
     "lucide-react": "^0.441.0",
+    "next": "^14.2.15",
     "pocketbase": "^0.21.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
-    "react-helmet": "^6.1.0",
     "react-icons": "^5.3.0",
     "react-quill": "^2.0.0",
-    "react-router-dom": "^6.26.1",
     "react-syntax-highlighter": "^15.5.0",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "@ant-design/icons": "^5.4.0",
-    "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.9.0",
-    "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.9",
-    "globals": "^15.9.0",
     "postcss": "^8.4.41",
-    "styled-components": "^6.1.13",
-    "tailwindcss": "^3.4.10",
-    "vite": "^5.4.1"
+    "eslint": "^8.57.0",
+    "@netlify/plugin-nextjs": "^4.41.3",
+    "eslint-config-next": "14.2.15",
+    "tailwindcss": "^3.4.10"
   }
 }

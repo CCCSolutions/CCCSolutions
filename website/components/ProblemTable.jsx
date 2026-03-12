@@ -1,15 +1,18 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Book, BookOpen, Info } from 'react-feather';
-import { problems } from '../../constants';
+import { problems } from '../constants';
 
 const ProblemsTable = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const initialPage = parseInt(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  
+
   const problemsPerPage = 20;
-  
+
   // Get the problems for the current page
   const currentProblems = problems.slice(
     (currentPage - 1) * problemsPerPage,
@@ -18,8 +21,8 @@ const ProblemsTable = () => {
 
   // Update URL when page changes
   useEffect(() => {
-    setSearchParams({ page: currentPage });
-  }, [currentPage, setSearchParams]);
+    router.replace(`?page=${currentPage}`, { scroll: false });
+  }, [currentPage, router]);
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 
@@ -104,9 +107,9 @@ const ProblemsTable = () => {
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
-        <button 
-          onClick={() => handlePageChange(currentPage - 1)} 
-          disabled={currentPage === 1} 
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
           className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
         >
           Previous
@@ -114,9 +117,9 @@ const ProblemsTable = () => {
         <div className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
         </div>
-        <button 
-          onClick={() => handlePageChange(currentPage + 1)} 
-          disabled={currentPage === totalPages} 
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
           className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
         >
           Next

@@ -1,7 +1,11 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import PocketBase from 'pocketbase';
-import { useNavigate } from 'react-router-dom';
-import ReactQuill from 'react-quill';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
@@ -10,20 +14,20 @@ export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
-      navigate('/login');
+      router.push('/login');
     }
-  }, [navigate]);
+  }, [router]);
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
 
     if (!pb.authStore.isValid) {
       setError("You need to log in to create a post.");
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
@@ -37,7 +41,7 @@ export default function CreatePost() {
 
       const createdPost = await pb.collection('posts').create(data);
 
-      navigate(`/forum/${createdPost.id}`);
+      router.push(`/forum/${createdPost.id}`);
 
       setNewPostTitle('');
       setNewPostBody('');

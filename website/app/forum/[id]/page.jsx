@@ -1,13 +1,18 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import PocketBase from 'pocketbase';
-import ReactQuill from 'react-quill';
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
 export default function PostPage() {
-  const {id} = useParams();
+  const { id } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -18,6 +23,12 @@ export default function PostPage() {
     fetchPost();
     fetchComments();
   }, [id]);
+
+  useEffect(() => {
+    if (post?.title) {
+      document.title = post.title;
+    }
+  }, [post?.title]);
 
   const checkAuthStatus = () => {
     const isAuth = pb.authStore.isValid;
@@ -99,9 +110,8 @@ export default function PostPage() {
 
   return (
       <div className="font-poppins">
-        <title>{post.title}</title>
         <div className="container mx-auto px-4 py-8">
-          <Link to="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
+          <Link href="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
 
           <div className="bg-white shadow-md p-6 rounded-lg mb-8">
             <h1 className="text-3xl font-bold mb-4 text-gray-800">{post.title}</h1>

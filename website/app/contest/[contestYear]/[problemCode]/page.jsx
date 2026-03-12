@@ -1,11 +1,14 @@
+'use client';
+
 import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Helmet } from "react-helmet";
 import { Info, Code, FileText } from "lucide-react";
-import { problems } from "../../constants";
+import { problems } from "../../../../constants";
 
-const Problem = ({ contestYear, problemCode }) => {
+const Problem = () => {
+  const { contestYear, problemCode } = useParams();
   const [solutions, setSolutions] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
   const [testCaseData, setTestCaseData] = useState({ input: "", output: "" });
@@ -20,7 +23,7 @@ const Problem = ({ contestYear, problemCode }) => {
     const fetchProblemInfo = async () => {
       try {
         // First try to find exact match
-        let problemData = problems.find(p => 
+        let problemData = problems.find(p =>
           p.link === `/contest/${contestYear}/${problemCode}`
         );
         setProblemInfo(problemData);
@@ -35,7 +38,7 @@ const Problem = ({ contestYear, problemCode }) => {
         });
       }
     };
-    
+
     fetchProblemInfo();
   }, [contestYear, problemCode]);
 
@@ -56,7 +59,7 @@ const Problem = ({ contestYear, problemCode }) => {
           }
 
           const text = await response.text();
-          
+
           if (!text.toLowerCase().includes("<!doctype html>")) {
             solutionsArray.push(text);
           }
@@ -279,31 +282,13 @@ const Problem = ({ contestYear, problemCode }) => {
     return "cpp";
   };
 
-  // Generate SEO keywords
-  const keywords = problemInfo ? 
-    `${problemInfo.name}, CCC ${contestYear} ${problemCode}, ${problemInfo.tags.join(', ')}, Solution` :
-    `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`;
-
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <Helmet>
-        <title>{problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} Solution | C++, Python & Java Code</title>
-        <meta name="description" content={`Complete solution to ${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} with detailed code. Includes test cases, algorithm explanation, and complexity analysis. Difficulty: ${problemInfo?.difficulty || 'N/A'}. Tags: ${problemInfo?.tags?.join(', ') || 'competitive programming'}.`} />
-        <meta name="keywords" content={`${keywords}, CCC ${contestYear} ${problemCode} solution, ${contestYear} ${problemCode.toUpperCase()} code, how to solve CCC ${contestYear} ${problemCode}, ${problemInfo?.name || ''} solution`} />
-        <meta name="author" content="CCCSolutions Community" />
-        <meta name="robots" content="index, follow, max-image-preview:large" />
-        <link rel="canonical" href={`https://cccsolutions.ca/contest/${contestYear}/${problemCode}`} />
-
-        {/* Open Graph */}
-        <meta property="og:title" content={`${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} Solution`} />
-        <meta property="og:description" content={`Complete solution with detailed code and test cases. Difficulty: ${problemInfo?.difficulty}. Topics: ${problemInfo?.tags?.join(', ')}.`} />
-        <meta property="og:url" content={`https://cccsolutions.ca/contest/${contestYear}/${problemCode}`} />
-        <meta property="og:type" content="article" />
-        <meta name="theme-color" content="#1e3a8a" />
-
-        {/* Breadcrumb Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+      {/* SEO structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [{
@@ -326,12 +311,13 @@ const Problem = ({ contestYear, problemCode }) => {
               "position": 4,
               "name": problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`
             }]
-          })}
-        </script>
-
-        {/* Article Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
             "headline": problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`,
@@ -352,9 +338,9 @@ const Problem = ({ contestYear, problemCode }) => {
             "dateModified": `${contestYear}-02-01`,
             "proficiencyLevel": problemInfo?.difficulty || "Intermediate",
             "dependencies": problemInfo?.tags?.join(', ') || "algorithms"
-          })}
-        </script>
-      </Helmet>
+          }),
+        }}
+      />
 
       <div className="mx-auto">
         <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
@@ -401,9 +387,9 @@ const Problem = ({ contestYear, problemCode }) => {
                       {getLanguageFromCode(solution).toUpperCase()}
                     </span>
                   </div>
-                  <SyntaxHighlighter 
-                    language={getLanguageFromCode(solution)} 
-                    style={solarizedlight} 
+                  <SyntaxHighlighter
+                    language={getLanguageFromCode(solution)}
+                    style={solarizedlight}
                     showLineNumbers
                     customStyle={{ margin: 0, borderRadius: 0 }}
                   >
@@ -420,7 +406,7 @@ const Problem = ({ contestYear, problemCode }) => {
               <FileText className="mr-2 h-5 w-5 text-blue-800" />
               <h2 className="text-xl font-semibold text-gray-900">Test Cases</h2>
             </div>
-            
+
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
               <div className="flex items-center p-4 border-b border-gray-200 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 {Array.from({ length: availableTestCases }, (_, idx) => (

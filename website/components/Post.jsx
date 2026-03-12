@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const Post = ({user, content, created_at, contributions, username_color}) => {
   return (

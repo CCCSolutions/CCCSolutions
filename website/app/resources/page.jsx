@@ -1,5 +1,6 @@
+'use client';
+
 import React from 'react';
-import { Helmet } from 'react-helmet';
 import { BookOutlined, GlobalOutlined } from '@ant-design/icons';
 
 const Resources = () => {
@@ -31,16 +32,6 @@ const Resources = () => {
 
   return (
     <div className="bg-gray-100">
-      <Helmet>
-        <title>CCC Preparation Resources | Books, Websites & Tools for Canadian Computing Competition</title>
-        <meta name="description" content="Essential resources to prepare for the Canadian Computing Competition (CCC). Recommended books, practice platforms (DMOJ, Codeforces), guides, and competitive programming tools for CCC success." />
-        <meta name="keywords" content="CCC preparation, CCC resources, Canadian Computing Competition study guide, competitive programming books, DMOJ, Codeforces, USACO guide, CCC practice problems, algorithm books, CCC training" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://cccsolutions.ca/resources" />
-        <meta property="og:title" content="CCC Preparation Resources | Study Materials & Practice" />
-        <meta property="og:description" content="Curated resources to help you excel at the Canadian Computing Competition: books, websites, and practice platforms." />
-        <meta property="og:url" content="https://cccsolutions.ca/resources" />
-      </Helmet>
       {/* Hero Section with Gradient */}
       <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
