@@ -282,11 +282,6 @@ const Problem = () => {
     return "cpp";
   };
 
-  // Generate SEO keywords
-  const keywords = problemInfo ?
-    `${problemInfo.name}, CCC ${contestYear} ${problemCode}, ${problemInfo.tags.join(', ')}, Solution` :
-    `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`;
-
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       {/* SEO structured data */}
