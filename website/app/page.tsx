@@ -7,7 +7,11 @@ import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icon
 import { stats } from '../constants';
 
 // Styled components (i got lazy)
-const IconWrapper = styled.div`
+interface IconWrapperProps {
+  background?: string;
+}
+
+const IconWrapper = styled.div<IconWrapperProps>`
     font-size: 2rem;
     margin-right: 20px;
     border-radius: 12px;
@@ -54,7 +58,7 @@ const AnnouncementBanner = styled.div`
 `;
 
 const Home = () => {
-  const contentRef = useRef(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
 
   useEffect(() => {

@@ -1,4 +1,26 @@
-const problems = [
+export interface Problem {
+	name: string;
+	difficulty: string;
+	tags: string[];
+	link: string;
+	hasSolution: boolean;
+}
+
+export interface Contributor {
+	initials: string;
+	name: string;
+	school?: string;
+	schools?: string;
+	contributions: string;
+}
+
+export interface Stats {
+	activeUsers: string;
+	numSolutions: string;
+	history: string;
+}
+
+const problems: Problem[] = [
 	// 2025 Junior
 	{ name: '2025 J1 - Roller Coaster Ride', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2025/j1', hasSolution: true },
 	{ name: '2025 J2 - Donut Shop', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2025/j2', hasSolution: true },
@@ -390,7 +412,7 @@ const problems = [
 
 ];
 
-const contributors = [
+const contributors: Contributor[] = [
 	{ initials: "AC", name: "Advay Chandorkar", school: "Glenforest Secondary School", contributions: "2025 S4, 2016-2017 J1-J2, 2016 J3"},
 	{ initials: "AJ", name: "Amlesh Jayakumar", school: "Waterloo Collegiate Institute", contributions: "2008 S5: 2009 S4, S5: 2012 S4, 2014 S4" },
 	{ initials: "AL", name: "Anton Likhtarov", school: "Burnaby North S.S.", contributions: "2005 S5" },
@@ -442,7 +464,7 @@ const contributors = [
 	{ initials: "ZZ", name: "Zihao Zhang", school: "Vincent Massey Secondary School", contributions: "2014 S4" }
 ];
 
-const stats = {
+const stats: Stats = {
     activeUsers: "2,700+",
     numSolutions: "270+",
     history: "20+ years"

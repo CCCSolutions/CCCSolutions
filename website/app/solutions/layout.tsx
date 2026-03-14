@@ -14,6 +14,6 @@ export const metadata = {
   },
 };
 
-export default function SolutionsLayout({ children }) {
+export default function SolutionsLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

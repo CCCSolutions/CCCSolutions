@@ -1,6 +1,14 @@
 import React from 'react';
 
-const Post = ({user, content, created_at, contributions, username_color}) => {
+interface PostProps {
+  user: string;
+  content: string;
+  created_at: string;
+  contributions: string;
+  username_color: string;
+}
+
+const Post = ({user, content, created_at, contributions, username_color}: PostProps) => {
   return (
     <div className="p-6">
       <div className="postheader">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import PocketBase from 'pocketbase';
+import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -12,10 +12,10 @@ import 'react-quill/dist/quill.bubble.css';
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
 export default function ForumPage() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<RecordModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('new');
-  const [user, setUser] = useState(pb.authStore.model);
+  const [user, setUser] = useState<AuthModel>(pb.authStore.model);
 
   const router = useRouter();
 
@@ -39,13 +39,14 @@ export default function ForumPage() {
     }
   };
 
-  const handleVote = async (postId, voteType) => {
+  const handleVote = async (postId: string, voteType: string) => {
     if (!user) {
       alert("Please log in to vote.");
       return;
     }
     try {
       const post = posts.find(p => p.id === postId);
+      if (!post) return;
       const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
 
       await pb.collection('posts').update(postId, { upvotes: updatedVotes });

@@ -8,7 +8,7 @@ import { problems } from '../constants';
 const ProblemsTable = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initialPage = parseInt(searchParams.get('page')) || 1;
+  const initialPage = parseInt(searchParams.get('page') || '1') || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
 
   const problemsPerPage = 20;
@@ -26,12 +26,12 @@ const ProblemsTable = () => {
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
-  const getDifficultyClass = (difficulty) => {
+  const getDifficultyClass = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
         return 'bg-green-100 text-green-800';
