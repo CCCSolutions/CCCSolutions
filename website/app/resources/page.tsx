@@ -3,8 +3,23 @@
 import React from 'react';
 import { BookOutlined, GlobalOutlined } from '@ant-design/icons';
 
+interface Book {
+  title: string;
+  author?: string;
+  link?: string;
+  edition?: string;
+  course?: string;
+}
+
+interface Website {
+  title: string;
+  link?: string;
+  description?: string;
+  author?: string;
+}
+
 const Resources = () => {
-  const books = [
+  const books: Book[] = [
     {
       title: "📌 Competitive Programmer's Handbook",
       author: 'Antti Laaksonen',
@@ -12,7 +27,7 @@ const Resources = () => {
     },
   ];
 
-  const websites = [
+  const websites: Website[] = [
     {
       title: 'DMOJ: Modern Online Judge',
       link: 'https://dmoj.ca/',

@@ -1,13 +1,18 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Problem } from '../constants';
 
-const SearchBar = ({ problems }) => {
+interface SearchBarProps {
+  problems: Problem[];
+}
+
+const SearchBar = ({ problems }: SearchBarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const searchBarRef = useRef(null);
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     setIsDropdownOpen(query.length > 0); // Open dropdown if query is not empty
@@ -20,8 +25,8 @@ const SearchBar = ({ problems }) => {
 
   // Click outside detection
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false); // Close dropdown if clicked outside
       }
     };
