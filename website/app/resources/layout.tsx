@@ -13,6 +13,6 @@ export const metadata = {
   },
 };
 
-export default function ResourcesLayout({ children }) {
+export default function ResourcesLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

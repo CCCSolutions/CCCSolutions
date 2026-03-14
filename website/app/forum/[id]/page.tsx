@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import PocketBase from 'pocketbase';
+import PocketBase, { RecordModel } from 'pocketbase';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -12,9 +12,9 @@ import 'react-quill/dist/quill.bubble.css';
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
 export default function PostPage() {
-  const { id } = useParams();
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<RecordModel | null>(null);
+  const [comments, setComments] = useState<RecordModel[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -42,8 +42,9 @@ export default function PostPage() {
         requestKey: `post_${id}`
       });
       setPost(record);
-    } catch (error) {
-      if (error.name !== 'ClientResponseError' || !error.message.includes('autocancelled')) {
+    } catch (error: unknown) {
+      const err = error as { name?: string; message?: string };
+      if (err.name !== 'ClientResponseError' || !err.message?.includes('autocancelled')) {
         console.error("Error fetching post:", error);
       }
     }
@@ -58,33 +59,34 @@ export default function PostPage() {
         requestKey: `comments_${id}`
       });
       setComments(resultList.items);
-    } catch (error) {
-      if (error.name !== 'ClientResponseError' || !error.message.includes('auto cancelled')) {
+    } catch (error: unknown) {
+      const err = error as { name?: string; message?: string };
+      if (err.name !== 'ClientResponseError' || !err.message?.includes('auto cancelled')) {
         console.error("Error fetching comments:", error);
       }
     }
   };
 
-  const handleVote = async (voteType) => {
+  const handleVote = async (voteType: string) => {
     if (!isLoggedIn) {
       alert("Please log in to vote.");
       return;
     }
 
     try {
-      const updatedVotes = post.upvotes + (voteType === 'upvote' ? 1 : -1);
+      const updatedVotes = post!.upvotes + (voteType === 'upvote' ? 1 : -1);
 
       await pb.collection('posts').update(id, {upvotes: updatedVotes});
-      setPost((prevPost) => ({
+      setPost((prevPost) => prevPost ? ({
         ...prevPost,
         upvotes: updatedVotes,
-      }));
+      }) : null);
     } catch (error) {
       console.error("Error voting on post:", error);
     }
   };
 
-  const handleAddComment = async (e) => {
+  const handleAddComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isLoggedIn) {
       alert("Please log in to comment.");
@@ -94,7 +96,7 @@ export default function PostPage() {
       const data = {
         body: newComment,
         post: id,
-        author: pb.authStore.model.id,
+        author: pb.authStore.model!.id,
       };
 
       await pb.collection('comments').create(data);
@@ -169,7 +171,7 @@ export default function PostPage() {
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="4"
+                rows={4}
                 required
             />
               <button

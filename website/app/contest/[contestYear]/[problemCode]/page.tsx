@@ -5,17 +5,27 @@ import { useParams } from "next/navigation";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Info, Code, FileText } from "lucide-react";
-import { problems } from "../../../../constants";
+import { Problem as ProblemType, problems } from "../../../../constants";
+
+interface TestCaseData {
+  input: string | null;
+  output: string | null;
+}
+
+interface TestCaseSize {
+  inputKB: number;
+  outputKB: number;
+}
 
 const Problem = () => {
-  const { contestYear, problemCode } = useParams();
-  const [solutions, setSolutions] = useState([]);
-  const [activeTab, setActiveTab] = useState(null);
-  const [testCaseData, setTestCaseData] = useState({ input: "", output: "" });
-  const [testCaseState, setTestCaseState] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+  const { contestYear, problemCode } = useParams<{ contestYear: string; problemCode: string }>();
+  const [solutions, setSolutions] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: "", output: "" });
+  const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [availableTestCases, setAvailableTestCases] = useState(10); // Will be determined dynamically
-  const [testCaseSizes, setTestCaseSizes] = useState({}); // Store file sizes: { "1": { inputKB: 50, outputKB: 10 }, ... }
-  const [problemInfo, setProblemInfo] = useState(null);
+  const [testCaseSizes, setTestCaseSizes] = useState<Record<number, TestCaseSize>>({}); // Store file sizes: { "1": { inputKB: 50, outputKB: 10 }, ... }
+  const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fetch problem info from the problems table
@@ -23,18 +33,20 @@ const Problem = () => {
     const fetchProblemInfo = async () => {
       try {
         // First try to find exact match
-        let problemData = problems.find(p =>
+        const problemData = problems.find(p =>
           p.link === `/contest/${contestYear}/${problemCode}`
         );
-        setProblemInfo(problemData);
+        setProblemInfo(problemData || null);
 
       } catch (error) {
         console.error("Error fetching problem info:", error);
         // Fallback title
         setProblemInfo({
-          name: `${contestYear} ${problemCode.toUpperCase()}`,
+          name: `${contestYear} ${(problemCode as string).toUpperCase()}`,
           difficulty: 'Unknown',
-          tags: []
+          tags: [],
+          link: '',
+          hasSolution: false
         });
       }
     };
@@ -46,7 +58,7 @@ const Problem = () => {
   useEffect(() => {
     const fetchSolutions = async () => {
       setLoading(true);
-      const solutionsArray = [];
+      const solutionsArray: string[] = [];
       const basePath = `/past_contests/${contestYear}/${problemCode}`;
 
       for (let i = 1; i <= 3; i++) {
@@ -91,7 +103,7 @@ const Problem = () => {
     }
   }, [problemInfo]);
 
-  const fetchTestCase = async (idx) => {
+  const fetchTestCase = async (idx: number) => {
     setTestCaseState('loading');
     setTestCaseData({ input: "", output: "" });
     const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
@@ -131,7 +143,7 @@ const Problem = () => {
     }
   };
 
-  const handleTabClick = (idx) => {
+  const handleTabClick = (idx: number) => {
     setActiveTab(idx);
     fetchTestCase(idx);
   };
@@ -141,7 +153,7 @@ const Problem = () => {
     const checkTestCases = async () => {
       const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
       let count = 0;
-      const sizes = {};
+      const sizes: Record<number, TestCaseSize> = {};
 
       // Check up to 20 test cases (all files now use sequential numbering)
       for (let i = 1; i <= 20; i++) {
@@ -190,13 +202,13 @@ const Problem = () => {
     checkTestCases();
   }, [contestYear, problemCode]);
 
-  const getFileSizeWarning = (text) => {
+  const getFileSizeWarning = (text: string | null) => {
     if (!text) return null;
-    const sizeKB = (text.length / 1024).toFixed(1);
+    const sizeKB = parseFloat((text.length / 1024).toFixed(1));
     return sizeKB > 50 ? `Large file (${sizeKB}KB)` : null;
   };
 
-  const getDifficultyColor = (difficulty) => {
+  const getDifficultyColor = (difficulty: string) => {
     switch (difficulty?.toLowerCase()) {
       case 'easy':
         return 'bg-green-100 text-green-800';
@@ -213,7 +225,7 @@ const Problem = () => {
     }
   };
 
-  const getLanguageFromCode = (code) => {
+  const getLanguageFromCode = (code: string) => {
     const trimmedCode = code.trim();
 
     // Turing (old educational language used in early CCC)
@@ -472,14 +484,14 @@ const Problem = () => {
                           Input:
                           {getFileSizeWarning(testCaseData.input) && (
                             <span className="text-xs text-gray-500 ml-2">
-                              ({(testCaseData.input.length / 1024).toFixed(1)}KB)
+                              ({(testCaseData.input!.length / 1024).toFixed(1)}KB)
                             </span>
                           )}
                         </h3>
                         <textarea
                           className="w-full h-48 p-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-md resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           readOnly
-                          value={testCaseData.input}
+                          value={testCaseData.input || ''}
                         />
                       </div>
                       <div>
@@ -487,14 +499,14 @@ const Problem = () => {
                           Output:
                           {getFileSizeWarning(testCaseData.output) && (
                             <span className="text-xs text-gray-500 ml-2">
-                              ({(testCaseData.output.length / 1024).toFixed(1)}KB)
+                              ({(testCaseData.output!.length / 1024).toFixed(1)}KB)
                             </span>
                           )}
                         </h3>
                         <textarea
                           className="w-full h-48 p-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-md resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           readOnly
-                          value={testCaseData.output}
+                          value={testCaseData.output || ''}
                         />
                       </div>
                     </div>
