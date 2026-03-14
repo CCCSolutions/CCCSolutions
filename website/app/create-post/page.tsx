@@ -13,7 +13,7 @@ const pb = new PocketBase('https://mmhs.pockethost.io');
 export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function CreatePost() {
     }
   }, [router]);
 
-  const handleCreatePost = async (e) => {
+  const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!pb.authStore.isValid) {
@@ -35,7 +35,7 @@ export default function CreatePost() {
       const data = {
         title: newPostTitle,
         body: newPostBody,
-        author: pb.authStore.model.id,
+        author: pb.authStore.model!.id,
         upvotes: 0,
       };
 

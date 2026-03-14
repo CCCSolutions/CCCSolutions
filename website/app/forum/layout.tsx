@@ -13,6 +13,6 @@ export const metadata = {
   },
 };
 
-export default function ForumLayout({ children }) {
+export default function ForumLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
