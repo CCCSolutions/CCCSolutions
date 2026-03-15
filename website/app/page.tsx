@@ -73,8 +73,8 @@ const Home = () => {
     <div>
       {/* New Announcement Banner */}
       <AnnouncementBanner>
-        <Link href="/solutions" className="text-white">
-          2025 solutions are now fully released! View them <u>here</u>.
+        <Link href="/forum" className="text-white">
+          Help us expand our repository! Submit your 2026 solutions <u>here</u>.
         </Link>
       </AnnouncementBanner>
 
