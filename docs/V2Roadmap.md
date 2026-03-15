@@ -231,6 +231,17 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
 - Leverages the existing difficulty and tag data — this isn't new metadata, it's proper API support for data that already exists
 - Frontend filter/search UI with clean controls
 
+**1.7 — Editorial Structure**
+- Each problem page shifts from "just code" to a structured editorial format:
+  - Problem summary (plain language description of what's being asked)
+  - Approach / key insight (the observation that unlocks the solution)
+  - Complexity analysis (time and space)
+  - Solution code (multi-language tabs from 1.5)
+  - Edge cases / gotchas (what trips people up on specific test cases)
+- Stored as sectioned Markdown in the editorials table
+- AI-generated drafts (Phase 4) follow this same structure
+- Community can edit/improve any section through the wiki system (Phase 2.6)
+
 ### Definition of Done
 
 - Users can sign in with one click via GitHub/Google
@@ -293,15 +304,22 @@ This phase is the highest-impact work. It turns the site into something people c
 - `is_ai_draft` boolean flag for AI-generated baseline content (see Phase 4)
 
 **2.7 — Progress Tracking**
-- Authenticated users can toggle problem state: `Solved`, `Attempting`, `Unsolved`
+- Problem statuses: `Not Attempted`, `Attempting`, `Solved`, `Reviewing`, `Skipped`
 - Dashboard view with visual progress indicators by year, contest, difficulty, or tag
-- Stored in Supabase, served via API
+- **Streak tracking:** Log a timestamp whenever a user marks a problem as solved. Display a streak counter and a GitHub-style activity heatmap on their profile. Competitive programmers will keep the streak alive.
+- **DMOJ Integration:** Users can link their DMOJ handle in their profile. A background job periodically hits the DMOJ API v2 submissions endpoint (`/api/v2/submissions?user=HANDLE&problem=PROBLEM_CODE`) to check for AC verdicts on CCC problems. # of "verified solves" get badge on the progress dashboard/forums. Sync runs on a schedule (not real-time) since the DMOJ API is slow. 
 
 **2.8 — Notifications (In-App)**
 - Bell icon in navbar with unread count
 - Triggers: someone replies to your comment, upvotes your solution/editorial, or edits an editorial you authored
 - `notifications` table in Supabase with `is_read` boolean
 - No email notifications for now — adds complexity without proportional value at this scale
+
+**2.10 — Community Difficulty Voting**
+- Users can vote on perceived difficulty of a problem 
+- Displayed as a community rating alongside the official 5-tier difficulty (or can replace entirely)
+- Does not override the official difficulty — could be shown as a separate "Community Rating" indicator
+- Helps future students gauge actual difficulty in case of inconsistencies
 
 ### Definition of Done
 
@@ -407,8 +425,8 @@ To:
 **4.2 — AI-Generated Cold-Start Editorials**
 - One-time local script (not a live feature):
   - Takes all problems without a human-written editorial
-  - Feeds each problem description + a known working solution to a cheap LLM
-  - Generates a baseline explanation
+  - Feeds each problem description + a known working solution to a high-quality model
+  - Generates structured editorial following the format from 1.7 (summary, approach, complexity, edge cases)
   - Pushes to Supabase with `is_ai_draft = true`
 - Frontend badges these as "AI-Generated Draft — Help improve this editorial!"
 - Community edits and improves them through the wiki editorial system (Phase 2.6)
