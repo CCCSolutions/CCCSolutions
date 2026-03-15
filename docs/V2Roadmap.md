@@ -59,7 +59,7 @@ The platform already has a **5-tier difficulty rating system** and **algorithmic
 | **Backend API** | Cloudflare Workers + Hono | Edge-first API, decoupled from frontend. Native integration with R2 and Turnstile. |
 | **Database** | Supabase (PostgreSQL + pgvector) | Managed Postgres with built-in auth, Row Level Security, and vector search. |
 | **Object Storage** | Cloudflare R2 | Test cases are too large for Postgres and currently bloat the git repo. R2 has 10GB free tier, zero egress fees. |
-| **Caching** | Upstash Redis | Edge-compatible Redis for caching hot solutions and powering rate limiting. |
+| **Caching** | Cloudflare Cache API + Upstash Redis | Three-layer cache (Cloudflare edge → Redis → Supabase). Cloudflare Cache API handles edge caching natively in Workers. Redis serves as warm fallback and handles per-user rate limiting. |
 | **Bot Protection** | Cloudflare Turnstile | Invisible CAPTCHA — no traffic-light clicking. Cryptographic challenge runs in background. |
 | **Auth** | Supabase Auth (GitHub + Google OAuth) | One-click sign-in. Eliminates registration friction for a community that already has GitHub accounts. |
 | **Analytics** | GA4 + Cloudflare Web Analytics | GA4 for funnel tracking and custom events. Cloudflare Web Analytics as a lightweight, privacy-friendly secondary layer. |
@@ -149,12 +149,15 @@ Test cases range from 2–3 lines for easy problems to thousands of lines for ha
 - **Preview endpoint:** Hono reads the first 50 lines from R2 and returns them. The frontend renders this as a preview.
 - **Download endpoint:** Hono generates a temporary signed R2 URL. Users download massive test cases locally.
 
-### What lives in Upstash Redis (cache)
+### Caching Strategy
 
-- Hot solutions (top ~50 most-requested, cached for instant retrieval)
-- Rate limit counters (per-user and per-IP request tracking)
-- IP jail keys (banned IPs stored with TTL expiration)
-- Solution/test case availability flags (lightweight lookups to avoid unnecessary R2 reads)
+Solutions and problem data rarely change. We use a three-layer cache to serve the vast majority of reads without hitting the database.
+
+1. **Cloudflare Cache API** — built into Workers, free. Cache full API responses at the edge with a ~24hr TTL. Handles most read traffic with zero external calls.
+2. **Upstash Redis** — warm fallback if the edge cache misses (cold location or expired TTL). Also handles per-user rate limit counters, IP jail keys, and solution/test case availability flags.
+3. **Supabase (Postgres)** — only hit on a full cache miss. Both caches are populated on the way back out.
+
+**Invalidation:** On any POST/PUT to a solution or editorial, the Hono handler purges that problem's cache key from both the Cloudflare Cache API and Redis. Edits are infrequent enough (a few times per week across the whole site) that nearly all traffic is served from cache.
 
 ---
 
@@ -325,16 +328,31 @@ The codebase is open source and the user base includes competitive programmers w
 - Hono middleware validates the Turnstile token via Cloudflare's `siteverify` endpoint
 - Requests without a valid token are rejected before touching the database
 
-**3.2 — Upstash Redis Rate Limiting**
-- Sliding window rate limiter in Hono middleware
-- Limits per authenticated user ID (or per IP for unauthenticated requests)
-- Thresholds: ~5 comments per minute, ~30 API requests per minute per IP
+**3.2 — Rate Limiting**
+- **IP-level:** Cloudflare's built-in rate limiting rules handle basic IP-level protection at the edge — no code needed
+- **Per-user:** Upstash Redis sliding window rate limiter in Hono middleware for authenticated user limits (e.g., ~5 comments per minute per user). Cloudflare can't do this because it doesn't know who's logged in.
 - Returns `429 Too Many Requests` when exceeded
+```
 
-**3.3 — IP Jailing**
-- If an IP exceeds a hard threshold (e.g., 100 requests/minute), write a `jail:{ip}` key to Redis with a 1-hour TTL
-- Every incoming request checks for the jail key — if present, immediately return `403 Forbidden`
-- Jailed requests never reach the database
+**4. In the Architecture diagram — add Cache API to the Workers box:**
+
+Change:
+```
+│  ┌─────────┐  ┌──────────────────┐  │
+│  │Turnstile│  │ Upstash Redis    │  │
+│  │Validate │  │ Rate Limit/Jail  │  │
+│  └─────────┘  └──────────────────┘  │
+```
+To:
+```
+│  ┌─────────┐  ┌──────────────────┐  │
+│  │Turnstile│  │ Cloudflare Cache │  │
+│  │Validate │  │ API + Upstash    │  │
+│  └─────────┘  └──────────────────┘  │
+
+**3.3 — IP Blocking**
+- Cloudflare's WAF and rate limiting rules handle IP-level blocking at the edge — abusive IPs are dropped before they reach the Worker
+- No custom jailing logic needed; configured in the Cloudflare dashboard
 
 **3.4 — Zod Payload Validation**
 - Every POST/PUT endpoint validates the request body with Zod schemas
