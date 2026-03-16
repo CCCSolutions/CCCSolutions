@@ -34,7 +34,7 @@ const Home = () => {
         <div className="relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
             The{' '}
-            <span className="bg-linear-to-br from-violet-300 via-indigo-200 to-sky-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-tr from-indigo-400 via-indigo-300 to-blue-200 bg-clip-text text-transparent">
               most comprehensive
             </span>{' '}
             CCC solution repository
@@ -81,7 +81,7 @@ const Home = () => {
       {/* Content Section */}
       <div className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">
+          <h2 className="text-4xl font-bold text-center mb-16 text-black">
             Find CCC solutions{' '}
             <span className="bg-linear-to-r from-yellow-400 to-amber-400 px-2 py-1 rounded">
               From 1996 To Present
@@ -94,31 +94,17 @@ const Home = () => {
               {
                 title: 'Interactive Forum',
                 content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
-                icon: (
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white shrink-0 shadow-md">
-                    <PersonIcon width="24" height="24" />
-                  </div>
-                ),
+                icon: <PersonIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
               },
               {
                 title: 'Comprehensive Solutions',
                 content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
-                icon: (
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-green-400 text-white shrink-0 shadow-md">
-                    <FileTextIcon width="24" height="24" />
-                  </div>
-                ),
+                icon: <FileTextIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
               },
               {
                 title: 'Open Source',
                 content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
-                icon: (
-                  <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gray-700 to-gray-500 text-white shrink-0 shadow-md hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:scale-105">
-                      <GitHubLogoIcon width="24" height="24" />
-                    </div>
-                  </a>
-                ),
+                icon: <GitHubLogoIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
               },
             ].map((feature, index) => (
               <Card key={index} size="3" variant="surface" className="h-full">

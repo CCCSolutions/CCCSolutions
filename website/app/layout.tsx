@@ -1,7 +1,7 @@
 import './globals.css';
 import { Theme } from '@radix-ui/themes';
 import Navbar from '../components/Navbar';
-import FooterWithLogo from '../components/Footer';
+import Footer from '../components/Footer';
 
 export const metadata = {
   metadataBase: new URL('https://cccsolutions.ca'),
@@ -140,14 +140,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="bg-gray-100">
+      <body className="bg-white">
         <Theme accentColor="indigo" grayColor="slate" radius="medium" scaling="100%">
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-grow">
               {children}
             </main>
-            <FooterWithLogo />
+            <Footer />
           </div>
         </Theme>
       </body>

@@ -1,56 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const FooterWithLogo = () => {
+const Footer = () => {
   return (
-    <footer className="w-full px-16 py-6 bg-white">
-      <div className="flex flex-row flex-wrap items-center justify-center gap-x-12 text-center md:justify-between">
-        <Image src="/images/mmhs_logo.png" alt="Milliken Mills High School Logo" width={75} height={75} className="h-[75px] w-auto" />
-        <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
-          <li>
-            <Link
-              href="/about"
-              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              About Us
-            </Link>
-          </li>
-          <li>
-            <a
-              href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              License
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://github.com/Tankman61/CCCSolutions"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              Contribute
-            </a>
-          </li>
-          <li>
-            <a
-              href="mailto:willi64645@gmail.com"
-              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              Contact Us
-            </a>
-          </li>
-        </ul>
+    <footer className="w-full bg-gray-100 text-gray-600 border-t border-gray-200 py-14 px-8 md:px-16">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-start justify-between gap-x-16 gap-y-6">
+        <div className="flex flex-wrap gap-x-16 gap-y-6">
+          <div>
+            <h4 className="text-gray-700 font-semibold mb-3 text-sm tracking-wide">Navigate</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/" className="hover:text-gray-900 transition-colors">Home</Link></li>
+              <li><Link href="/solutions" className="hover:text-gray-900 transition-colors">Solutions</Link></li>
+              <li><Link href="/forum" className="hover:text-gray-900 transition-colors">Forum</Link></li>
+              <li><Link href="/resources" className="hover:text-gray-900 transition-colors">Resources</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-gray-700 font-semibold mb-3 text-sm tracking-wide">Project</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/about" className="hover:text-gray-900 transition-colors">About</Link></li>
+              <li><a href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">License</a></li>
+              <li><a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">Contribute</a></li>
+              <li><a href="mailto:willi64645@gmail.com" className="hover:text-gray-900 transition-colors">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <Image src="/images/mmhs_logo_transparent.png" alt="MMHS Logo" width={80} height={80} />
       </div>
-      <hr className="my-8 border-gray-400" />
-      <p className="text-center font-normal text-gray-600">
-        &copy; 2025 Milken Mills High School
+
+      <hr className="my-8 border-gray-200" />
+      <p className="text-center text-sm text-gray-500">
+        Made with love by the CCCSolutions team
       </p>
     </footer>
   );
-}
+};
 
-export default FooterWithLogo;
+export default Footer;
