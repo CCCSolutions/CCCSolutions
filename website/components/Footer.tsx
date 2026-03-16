@@ -1,6 +1,5 @@
-'use client';
-
 import Image from "next/image";
+import Link from "next/link";
 
 const FooterWithLogo = () => {
   return (
@@ -9,19 +8,19 @@ const FooterWithLogo = () => {
         <Image src="/images/mmhs_logo.png" alt="Milliken Mills High School Logo" width={75} height={75} className="h-[75px] w-auto" />
         <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
           <li>
-            <a
-              href="/About"
-              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+            <Link
+              href="/about"
+              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               About Us
-            </a>
+            </Link>
           </li>
           <li>
             <a
               href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               License
             </a>
@@ -29,7 +28,9 @@ const FooterWithLogo = () => {
           <li>
             <a
               href="https://github.com/Tankman61/CCCSolutions"
-              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               Contribute
             </a>
@@ -37,7 +38,7 @@ const FooterWithLogo = () => {
           <li>
             <a
               href="mailto:willi64645@gmail.com"
-              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-gray-600 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               Contact Us
             </a>

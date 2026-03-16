@@ -1,4 +1,5 @@
 import './globals.css';
+import { Theme } from '@radix-ui/themes';
 import Navbar from '../components/Navbar';
 import FooterWithLogo from '../components/Footer';
 
@@ -140,13 +141,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-gray-100">
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <FooterWithLogo />
-        </div>
+        <Theme accentColor="indigo" grayColor="slate" radius="medium" scaling="100%">
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <FooterWithLogo />
+          </div>
+        </Theme>
       </body>
     </html>
   );
