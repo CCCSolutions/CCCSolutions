@@ -355,7 +355,7 @@ const Problem = () => {
       />
 
       <div className="mx-auto">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="bg-white rounded-lg shadow-xs overflow-hidden mb-8">
           {/* Problem Header */}
           <div className="p-6">
             <h1 className="text-2xl font-bold">
@@ -419,7 +419,7 @@ const Problem = () => {
               <h2 className="text-xl font-semibold text-gray-900">Test Cases</h2>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-xs overflow-hidden">
               <div className="flex items-center p-4 border-b border-gray-200 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 {Array.from({ length: availableTestCases }, (_, idx) => (
                   <button

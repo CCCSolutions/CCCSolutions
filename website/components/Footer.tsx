@@ -1,6 +1,5 @@
 'use client';
 
-import { Typography } from "@material-tailwind/react";
 import Image from "next/image";
 
 const FooterWithLogo = () => {
@@ -10,53 +9,45 @@ const FooterWithLogo = () => {
         <Image src="/images/mmhs_logo.png" alt="Milliken Mills High School Logo" width={75} height={75} className="h-[75px] w-auto" />
         <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
           <li>
-            <Typography
-              as="a"
+            <a
               href="/About"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               About Us
-            </Typography>
+            </a>
           </li>
           <li>
-            <Typography
-              as="a"
+            <a
               href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               License
-            </Typography>
+            </a>
           </li>
           <li>
-            <Typography
-              as="a"
+            <a
               href="https://github.com/Tankman61/CCCSolutions"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               Contribute
-            </Typography>
+            </a>
           </li>
           <li>
-            <Typography
-              as="a"
+            <a
               href="mailto:willi64645@gmail.com"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
+              className="text-blue-gray-500 font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
             >
               Contact Us
-            </Typography>
+            </a>
           </li>
         </ul>
       </div>
       <hr className="my-8 border-gray-400" />
-      <Typography color="blue-gray" className="text-center font-normal">
+      <p className="text-center font-normal text-gray-600">
         &copy; 2025 Milken Mills High School
-      </Typography>
+      </p>
     </footer>
   );
 }

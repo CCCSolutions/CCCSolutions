@@ -93,7 +93,7 @@ const ProblemsTable = () => {
                 </a>
               </td>
               <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
-                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
+                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-xs ${getDifficultyClass(problem.difficulty)}`}>
                   {problem.difficulty}
                 </span>
               </td>

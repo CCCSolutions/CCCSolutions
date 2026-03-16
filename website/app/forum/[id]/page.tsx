@@ -6,8 +6,8 @@ import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
 import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.bubble.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -154,7 +154,7 @@ export default function PostPage() {
               {comments.map((comment) => (
                   <div
                       key={comment.id}
-                      className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
+                      className="bg-white border border-gray-200 p-4 rounded-lg shadow-xs"
                   >
                     <p className="text-gray-700">{comment.body}</p>
                     <div className="mt-2 text-sm text-gray-500">
@@ -170,7 +170,7 @@ export default function PostPage() {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={4}
                 required
             />

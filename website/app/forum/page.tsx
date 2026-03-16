@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.bubble.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -30,10 +30,14 @@ export default function ForumPage() {
       const resultList = await pb.collection('posts').getList(1, 50, {
         sort: sortField,
         expand: 'author',
+        requestKey: `posts_${sortField}`,
       });
       setPosts(resultList.items);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
+    } catch (error: unknown) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error('Error fetching posts:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -63,7 +67,7 @@ export default function ForumPage() {
 
   return (
     <div className="font-poppins">
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+      <div className="bg-linear-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto mb-5">
