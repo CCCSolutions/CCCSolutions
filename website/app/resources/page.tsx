@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { BookOutlined, GlobalOutlined } from '@ant-design/icons';
+import BookOutlined from '@ant-design/icons/BookOutlined';
+import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 
 interface Book {
   title: string;
@@ -48,7 +49,7 @@ const Resources = () => {
   return (
     <div className="bg-gray-100">
       {/* Hero Section with Gradient */}
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+      <div className="bg-linear-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Resources</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
@@ -61,7 +62,7 @@ const Resources = () => {
         {/* Books Section */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-red-500 to-orange-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
+            <div className="text-2xl mr-4 rounded-lg bg-linear-to-br from-red-500 to-orange-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow-sm">
               <BookOutlined />
             </div>
             Books
@@ -93,7 +94,7 @@ const Resources = () => {
         {/* Websites Section */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
+            <div className="text-2xl mr-4 rounded-lg bg-linear-to-br from-indigo-600 to-blue-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow-sm">
               <GlobalOutlined />
             </div>
             Websites

@@ -5,7 +5,7 @@ const About = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+      <div className="bg-linear-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">About CCC Solutions</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">

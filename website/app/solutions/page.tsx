@@ -9,7 +9,7 @@ import { problems } from "../../constants";
 function SolutionsContent() {
   return (
     <div>
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+      <div className="bg-linear-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Curated Solutions</h1>
           <p className="text-2xl">Find all solutions to past Canadian Computing Competition problems.</p>

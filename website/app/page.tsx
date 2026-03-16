@@ -2,60 +2,10 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import styled from 'styled-components';
-import { TeamOutlined, FileTextOutlined, GithubOutlined } from '@ant-design/icons';
+import TeamOutlined from '@ant-design/icons/TeamOutlined';
+import FileTextOutlined from '@ant-design/icons/FileTextOutlined';
+import GithubOutlined from '@ant-design/icons/GithubOutlined';
 import { stats } from '../constants';
-
-// Styled components (i got lazy)
-interface IconWrapperProps {
-  background?: string;
-}
-
-const IconWrapper = styled.div<IconWrapperProps>`
-    font-size: 2rem;
-    margin-right: 20px;
-    border-radius: 12px;
-    background: ${props => props.background || 'linear-gradient(135deg, #8a59fa, #7f73ff, #786cae, #8a59fa)'};
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 58px;
-    height: 58px;
-    flex-shrink: 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const TeamIconWrapper = styled(IconWrapper)`
-    background: linear-gradient(135deg, #4E54C8, #8F94FB);
-`;
-
-const FileTextIconWrapper = styled(IconWrapper)`
-    background: linear-gradient(135deg, #11998E, #38EF7D);
-`;
-
-const GithubIconWrapper = styled(IconWrapper)`
-  background: linear-gradient(135deg, #333, #666);
-  transition: background 0.5s ease, transform 0.3s ease;
-
-  &:hover {
-    background: linear-gradient(135deg, #42A5F5, #1E88E5);
-    transform: scale(1.03);
-    z-index: 1;
-  }
-`;
-
-// New Banner component
-const AnnouncementBanner = styled.div`
-  background: linear-gradient(90deg, #4E54C8, #8F94FB);
-  color: white;
-  text-align: center;
-  padding: 10px;
-  font-weight: 600;
-  position: relative;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-`;
 
 const Home = () => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -71,12 +21,18 @@ const Home = () => {
 
   return (
     <div>
-      {/* New Announcement Banner */}
-      <AnnouncementBanner>
+      {/* Announcement Banner */}
+      <div
+        className="text-white text-center p-2.5 font-semibold relative z-10"
+        style={{
+          background: 'linear-gradient(90deg, #4E54C8, #8F94FB)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        }}
+      >
         <Link href="/forum" className="text-white">
           Help us expand our repository! Submit your 2026 solutions <u>here</u>.
         </Link>
-      </AnnouncementBanner>
+      </div>
 
       <div className="bg-gray-100">
       {/* Hero Section */}
@@ -86,7 +42,7 @@ const Home = () => {
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           The <span
-            className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+            className="bg-linear-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
 most comprehensive</span> CCC solution repository
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
@@ -108,7 +64,7 @@ most comprehensive</span> CCC solution repository
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
             Find CCC solutions{' '}
-            <span className="bg-gradient-to-r from-yellow-400 to-amber-400 px-2 py-1 rounded">
+            <span className="bg-linear-to-r from-yellow-400 to-amber-400 px-2 py-1 rounded">
               From 1996 To Present
             </span>
           </h2>
@@ -119,24 +75,36 @@ most comprehensive</span> CCC solution repository
               {
                 title: 'Interactive Forum',
                 content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
-                icon: <TeamIconWrapper><TeamOutlined/></TeamIconWrapper>,
+                icon: (
+                  <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0" style={{ background: 'linear-gradient(135deg, #4E54C8, #8F94FB)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                    <TeamOutlined />
+                  </div>
+                ),
               },
               {
                 title: 'Comprehensive Solutions',
                 content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
-                icon: <FileTextIconWrapper><FileTextOutlined/></FileTextIconWrapper>,
+                icon: (
+                  <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0" style={{ background: 'linear-gradient(135deg, #11998E, #38EF7D)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                    <FileTextOutlined />
+                  </div>
+                ),
               },
               {
                 title: 'Open Source',
                 content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
-                icon: <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
-                  <GithubIconWrapper><GithubOutlined/></GithubIconWrapper>
-                </a>,
+                icon: (
+                  <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
+                    <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0 transition-all duration-300 hover:scale-103" style={{ background: 'linear-gradient(135deg, #333, #666)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                      <GithubOutlined />
+                    </div>
+                  </a>
+                ),
               },
             ].map((feature, index) => (
                 <div key={index} className="relative group">
                   <div
-                      className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
+                      className="absolute inset-0 bg-linear-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
                   ></div>
                   <div
                       className="relative bg-white/95 backdrop-blur-sm rounded-xl p-6 flex flex-col items-start space-y-4 h-full transform transition duration-300 hover:scale-102 hover:shadow-md"
@@ -156,7 +124,7 @@ most comprehensive</span> CCC solution repository
           {/* Statistics */}
           <div className="relative group mx-16">
             <div
-                className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
+                className="absolute inset-0 bg-linear-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
             ></div>
             <div
                 className="relative bg-white/95 backdrop-blur-sm rounded-xl p-4 flex justify-around transform transition duration-300 hover:scale-102 hover:shadow-md"
