@@ -1,49 +1,67 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import TeamOutlined from '@ant-design/icons/TeamOutlined';
-import FileTextOutlined from '@ant-design/icons/FileTextOutlined';
-import GithubOutlined from '@ant-design/icons/GithubOutlined';
+import { Card, Heading, Text } from '@radix-ui/themes';
+import { PersonIcon, FileTextIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
+import { FlickeringGrid } from '../components/FlickeringGrid';
+
 import { stats } from '../constants';
 
 const Home = () => {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prevCount) => (prevCount < 1000 ? prevCount + 10 : 1000));
-    }, 20);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div>
       {/* Announcement Banner */}
-      <div
-        className="text-white text-center p-2.5 font-semibold relative z-10"
-        style={{
-          background: 'linear-gradient(90deg, #4E54C8, #8F94FB)',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}
-      >
-        <Link href="/forum" className="text-white">
+      <div className="bg-indigo-600 text-white text-center py-2.5 px-4 font-semibold relative z-10 shadow-sm">
+        <Link href="/forum" className="text-white hover:text-indigo-100 transition-colors">
           Help us expand our repository! Submit your 2026 solutions <u>here</u>.
         </Link>
       </div>
 
       <div className="bg-gray-100">
-      {/* Hero Section */}
+      {/* Hero Section — FlickeringGrid + AuroraText */}
+      <div className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 bg-gradient-to-b from-blue-900 to-indigo-950 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <FlickeringGrid
+            className="size-full"
+            squareSize={4}
+            gridGap={6}
+            color="#6366f1"
+            maxOpacity={0.3}
+            flickerChance={0.05}
+          />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
+            The{' '}
+            <span className="bg-linear-to-br from-violet-300 via-indigo-200 to-sky-300 bg-clip-text text-transparent">
+              most comprehensive
+            </span>{' '}
+            CCC solution repository
+          </h1>
+          <p className="text-xl md:text-2xl max-w-2xl mb-10 mx-auto" style={{ color: 'rgba(255,255,255,0.9)' }}>
+            Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
+          </p>
+          <div className="flex justify-center space-x-4">
+            <Link href="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors">
+              Explore Solutions
+            </Link>
+            <Link href="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors">
+              Visit Forum
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Old image-based hero (uncomment to switch back):
       <div
         className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
         style={{ backgroundImage: `url(/images/image.png)` }}
       >
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          The <span
-            className="bg-linear-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
-most comprehensive</span> CCC solution repository
+          The <span className="bg-linear-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
+            most comprehensive
+          </span> CCC solution repository
         </h1>
         <p className="text-xl md:text-2xl max-w-2xl mb-10">
           Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
@@ -57,10 +75,11 @@ most comprehensive</span> CCC solution repository
           </Link>
         </div>
       </div>
+      */}
       </div>
 
       {/* Content Section */}
-      <div ref={contentRef} className="py-20 px-4">
+      <div className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
             Find CCC solutions{' '}
@@ -70,14 +89,14 @@ most comprehensive</span> CCC solution repository
           </h2>
 
           {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-8 mb-10 m-16">
+          <div className="grid md:grid-cols-3 gap-8 mb-10 mx-16">
             {[
               {
                 title: 'Interactive Forum',
                 content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
                 icon: (
-                  <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0" style={{ background: 'linear-gradient(135deg, #4E54C8, #8F94FB)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                    <TeamOutlined />
+                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white shrink-0 shadow-md">
+                    <PersonIcon width="24" height="24" />
                   </div>
                 ),
               },
@@ -85,8 +104,8 @@ most comprehensive</span> CCC solution repository
                 title: 'Comprehensive Solutions',
                 content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
                 icon: (
-                  <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0" style={{ background: 'linear-gradient(135deg, #11998E, #38EF7D)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                    <FileTextOutlined />
+                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-green-400 text-white shrink-0 shadow-md">
+                    <FileTextIcon width="24" height="24" />
                   </div>
                 ),
               },
@@ -95,56 +114,46 @@ most comprehensive</span> CCC solution repository
                 content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
                 icon: (
                   <a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer">
-                    <div className="text-3xl mr-5 rounded-xl text-white flex items-center justify-center w-[58px] h-[58px] shrink-0 transition-all duration-300 hover:scale-103" style={{ background: 'linear-gradient(135deg, #333, #666)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                      <GithubOutlined />
+                    <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-gray-700 to-gray-500 text-white shrink-0 shadow-md hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:scale-105">
+                      <GitHubLogoIcon width="24" height="24" />
                     </div>
                   </a>
                 ),
               },
             ].map((feature, index) => (
-                <div key={index} className="relative group">
-                  <div
-                      className="absolute inset-0 bg-linear-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
-                  ></div>
-                  <div
-                      className="relative bg-white/95 backdrop-blur-sm rounded-xl p-6 flex flex-col items-start space-y-4 h-full transform transition duration-300 hover:scale-102 hover:shadow-md"
-                  >
-                    {feature.icon}
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2 bg-clip-text text-transparent bg-blue-800">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-700">{feature.content}</p>
-                    </div>
+              <Card key={index} size="3" variant="surface" className="h-full">
+                <div className="flex flex-col items-start gap-4">
+                  {feature.icon}
+                  <div>
+                    <Heading as="h3" size="4" weight="bold" color="indigo">
+                      {feature.title}
+                    </Heading>
+                    <Text as="p" size="2" color="gray" mt="2">
+                      {feature.content}
+                    </Text>
                   </div>
                 </div>
+              </Card>
             ))}
           </div>
 
           {/* Statistics */}
-          <div className="relative group mx-16">
-            <div
-                className="absolute inset-0 bg-linear-to-r from-blue-400 to-indigo-800 rounded-xl blur opacity-45 group-hover:opacity-90 transition duration-1000"
-            ></div>
-            <div
-                className="relative bg-white/95 backdrop-blur-sm rounded-xl p-4 flex justify-around transform transition duration-300 hover:scale-102 hover:shadow-md"
-            >
-              <div className="grid md:grid-cols-3 gap-16">
-                <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">{stats.activeUsers}</p>
-                  <p className="text-gray-600">Active Users</p>
-                </div>
-                <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">{stats.numSolutions}</p>
-                  <p className="text-gray-600">CCC Solutions</p>
-                </div>
-                <div className="text-center p-3">
-                  <p className="text-4xl font-bold text-blue-800">{stats.history}</p>
-                  <p className="text-gray-600">Providing Answers</p>
-                </div>
+          <Card size="3" variant="surface" className="mx-16">
+            <div className="grid md:grid-cols-3 gap-16">
+              <div className="text-center p-3">
+                <Text as="p" size="7" weight="bold" color="indigo">{stats.activeUsers}</Text>
+                <Text as="p" size="2" color="gray">Active Users</Text>
+              </div>
+              <div className="text-center p-3">
+                <Text as="p" size="7" weight="bold" color="indigo">{stats.numSolutions}</Text>
+                <Text as="p" size="2" color="gray">CCC Solutions</Text>
+              </div>
+              <div className="text-center p-3">
+                <Text as="p" size="7" weight="bold" color="indigo">{stats.history}</Text>
+                <Text as="p" size="2" color="gray">Providing Answers</Text>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

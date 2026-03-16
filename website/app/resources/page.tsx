@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import BookOutlined from '@ant-design/icons/BookOutlined';
-import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
+import { ReaderIcon, GlobeIcon } from '@radix-ui/react-icons';
 
 interface Book {
   title: string;
@@ -63,7 +62,7 @@ const Resources = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <div className="text-2xl mr-4 rounded-lg bg-linear-to-br from-red-500 to-orange-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow-sm">
-              <BookOutlined />
+              <ReaderIcon width="20" height="20" />
             </div>
             Books
           </h2>
@@ -95,7 +94,7 @@ const Resources = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <div className="text-2xl mr-4 rounded-lg bg-linear-to-br from-indigo-600 to-blue-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow-sm">
-              <GlobalOutlined />
+              <GlobeIcon width="20" height="20" />
             </div>
             Websites
           </h2>

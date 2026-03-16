@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card, Heading, Text } from '@radix-ui/themes';
 
 interface ClickableCardProps {
   title: string;
@@ -8,12 +9,12 @@ interface ClickableCardProps {
 
 const ClickableCard = ({title, description, link}: ClickableCardProps) => {
   return (
-    <a href={link} className="block bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 w-full">
-      <div className="p-6">
-        <h2 className="text-2xl font-semibold mb-2">{title}</h2>
-        <p className="text-gray-700">{description}</p>
-      </div>
-    </a>
+    <Card asChild size="3" variant="surface" className="w-full hover:shadow-lg transition-shadow duration-300">
+      <a href={link}>
+        <Heading as="h2" size="5" mb="2">{title}</Heading>
+        <Text as="p" color="gray">{description}</Text>
+      </a>
+    </Card>
   );
 };
 

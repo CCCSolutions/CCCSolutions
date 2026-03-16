@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 
 const Navbar = () => {
@@ -77,9 +77,9 @@ const Navbar = () => {
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
+                <Cross1Icon width="24" height="24" aria-hidden="true" />
               ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
+                <HamburgerMenuIcon width="24" height="24" aria-hidden="true" />
               )}
             </button>
           </div>
