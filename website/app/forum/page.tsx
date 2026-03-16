@@ -15,9 +15,13 @@ export default function ForumPage() {
   const [posts, setPosts] = useState<RecordModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('new');
-  const [user, setUser] = useState<AuthModel | null>(pb.authStore.model);
+  const [user, setUser] = useState<AuthModel | null>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    setUser(pb.authStore.model);
+  }, []);
 
   useEffect(() => {
     fetchPosts();

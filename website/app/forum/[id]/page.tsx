@@ -22,6 +22,7 @@ export default function PostPage() {
     checkAuthStatus();
     fetchPost();
     fetchComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -39,14 +40,11 @@ export default function PostPage() {
     try {
       const record = await pb.collection('posts').getOne(id, {
         expand: 'author',
-        requestKey: `post_${id}`
+        requestKey: null
       });
       setPost(record);
-    } catch (error: unknown) {
-      const err = error as { name?: string; message?: string };
-      if (err.name !== 'ClientResponseError' || !err.message?.includes('autocancelled')) {
-        console.error("Error fetching post:", error);
-      }
+    } catch (error) {
+      console.error("Error fetching post:", error);
     }
   };
 
@@ -56,14 +54,11 @@ export default function PostPage() {
         filter: `post="${id}"`,
         sort: '-created',
         expand: 'author',
-        requestKey: `comments_${id}`
+        requestKey: null
       });
       setComments(resultList.items);
-    } catch (error: unknown) {
-      const err = error as { name?: string; message?: string };
-      if (err.name !== 'ClientResponseError' || !err.message?.includes('auto cancelled')) {
-        console.error("Error fetching comments:", error);
-      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
     }
   };
 
