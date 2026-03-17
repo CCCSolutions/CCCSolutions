@@ -94,17 +94,17 @@ const Home = () => {
               {
                 title: 'Interactive Forum',
                 content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
-                icon: <PersonIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
+                icon: <PersonIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
               },
               {
                 title: 'Comprehensive Solutions',
                 content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
-                icon: <FileTextIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
+                icon: <FileTextIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
               },
               {
                 title: 'Open Source',
                 content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
-                icon: <GitHubLogoIcon width="28" height="28" className="shrink-0" style={{ color: 'var(--indigo-11)' }} />,
+                icon: <GitHubLogoIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
               },
             ].map((feature, index) => (
               <Card key={index} size="3" variant="surface" className="h-full">
@@ -114,7 +114,7 @@ const Home = () => {
                     <Heading as="h3" size="4" weight="bold" color="indigo">
                       {feature.title}
                     </Heading>
-                    <Text as="p" size="2" color="gray" mt="2">
+                    <Text as="p" size="3" color="gray" mt="2">
                       {feature.content}
                     </Text>
                   </div>

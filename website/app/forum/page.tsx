@@ -71,8 +71,9 @@ export default function ForumPage() {
 
   return (
     <div className="font-poppins">
-      <div className="bg-linear-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
-        <div className="container mx-auto text-center">
+      <div className="relative overflow-hidden bg-blue-900 text-white py-16 px-4">
+
+        <div className="relative z-10 container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto mb-5">
             Ask, search, or answer any question related to the CCC.
