@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -71,7 +72,7 @@ export default function ForumPage() {
 
   return (
     <div className="font-poppins">
-      <div className="relative overflow-hidden bg-blue-900 text-white py-16 px-4">
+      <div className="relative overflow-hidden bg-indigo-900 text-white py-16 px-4">
 
         <div className="relative z-10 container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
@@ -128,7 +129,7 @@ export default function ForumPage() {
           ) : (
             <div className="space-y-4">
               {posts.map(post => (
-                <div key={post.id} className="border p-4 rounded shadow-md transition hover:shadow-lg bg-white">
+                <Card key={post.id} size="3" variant="surface">
                   <h2 className="text-xl font-semibold">
                     <Link href={`/forum/${post.id}`} className="hover:underline">
                       {post.title}
@@ -162,7 +163,7 @@ export default function ForumPage() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}

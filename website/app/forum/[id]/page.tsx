@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
+import { Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -110,7 +111,7 @@ export default function PostPage() {
         <div className="container mx-auto px-4 py-8">
           <Link href="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
 
-          <div className="bg-white shadow-md p-6 rounded-lg mb-8">
+          <Card size="3" variant="surface" className="mb-8">
             <h1 className="text-3xl font-bold mb-4 text-gray-800">{post.title}</h1>
 
             <ReactQuill
@@ -119,7 +120,7 @@ export default function PostPage() {
                 theme="bubble"
                 className="text-gray-700 leading-relaxed text-lg mb-4"
             />
-            <div className="flex items-center space-x-6 mb-6">
+            <div className="flex items-center space-x-6">
             <span className="text-gray-500 text-sm">
               By {post.expand?.author?.username || 'Unknown'} on {new Date(post.created).toLocaleDateString()}
             </span>
@@ -140,23 +141,20 @@ export default function PostPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
 
           <div className="mt-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Comments</h2>
 
             <div className="space-y-4">
               {comments.map((comment) => (
-                  <div
-                      key={comment.id}
-                      className="bg-white border border-gray-200 p-4 rounded-lg shadow-xs"
-                  >
+                  <Card key={comment.id} size="2" variant="surface">
                     <p className="text-gray-700">{comment.body}</p>
                     <div className="mt-2 text-sm text-gray-500">
                       By {comment.expand?.author?.username || 'Unknown'} on{' '}
                       {new Date(comment.created).toLocaleDateString()}
                     </div>
-                  </div>
+                  </Card>
               ))}
             </div>
 

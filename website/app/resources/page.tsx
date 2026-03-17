@@ -49,7 +49,7 @@ const Resources = () => {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-blue-900 text-white py-16 px-4">
+      <div className="relative overflow-hidden bg-indigo-900 text-white py-16 px-4">
         <div className="relative z-10 container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Resources</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
