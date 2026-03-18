@@ -40,7 +40,7 @@ const About = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-blue-900 text-white py-20 px-4">
         <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">About CCC Solutions</h1>
+          <h1 className="text-5xl font-bold mb-4">About CCCSolutions</h1>
           <p className="text-xl max-w-2xl mx-auto">
             Learn more about our journey in becoming the most comprehensive platform for Canadian Computing Competition solutions since 1996.
           </p>
@@ -52,7 +52,7 @@ const About = () => {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Our Journey</h2>
 
-          <div className="relative pl-8 border-l-2 border-indigo-200 space-y-6">
+          <div className="space-y-6">
             {timeline.map((item, index) => (
               <div key={index} className="relative">
                 <Card size="2" variant="surface">
