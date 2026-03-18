@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Card } from '@radix-ui/themes';
+import { Button, Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -103,25 +103,27 @@ export default function ForumPage() {
 
         <div className="py-8">
           <div className="flex justify-between mb-4">
-            <div className="flex items-center">
-              <span className="mr-4">Sort by:</span>
+            <div className="flex items-center gap-1">
+              <span className="mr-2">Sort by:</span>
               {['new', 'top'].map(option => (
-                <button
+                <Button
                   key={option}
                   onClick={() => setSortBy(option)}
-                  className={`mr-2 ${sortBy === option ? 'bg-blue-500 text-white' : 'bg-gray-200'} px-3 py-1 rounded`}
+                  color={sortBy === option ? 'indigo' : 'gray'}
+                  variant="solid"
+                  size="1"
+                  className="cursor-pointer"
                 >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
 
-            <Link
-              href="/create-post"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-            >
-              Create New Post
-            </Link>
+            <Button asChild color="indigo" variant="solid" size="2">
+              <Link href="/create-post">
+                Create New Post
+              </Link>
+            </Button>
           </div>
 
           {loading ? (

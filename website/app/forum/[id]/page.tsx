@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
-import { Card } from '@radix-ui/themes';
+import { Button, Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -167,12 +167,9 @@ export default function PostPage() {
                 rows={4}
                 required
             />
-              <button
-                  type="submit"
-                  className="mt-3 bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-              >
+              <Button type="submit" color="indigo" variant="solid" size="2" className="mt-3">
                 Add Comment
-              </button>
+              </Button>
             </form>
           </div>
         </div>

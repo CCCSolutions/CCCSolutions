@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
+import { Button } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -107,12 +108,9 @@ export default function CreatePost() {
             className="bg-white"
           />
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition"
-        >
+        <Button type="submit" color="indigo" variant="solid" size="3" className="w-full">
           Create Post
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
+import { Button, Card, Theme } from '@radix-ui/themes';
+import { FlickeringGrid } from './FlickeringGrid';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -52,15 +54,26 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div className="relative min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-900 to-indigo-950 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <FlickeringGrid
+          className="size-full"
+          squareSize={4}
+          gridGap={6}
+          color="#6366f1"
+          maxOpacity={0.3}
+          flickerChance={0.05}
+        />
+      </div>
+      <div className="relative z-10 sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-bold text-white">
           {isLogin ? 'Sign in to your account' : 'Create a new account'}
         </h2>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="relative z-10 mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <Theme panelBackground="solid">
+        <Card size="3" variant="surface">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -96,23 +109,22 @@ export default function AuthForm() {
               </div>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
+            <div className="flex justify-center">
+              <Button type="submit" color="indigo" variant="solid" size="2" className="w-full" style={{ justifyContent: 'center' }}>
                 {isLogin ? 'Sign in' : 'Create account'}
-              </button>
+              </Button>
             </div>
           </form>
 
-          <div className="mt-4 text-center">
-            <button
+          <div className="mt-4 flex justify-center">
+            <Button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
+              variant="ghost"
+              color="indigo"
+              size="1"
             >
               {isLogin ? 'Need to create an account?' : 'Already have an account?'}
-            </button>
+            </Button>
           </div>
 
           {error && (
@@ -126,7 +138,8 @@ export default function AuthForm() {
               {success}
             </div>
           )}
-        </div>
+        </Card>
+        </Theme>
       </div>
     </div>
   );

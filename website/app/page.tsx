@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Card, Heading, Text } from '@radix-ui/themes';
+import { Button, Card, Heading, Text } from '@radix-ui/themes';
 import { PersonIcon, FileTextIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import { FlickeringGrid } from '../components/FlickeringGrid';
 
@@ -42,13 +42,17 @@ const Home = () => {
           <p className="text-xl md:text-2xl max-w-2xl mb-10 mx-auto" style={{ color: 'rgba(255,255,255,0.9)' }}>
             Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
           </p>
-          <div className="flex justify-center space-x-4">
-            <Link href="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors">
-              Explore Solutions
-            </Link>
-            <Link href="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors">
-              Visit Forum
-            </Link>
+          <div className="flex justify-center gap-2">
+            <Button asChild color="indigo" variant="solid" size="3">
+              <Link href="/solutions">
+                Explore Solutions
+              </Link>
+            </Button>
+            <Button asChild color="gray" variant="soft" size="3">
+              <Link href="/forum" className="!bg-white !text-blue-700">
+                Visit Forum
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
