@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-// FIXME: bad practice to use <a> tags and also hardcode colors
 const Footer = () => {
   return (
     <footer className="w-full bg-[#f2f2f2] text-[#1f1f28] border-t border-gray-200 py-14 px-8 md:px-16">

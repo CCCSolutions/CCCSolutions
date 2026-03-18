@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
@@ -19,49 +19,49 @@ export default function PostPage() {
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const fetchPost = useCallback(async () => {
+    try {
+      const record = await pb.collection('posts').getOne(id, {
+        expand: 'author',
+        requestKey: `post_${id}`
+      });
+      setPost(record);
+    } catch (error) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error("Error fetching post:", error);
+      }
+    }
+  }, [id]);
+
+  const fetchComments = useCallback(async () => {
+    try {
+      const resultList = await pb.collection('comments').getList(1, 50, {
+        filter: `post="${id}"`,
+        sort: '-created',
+        expand: 'author',
+        requestKey: `comments_${id}`
+      });
+      setComments(resultList.items);
+    } catch (error) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error("Error fetching comments:", error);
+      }
+    }
+  }, [id]);
+
   useEffect(() => {
-    checkAuthStatus();
+    setIsLoggedIn(pb.authStore.isValid);
     fetchPost();
     fetchComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, fetchPost, fetchComments]);
 
   useEffect(() => {
     if (post?.title) {
       document.title = post.title;
     }
   }, [post?.title]);
-
-  const checkAuthStatus = () => {
-    const isAuth = pb.authStore.isValid;
-    setIsLoggedIn(isAuth);
-  };
-
-  const fetchPost = async () => {
-    try {
-      const record = await pb.collection('posts').getOne(id, {
-        expand: 'author',
-        requestKey: null
-      });
-      setPost(record);
-    } catch (error) {
-      console.error("Error fetching post:", error);
-    }
-  };
-
-  const fetchComments = async () => {
-    try {
-      const resultList = await pb.collection('comments').getList(1, 50, {
-        filter: `post="${id}"`,
-        sort: '-created',
-        expand: 'author',
-        requestKey: null
-      });
-      setComments(resultList.items);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
 
   const handleVote = async (voteType: string) => {
     if (!isLoggedIn) {
