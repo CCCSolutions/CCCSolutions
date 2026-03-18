@@ -19,7 +19,7 @@ const Home = () => {
       </div>
 
       <div className="bg-gray-100">
-      {/* Hero Section — FlickeringGrid + AuroraText */}
+      {/* Hero Section */}
       <div className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 bg-gradient-to-b from-blue-900 to-indigo-950 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <FlickeringGrid
