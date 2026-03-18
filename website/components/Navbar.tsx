@@ -36,9 +36,9 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+          <Link href="/" className="flex items-center">
             <Image src="/images/mmhs_logo.png" alt="MMHS Logo" width={40} height={40} className="h-10 w-auto mr-3" />
-          </div>
+          </Link>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
