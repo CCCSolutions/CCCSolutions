@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
+import { Button, Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.bubble.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -18,39 +19,22 @@ export default function PostPage() {
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    checkAuthStatus();
-    fetchPost();
-    fetchComments();
-  }, [id]);
-
-  useEffect(() => {
-    if (post?.title) {
-      document.title = post.title;
-    }
-  }, [post?.title]);
-
-  const checkAuthStatus = () => {
-    const isAuth = pb.authStore.isValid;
-    setIsLoggedIn(isAuth);
-  };
-
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     try {
       const record = await pb.collection('posts').getOne(id, {
         expand: 'author',
         requestKey: `post_${id}`
       });
       setPost(record);
-    } catch (error: unknown) {
-      const err = error as { name?: string; message?: string };
-      if (err.name !== 'ClientResponseError' || !err.message?.includes('autocancelled')) {
+    } catch (error) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
         console.error("Error fetching post:", error);
       }
     }
-  };
+  }, [id]);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const resultList = await pb.collection('comments').getList(1, 50, {
         filter: `post="${id}"`,
@@ -59,22 +43,35 @@ export default function PostPage() {
         requestKey: `comments_${id}`
       });
       setComments(resultList.items);
-    } catch (error: unknown) {
-      const err = error as { name?: string; message?: string };
-      if (err.name !== 'ClientResponseError' || !err.message?.includes('auto cancelled')) {
+    } catch (error) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
         console.error("Error fetching comments:", error);
       }
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    setIsLoggedIn(pb.authStore.isValid);
+    fetchPost();
+    fetchComments();
+  }, [id, fetchPost, fetchComments]);
+
+  useEffect(() => {
+    if (post?.title) {
+      document.title = post.title;
+    }
+  }, [post?.title]);
 
   const handleVote = async (voteType: string) => {
     if (!isLoggedIn) {
       alert("Please log in to vote.");
       return;
     }
+    if (!post) return;
 
     try {
-      const updatedVotes = post!.upvotes + (voteType === 'upvote' ? 1 : -1);
+      const updatedVotes = post.upvotes + (voteType === 'upvote' ? 1 : -1);
 
       await pb.collection('posts').update(id, {upvotes: updatedVotes});
       setPost((prevPost) => prevPost ? ({
@@ -93,10 +90,15 @@ export default function PostPage() {
       return;
     }
     try {
+      if (!pb.authStore.model) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
+
       const data = {
         body: newComment,
         post: id,
-        author: pb.authStore.model!.id,
+        author: pb.authStore.model.id,
       };
 
       await pb.collection('comments').create(data);
@@ -115,7 +117,7 @@ export default function PostPage() {
         <div className="container mx-auto px-4 py-8">
           <Link href="/forum" className="text-blue-500 hover:underline mb-6 inline-block">← Back to Forum</Link>
 
-          <div className="bg-white shadow-md p-6 rounded-lg mb-8">
+          <Card size="3" variant="surface" className="mb-8">
             <h1 className="text-3xl font-bold mb-4 text-gray-800">{post.title}</h1>
 
             <ReactQuill
@@ -124,7 +126,7 @@ export default function PostPage() {
                 theme="bubble"
                 className="text-gray-700 leading-relaxed text-lg mb-4"
             />
-            <div className="flex items-center space-x-6 mb-6">
+            <div className="flex items-center space-x-6">
             <span className="text-gray-500 text-sm">
               By {post.expand?.author?.username || 'Unknown'} on {new Date(post.created).toLocaleDateString()}
             </span>
@@ -133,6 +135,7 @@ export default function PostPage() {
                 <button
                     onClick={() => handleVote('upvote')}
                     className="text-green-500 hover:text-green-600"
+                    aria-label="Upvote"
                 >
                   ▲
                 </button>
@@ -140,28 +143,26 @@ export default function PostPage() {
                 <button
                     onClick={() => handleVote('downvote')}
                     className="text-red-500 hover:text-red-600"
+                    aria-label="Downvote"
                 >
                   ▼
                 </button>
               </div>
             </div>
-          </div>
+          </Card>
 
           <div className="mt-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Comments</h2>
 
             <div className="space-y-4">
               {comments.map((comment) => (
-                  <div
-                      key={comment.id}
-                      className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
-                  >
+                  <Card key={comment.id} size="2" variant="surface">
                     <p className="text-gray-700">{comment.body}</p>
                     <div className="mt-2 text-sm text-gray-500">
                       By {comment.expand?.author?.username || 'Unknown'} on{' '}
                       {new Date(comment.created).toLocaleDateString()}
                     </div>
-                  </div>
+                  </Card>
               ))}
             </div>
 
@@ -170,16 +171,13 @@ export default function PostPage() {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={4}
                 required
             />
-              <button
-                  type="submit"
-                  className="mt-3 bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-              >
+              <Button type="submit" color="indigo" variant="solid" size="2" className="mt-3">
                 Add Comment
-              </button>
+              </Button>
             </form>
           </div>
         </div>

@@ -1,64 +1,38 @@
-'use client';
-
-import { Typography } from "@material-tailwind/react";
 import Image from "next/image";
-
-const FooterWithLogo = () => {
+import Link from "next/link";
+const Footer = () => {
   return (
-    <footer className="w-full px-16 py-6 bg-white">
-      <div className="flex flex-row flex-wrap items-center justify-center gap-x-12 text-center md:justify-between">
-        <Image src="/images/mmhs_logo.png" alt="Milliken Mills High School Logo" width={75} height={75} className="h-[75px] w-auto" />
-        <ul className="flex flex-wrap items-center gap-y-2 gap-x-8">
-          <li>
-            <Typography
-              as="a"
-              href="/About"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              About Us
-            </Typography>
-          </li>
-          <li>
-            <Typography
-              as="a"
-              href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              License
-            </Typography>
-          </li>
-          <li>
-            <Typography
-              as="a"
-              href="https://github.com/Tankman61/CCCSolutions"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              Contribute
-            </Typography>
-          </li>
-          <li>
-            <Typography
-              as="a"
-              href="mailto:willi64645@gmail.com"
-              color="blue-gray"
-              className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500"
-            >
-              Contact Us
-            </Typography>
-          </li>
-        </ul>
+    <footer className="w-full bg-[#f2f2f2] text-[#1f1f28] border-t border-gray-200 py-14 px-8 md:px-16">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-start justify-between gap-x-16 gap-y-6">
+        <div className="flex flex-wrap gap-x-16 gap-y-6">
+          <div>
+            <h4 className="font-bold mb-3 text-sm opacity-60">Navigate</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/" className="hover:underline">Home</Link></li>
+              <li><Link href="/solutions" className="hover:underline">Solutions</Link></li>
+              <li><Link href="/forum" className="hover:underline">Forum</Link></li>
+              <li><Link href="/resources" className="hover:underline">Resources</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-3 text-sm opacity-60">Project</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/about" className="hover:underline">About</Link></li>
+              <li><a href="https://github.com/Tankman61/CCCSolutions/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:underline">License</a></li>
+              <li><a href="https://github.com/Tankman61/CCCSolutions" target="_blank" rel="noopener noreferrer" className="hover:underline">Contribute</a></li>
+              <li><a href="mailto:willi64645@gmail.com" className="hover:underline">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <Image src="/images/mmhs_logo_transparent.png" alt="MMHS Logo" width={80} height={80} />
       </div>
-      <hr className="my-8 border-gray-400" />
-      <Typography color="blue-gray" className="text-center font-normal">
-        &copy; 2025 Milken Mills High School
-      </Typography>
+
+      <hr className="my-8 border-gray-300" />
+      <p className="text-center text-sm opacity-60">
+        Made with love by the CCCSolutions team
+      </p>
     </footer>
   );
-}
+};
 
-export default FooterWithLogo;
+export default Footer;

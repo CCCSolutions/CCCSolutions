@@ -1,19 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss" source(none);
+@import "@radix-ui/themes/styles.css";
 
+@source "../app";
+@source "../components";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --font-sans: 'Roboto', 'Arial', sans-serif;
+  --color-pastel-green: #c1e1c1;
+  --color-pastel-blue: #c6e4ee;
+  --color-pastel-red: #f6c6c6;
+  --color-pastel-orange: #ffd5b9;
+  --color-pastel-purple: #d6aaff;
+  --color-pastel-gray: #e3e3e3;
 
-body {
-    font-family: 'Lato', sans-serif; /* Set the global font */
-    margin: 0;
-    padding: 0;
-    line-height: 1.6; /* Optional: Improve readability */
 }
 
-* {
-    box-sizing: border-box; /* Optional: Consistent box sizing */
+@layer base {
+  *, ::after, ::before {
+    border-color: var(--color-gray-200);
+  }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato', sans-serif;
+    line-height: 1.6;
+}
+
+.radix-themes {
+    --default-font-family: 'Lato', sans-serif;
 }
 
 .evil-purple-glow {
@@ -34,15 +50,15 @@ body {
   height: 150%;
   background: linear-gradient(90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(224, 159, 255, 0.5) 50%, /* Lower opacity */
+    rgba(224, 159, 255, 0.5) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: subtle-gleam 6s linear infinite; /* Slower animation */
+  animation: subtle-gleam 6s linear infinite;
 }
 
 @keyframes subtle-pulse {
   0%, 100% {
-    box-shadow: 0 0 6px 3px rgba(128, 0, 128, 0.2); /* Reduced intensity */
+    box-shadow: 0 0 6px 3px rgba(128, 0, 128, 0.2);
   }
   50% {
     box-shadow: 0 0 10px 5px rgba(128, 0, 128, 0.3);
@@ -57,3 +73,4 @@ body {
     transform: translateX(100%) skew(-45deg);
   }
 }
+

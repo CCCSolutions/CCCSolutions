@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Info, Code, FileText } from "lucide-react";
+import { InfoCircledIcon, CodeIcon, FileTextIcon } from "@radix-ui/react-icons";
 import { Problem as ProblemType, problems } from "../../../../constants";
 
 interface TestCaseData {
@@ -355,7 +355,7 @@ const Problem = () => {
       />
 
       <div className="mx-auto">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="bg-white rounded-lg shadow-xs overflow-hidden mb-8">
           {/* Problem Header */}
           <div className="p-6">
             <h1 className="text-2xl font-bold">
@@ -378,7 +378,7 @@ const Problem = () => {
           {/* Solutions Section */}
           <div className="p-6">
             <div className="flex items-center mb-4">
-              <Code className="mr-2 h-5 w-5 text-blue-800" />
+              <CodeIcon width="20" height="20" className="mr-2 text-blue-800" />
               <h2 className="text-xl font-semibold text-gray-900">
                 {loading ? "Loading Solutions..." : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} Available`}
               </h2>
@@ -415,11 +415,11 @@ const Problem = () => {
           {/* Test Cases Section */}
           <div className="border-t border-gray-200 p-6">
             <div className="flex items-center mb-4">
-              <FileText className="mr-2 h-5 w-5 text-blue-800" />
+              <FileTextIcon width="20" height="20" className="mr-2 text-blue-800" />
               <h2 className="text-xl font-semibold text-gray-900">Test Cases</h2>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-xs overflow-hidden">
               <div className="flex items-center p-4 border-b border-gray-200 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 {Array.from({ length: availableTestCases }, (_, idx) => (
                   <button
@@ -466,7 +466,7 @@ const Problem = () => {
                   </div>
                 ) : testCaseState === 'error' ? (
                   <div className="flex items-center justify-center py-8 text-red-600">
-                    <Info className="mr-2 h-5 w-5" />
+                    <InfoCircledIcon width="20" height="20" className="mr-2" />
                     <p className="font-medium">Test case not available. See GitHub repo for test data.</p>
                   </div>
                 ) : testCaseState === 'success' ? (

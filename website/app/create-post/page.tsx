@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
+import { Button } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.snow.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -32,10 +33,16 @@ export default function CreatePost() {
     }
 
     try {
+      if (!pb.authStore.model) {
+        setError("Session expired. Please log in again.");
+        router.push('/login');
+        return;
+      }
+
       const data = {
         title: newPostTitle,
         body: newPostBody,
-        author: pb.authStore.model!.id,
+        author: pb.authStore.model.id,
         upvotes: 0,
       };
 
@@ -66,7 +73,7 @@ export default function CreatePost() {
   const formats = [
     'header',
     'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
+    'list', 'indent',
     'link', 'image',
     'code-block'
   ];
@@ -90,7 +97,7 @@ export default function CreatePost() {
             value={newPostTitle}
             onChange={(e) => setNewPostTitle(e.target.value)}
             placeholder="Enter your post title"
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -107,12 +114,9 @@ export default function CreatePost() {
             className="bg-white"
           />
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition"
-        >
+        <Button type="submit" color="indigo" variant="solid" size="3" className="w-full">
           Create Post
-        </button>
+        </Button>
       </form>
     </div>
   );

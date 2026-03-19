@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { BookOutlined, GlobalOutlined } from '@ant-design/icons';
+import { Card, Heading, Text } from '@radix-ui/themes';
+import { ReaderIcon, GlobeIcon } from '@radix-ui/react-icons';
 
 interface Book {
   title: string;
@@ -21,7 +22,7 @@ interface Website {
 const Resources = () => {
   const books: Book[] = [
     {
-      title: "📌 Competitive Programmer's Handbook",
+      title: "Competitive Programmer's Handbook",
       author: 'Antti Laaksonen',
       link: 'https://cses.fi/book/book.pdf',
     },
@@ -46,10 +47,10 @@ const Resources = () => {
   ];
 
   return (
-    <div className="bg-gray-100">
-      {/* Hero Section with Gradient */}
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
-        <div className="container mx-auto flex flex-col items-center text-center">
+    <div>
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-indigo-900 text-white py-16 px-4">
+        <div className="relative z-10 container mx-auto flex flex-col items-center text-center">
           <h1 className="text-5xl font-bold mb-4">Resources</h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-5">
             A list of useful resources to prepare for the CCC.
@@ -57,70 +58,68 @@ const Resources = () => {
         </div>
       </div>
 
-      <div className="space-y-8 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto py-12 px-4 space-y-10">
         {/* Books Section */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-red-500 to-orange-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
-              <BookOutlined />
-            </div>
-            Books
-          </h2>
-          <ul className="space-y-4">
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <ReaderIcon width="24" height="24" className="shrink-0 text-indigo-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Books</h2>
+          </div>
+          <div className="space-y-4">
             {books.map((book, index) => (
-              <li key={index} className="border-b pb-4 last:border-b-0">
-                <h3 className="font-semibold">{book.title}</h3>
-                <p className="text-sm text-gray-600">
+              <Card key={index} size="3" variant="surface">
+                <Heading as="h3" size="3" weight="bold">{book.title}</Heading>
+                <Text as="p" size="2" color="gray" mt="1">
                   {book.author}
-                  {book.edition && ` - ${book.edition}`}
+                  {book.edition && ` — ${book.edition}`}
                   {book.course && ` (${book.course})`}
-                </p>
+                </Text>
                 {book.link && (
                   <a
                     href={book.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline text-sm"
+                    className="text-indigo-600 hover:underline text-sm mt-2 inline-block"
                   >
                     Download PDF
                   </a>
                 )}
-              </li>
+              </Card>
             ))}
-          </ul>
+          </div>
         </div>
 
+        <hr className="border-gray-200" />
+
         {/* Websites Section */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6 flex items-center">
-            <div className="text-2xl mr-4 rounded-lg bg-gradient-to-br from-indigo-600 to-blue-400 text-white flex items-center justify-center w-10 h-10 flex-shrink-0 shadow">
-              <GlobalOutlined />
-            </div>
-            Websites
-          </h2>
-          <ul className="space-y-4">
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <GlobeIcon width="24" height="24" className="shrink-0 text-indigo-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Websites</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
             {websites.map((site, index) => (
-              <li key={index} className="border-b pb-4 last:border-b-0">
-                <h3 className="font-semibold">{site.title}</h3>
+              <Card key={index} size="3" variant="surface">
+                <Heading as="h3" size="3" weight="bold">{site.title}</Heading>
                 {site.author && (
-                  <p className="text-sm text-gray-600">by {site.author}</p>
+                  <Text as="p" size="2" color="gray">by {site.author}</Text>
                 )}
                 {site.description && (
-                  <p className="text-sm text-gray-700 mt-1">{site.description}</p>
+                  <Text as="p" size="2" color="gray" mt="1">{site.description}</Text>
                 )}
                 {site.link && (
                   <a
                     href={site.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline text-sm mt-2 inline-block"
+                    className="text-indigo-600 hover:underline text-sm mt-2 inline-block"
                   >
                     Visit Site
                   </a>
                 )}
-              </li>
+              </Card>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </div>
