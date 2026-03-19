@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Button, Card } from '@radix-ui/themes';
 import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.bubble.css';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.bubble.css';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 
@@ -15,9 +16,13 @@ export default function ForumPage() {
   const [posts, setPosts] = useState<RecordModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('new');
-  const [user, setUser] = useState<AuthModel | null>(pb.authStore.model);
+  const [user, setUser] = useState<AuthModel | null>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    setUser(pb.authStore.model);
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -30,10 +35,14 @@ export default function ForumPage() {
       const resultList = await pb.collection('posts').getList(1, 50, {
         sort: sortField,
         expand: 'author',
+        requestKey: `posts_${sortField}`,
       });
       setPosts(resultList.items);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
+    } catch (error: unknown) {
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error('Error fetching posts:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -63,8 +72,9 @@ export default function ForumPage() {
 
   return (
     <div className="font-poppins">
-      <div className="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
-        <div className="container mx-auto text-center">
+      <div className="relative overflow-hidden bg-indigo-900 text-white py-16 px-4">
+
+        <div className="relative z-10 container mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Forums</h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto mb-5">
             Ask, search, or answer any question related to the CCC.
@@ -77,41 +87,43 @@ export default function ForumPage() {
           {user ? (
             <p className="text-sm">
               Logged in as <span className="font-semibold">{user.username}</span> |{' '}
-              <span className="cursor-pointer underline" onClick={handleLogout}>
+              <button className="cursor-pointer underline" onClick={handleLogout}>
                 Logout
-              </span>
+              </button>
             </p>
           ) : (
             <p className="text-sm italic">
               Not logged in |{' '}
-              <span className="cursor-pointer underline" onClick={() => router.push('/login')}>
+              <button className="cursor-pointer underline" onClick={() => router.push('/login')}>
                 Login
-              </span>
+              </button>
             </p>
           )}
         </div>
 
         <div className="py-8">
           <div className="flex justify-between mb-4">
-            <div className="flex items-center">
-              <span className="mr-4">Sort by:</span>
+            <div className="flex items-center gap-1">
+              <span className="mr-2">Sort by:</span>
               {['new', 'top'].map(option => (
-                <button
+                <Button
                   key={option}
                   onClick={() => setSortBy(option)}
-                  className={`mr-2 ${sortBy === option ? 'bg-blue-500 text-white' : 'bg-gray-200'} px-3 py-1 rounded`}
+                  color={sortBy === option ? 'indigo' : 'gray'}
+                  variant="solid"
+                  size="1"
+                  className="cursor-pointer"
                 >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
 
-            <Link
-              href="/create-post"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-            >
-              Create New Post
-            </Link>
+            <Button asChild color="indigo" variant="solid" size="2">
+              <Link href="/create-post">
+                Create New Post
+              </Link>
+            </Button>
           </div>
 
           {loading ? (
@@ -119,7 +131,7 @@ export default function ForumPage() {
           ) : (
             <div className="space-y-4">
               {posts.map(post => (
-                <div key={post.id} className="border p-4 rounded shadow-md transition hover:shadow-lg bg-white">
+                <Card key={post.id} size="3" variant="surface">
                   <h2 className="text-xl font-semibold">
                     <Link href={`/forum/${post.id}`} className="hover:underline">
                       {post.title}
@@ -140,6 +152,7 @@ export default function ForumPage() {
                         onClick={() => handleVote(post.id, 'upvote')}
                         className="text-green-500 hover:text-green-600"
                         disabled={!user}
+                        aria-label="Upvote"
                       >
                         ▲
                       </button>
@@ -148,12 +161,13 @@ export default function ForumPage() {
                         onClick={() => handleVote(post.id, 'downvote')}
                         className="text-red-500 hover:text-red-600"
                         disabled={!user}
+                        aria-label="Downvote"
                       >
                         ▼
                       </button>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}

@@ -1,4 +1,4 @@
-declare module 'react-quill' {
+declare module 'react-quill-new' {
   import React from 'react';
 
   interface QuillModules {
@@ -21,18 +21,5 @@ declare module 'react-quill' {
   export default ReactQuill;
 }
 
-declare module 'react-quill/dist/quill.snow.css';
-declare module 'react-quill/dist/quill.bubble.css';
-
-// @material-tailwind/react type augmentation
-import type { TypographyProps as MTTypographyProps } from '@material-tailwind/react';
-
-declare module '@material-tailwind/react' {
-  interface TypographyProps extends MTTypographyProps {
-    placeholder?: string;
-    onPointerEnterCapture?: React.PointerEventHandler;
-    onPointerLeaveCapture?: React.PointerEventHandler;
-    onResize?: React.ReactEventHandler;
-    onResizeCapture?: React.ReactEventHandler;
-  }
-}
+declare module 'react-quill-new/dist/quill.snow.css';
+declare module 'react-quill-new/dist/quill.bubble.css';

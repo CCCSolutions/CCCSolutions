@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 
 const Navbar = () => {
@@ -36,9 +36,8 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="https://mmhs.ca" className="flex items-center">
+          <Link href="/" className="flex items-center">
             <Image src="/images/mmhs_logo.png" alt="MMHS Logo" width={40} height={40} className="h-10 w-auto mr-3" />
-            <span className="text-xl font-medium text-gray-900">Milliken Mills High School</span>
           </Link>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
@@ -77,9 +76,9 @@ const Navbar = () => {
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
+                <Cross1Icon width="24" height="24" aria-hidden="true" />
               ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
+                <HamburgerMenuIcon width="24" height="24" aria-hidden="true" />
               )}
             </button>
           </div>

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Book, BookOpen, Info } from 'react-feather';
+import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
+import { Button } from '@radix-ui/themes';
 import { problems } from '../constants';
 
 const ProblemsTable = () => {
@@ -59,7 +60,7 @@ const ProblemsTable = () => {
               <div className="flex items-center space-x-2 relative">
                 <span>Difficulty</span>
                 <div className="relative group">
-                  <Info className="w-4 h-4 text-gray-500 cursor-pointer" />
+                  <InfoCircledIcon width="16" height="16" className="text-gray-500 cursor-pointer" />
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-slate-200 rounded z-10 whitespace-nowrap">
                     <div className="mb-1"><strong>Easy</strong> - an average grade 11 student should get this</div>
                     <div className="mb-1"><strong>Normal</strong> - an average grade 12 student should get this</div>
@@ -79,11 +80,11 @@ const ProblemsTable = () => {
               <td className="py-3 whitespace-nowrap text-sm font-medium">
                 {problem.hasSolution ? (
                   <div className="px-10 text-green-400">
-                    <BookOpen className="w-5 h-5" />
+                    <ReaderIcon width="20" height="20" />
                   </div>
                 ) : (
                   <div className="px-10 text-red-600">
-                    <Book className="w-5 h-5" />
+                    <Cross2Icon width="20" height="20" />
                   </div>
                 )}
               </td>
@@ -93,7 +94,7 @@ const ProblemsTable = () => {
                 </a>
               </td>
               <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
-                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-sm ${getDifficultyClass(problem.difficulty)}`}>
+                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-xs ${getDifficultyClass(problem.difficulty)}`}>
                   {problem.difficulty}
                 </span>
               </td>
@@ -107,23 +108,27 @@ const ProblemsTable = () => {
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
-        <button
+        <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-blue-900 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
+          color="indigo"
+          variant="solid"
+          size="2"
         >
           Previous
-        </button>
+        </Button>
         <div className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
         </div>
-        <button
+        <Button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-blue-800 text-white rounded transition-colors duration-300 hover:bg-blue-600 disabled:bg-gray-300 disabled:opacity-50"
+          color="indigo"
+          variant="solid"
+          size="2"
         >
           Next
-        </button>
+        </Button>
       </div>
     </div>
   );
