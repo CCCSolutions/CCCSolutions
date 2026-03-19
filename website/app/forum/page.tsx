@@ -87,16 +87,16 @@ export default function ForumPage() {
           {user ? (
             <p className="text-sm">
               Logged in as <span className="font-semibold">{user.username}</span> |{' '}
-              <span className="cursor-pointer underline" onClick={handleLogout}>
+              <button className="cursor-pointer underline" onClick={handleLogout}>
                 Logout
-              </span>
+              </button>
             </p>
           ) : (
             <p className="text-sm italic">
               Not logged in |{' '}
-              <span className="cursor-pointer underline" onClick={() => router.push('/login')}>
+              <button className="cursor-pointer underline" onClick={() => router.push('/login')}>
                 Login
-              </span>
+              </button>
             </p>
           )}
         </div>
@@ -152,6 +152,7 @@ export default function ForumPage() {
                         onClick={() => handleVote(post.id, 'upvote')}
                         className="text-green-500 hover:text-green-600"
                         disabled={!user}
+                        aria-label="Upvote"
                       >
                         ▲
                       </button>
@@ -160,6 +161,7 @@ export default function ForumPage() {
                         onClick={() => handleVote(post.id, 'downvote')}
                         className="text-red-500 hover:text-red-600"
                         disabled={!user}
+                        aria-label="Downvote"
                       >
                         ▼
                       </button>

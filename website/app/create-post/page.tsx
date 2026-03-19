@@ -33,10 +33,16 @@ export default function CreatePost() {
     }
 
     try {
+      if (!pb.authStore.model) {
+        setError("Session expired. Please log in again.");
+        router.push('/login');
+        return;
+      }
+
       const data = {
         title: newPostTitle,
         body: newPostBody,
-        author: pb.authStore.model!.id,
+        author: pb.authStore.model.id,
         upvotes: 0,
       };
 
