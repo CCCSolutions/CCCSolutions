@@ -57,29 +57,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Old image-based hero (uncomment to switch back):
-      <div
-        className="relative bg-cover bg-center text-white min-h-screen flex flex-col justify-center items-center text-center px-4"
-        style={{ backgroundImage: `url(/images/image.png)` }}
-      >
-        <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          The <span className="bg-linear-to-r from-indigo-400 via-indigo-300 to-blue-300 bg-clip-text text-transparent">
-            most comprehensive
-          </span> CCC solution repository
-        </h1>
-        <p className="text-xl md:text-2xl max-w-2xl mb-10">
-          Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
-        </p>
-        <div className="flex space-x-4">
-          <Link href="/solutions" className="bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-            Explore Solutions
-          </Link>
-          <Link href="/forum" className="bg-white text-blue-700 font-bold py-3 px-6 rounded-lg">
-            Visit Forum
-          </Link>
-        </div>
-      </div>
-      */}
       </div>
 
       {/* Content Section */}

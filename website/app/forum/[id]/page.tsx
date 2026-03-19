@@ -68,9 +68,10 @@ export default function PostPage() {
       alert("Please log in to vote.");
       return;
     }
+    if (!post) return;
 
     try {
-      const updatedVotes = post!.upvotes + (voteType === 'upvote' ? 1 : -1);
+      const updatedVotes = post.upvotes + (voteType === 'upvote' ? 1 : -1);
 
       await pb.collection('posts').update(id, {upvotes: updatedVotes});
       setPost((prevPost) => prevPost ? ({
@@ -89,10 +90,15 @@ export default function PostPage() {
       return;
     }
     try {
+      if (!pb.authStore.model) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
+
       const data = {
         body: newComment,
         post: id,
-        author: pb.authStore.model!.id,
+        author: pb.authStore.model.id,
       };
 
       await pb.collection('comments').create(data);
@@ -129,6 +135,7 @@ export default function PostPage() {
                 <button
                     onClick={() => handleVote('upvote')}
                     className="text-green-500 hover:text-green-600"
+                    aria-label="Upvote"
                 >
                   ▲
                 </button>
@@ -136,6 +143,7 @@ export default function PostPage() {
                 <button
                     onClick={() => handleVote('downvote')}
                     className="text-red-500 hover:text-red-600"
+                    aria-label="Downvote"
                 >
                   ▼
                 </button>

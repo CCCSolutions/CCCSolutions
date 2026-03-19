@@ -25,8 +25,7 @@ export default function AuthForm() {
     try {
       if (isLogin) {
         // Login logic
-        const authData = await pb.collection('users').authWithPassword(username, password);
-        console.log(authData);
+        await pb.collection('users').authWithPassword(username, password);
         setSuccess('Login successful!');
         router.push('/forum');
       } else {
@@ -38,13 +37,11 @@ export default function AuthForm() {
         };
 
         // Create the user
-        const record = await pb.collection('users').create(data);
-        console.log(record);
+        await pb.collection('users').create(data);
         setSuccess('User created successfully!');
 
         // Automatically log in the newly created user
-        const authData = await pb.collection('users').authWithPassword(username, password);
-        console.log(authData);
+        await pb.collection('users').authWithPassword(username, password);
         router.push('/forum');
       }
     } catch (error) {
