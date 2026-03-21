@@ -21,6 +21,20 @@ export interface Stats {
 }
 
 const problems: Problem[] = [
+	// 2026 Junior
+	{ name: '2026 J1 - Concert Tickets', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2026/j1', hasSolution: true },
+	{ name: '2026 J2 - Olympic Scores', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2026/j2', hasSolution: true },
+	{ name: '2026 J3 - Creative Candy Consumption', difficulty: 'Normal', tags: ['simulation', 'implementation'], link: '/contest/2026/j3', hasSolution: false },
+	{ name: '2026 J4 - Snail Path', difficulty: 'Normal', tags: ['simulation', 'data structures'], link: '/contest/2026/j4', hasSolution: false },
+	{ name: '2026 J5 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: false },
+
+	// 2026 Senior
+	{ name: '2026 S1 - Baby Hop, Giant Hop', difficulty: 'Normal', tags: ['math', 'greedy'], link: '/contest/2026/s1', hasSolution: false },
+	{ name: '2026 S2 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: false },
+	{ name: '2026 S3 - Common Card Choice', difficulty: 'Hard', tags: ['number theory', 'constructive'], link: '/contest/2026/s3', hasSolution: false },
+	{ name: '2026 S4 - Minecarts', difficulty: 'Insane', tags: ['greedy', 'stack', 'binary search'], link: '/contest/2026/s4', hasSolution: false },
+	{ name: '2026 S5 - On the Fence', difficulty: 'Wicked', tags: ['math', 'optimization'], link: '/contest/2026/s5', hasSolution: false },
+
 	// 2025 Junior
 	{ name: '2025 J1 - Roller Coaster Ride', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2025/j1', hasSolution: true },
 	{ name: '2025 J2 - Donut Shop', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2025/j2', hasSolution: true },
@@ -440,7 +454,7 @@ const contributors: Contributor[] = [
 	{ initials: "KL2", name: "Kevin Luo", school: "Eric Hamber Secondary School", contributions: "2012 S5, 2012 S4" },
 	{ initials: "ML", name: "Matthew Lai", school: "Steveston-London Secondary School", contributions: "2008 S5: 2007 S4" },
 	{ initials: "ML2", name: "Matthew Lee", school: "Galt Collegiate Institute", contributions: "2015 S3" },
-	{ initials: "MS", name: "Morgan Su", schools: "Bayview Secondary School", contributions: "2019 J1, 2020 J1, 2021 J2, 2021 J1, 2018 J1, 2022 J1, 2018 J2, 2018 J1" },
+	{ initials: "MS", name: "Morgan Su", schools: "Bayview Secondary School", contributions: "2026 J1, 2026 J2, 2019 J1, 2020 J1, 2021 J2, 2021 J1, 2018 J1, 2022 J1, 2018 J2, 2018 J1" },
 	{ initials: "NB", name: "Nenad Bauk", school: "Richview Collegiate Institute", contributions: "2013 S2" },
 	{ initials: "NV", name: "Nazar Viznytsya", school: "", contributions: "2016-2019" },
 	{ initials: "OZ", name: "Oscar Zhou", school: "Abbey Park High School", contributions: "Various solutions from 2016-2024"},
