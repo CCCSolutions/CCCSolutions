@@ -1,0 +1,10 @@
+#Morgan Su, BayviewSS
+B=int(input())
+T=int(input())
+P=int(input())
+
+if (T-P-B)>=0:
+    print("Y "+str(T-P-B))
+
+else:
+    print("N")

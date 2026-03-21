@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { Button } from '@radix-ui/themes';
 import { problems } from '../constants';
 
 const ProblemsTable = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const initialPage = parseInt(searchParams.get('page') || '1') || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
 
@@ -20,10 +19,10 @@ const ProblemsTable = () => {
     currentPage * problemsPerPage
   );
 
-  // Update URL when page changes
+  // Update URL when page changes (use replaceState to avoid Suspense flash and scroll jump)
   useEffect(() => {
-    router.replace(`?page=${currentPage}`, { scroll: false });
-  }, [currentPage, router]);
+    window.history.replaceState(null, '', `?page=${currentPage}`);
+  }, [currentPage]);
 
   const totalPages = Math.ceil(problems.length / problemsPerPage);
 
