@@ -24,13 +24,13 @@ const problems: Problem[] = [
 	// 2026 Junior
 	{ name: '2026 J1 - Concert Tickets', difficulty: 'Easy', tags: ['simple math'], link: '/contest/2026/j1', hasSolution: true },
 	{ name: '2026 J2 - Olympic Scores', difficulty: 'Easy', tags: ['implementation', 'simple math'], link: '/contest/2026/j2', hasSolution: true },
-	{ name: '2026 J3 - Creative Candy Consumption', difficulty: 'Normal', tags: ['simulation', 'implementation'], link: '/contest/2026/j3', hasSolution: false },
-	{ name: '2026 J4 - Snail Path', difficulty: 'Normal', tags: ['simulation', 'data structures'], link: '/contest/2026/j4', hasSolution: false },
-	{ name: '2026 J5 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: false },
+	{ name: '2026 J3 - Creative Candy Consumption', difficulty: 'Normal', tags: ['simulation', 'implementation'], link: '/contest/2026/j3', hasSolution: true },
+	{ name: '2026 J4 - Snail Path', difficulty: 'Normal', tags: ['simulation', 'data structures'], link: '/contest/2026/j4', hasSolution: true },
+	{ name: '2026 J5 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: true },
 
 	// 2026 Senior
 	{ name: '2026 S1 - Baby Hop, Giant Hop', difficulty: 'Normal', tags: ['math', 'greedy'], link: '/contest/2026/s1', hasSolution: false },
-	{ name: '2026 S2 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: false },
+	{ name: '2026 S2 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: true },
 	{ name: '2026 S3 - Common Card Choice', difficulty: 'Hard', tags: ['number theory', 'constructive'], link: '/contest/2026/s3', hasSolution: false },
 	{ name: '2026 S4 - Minecarts', difficulty: 'Insane', tags: ['greedy', 'stack', 'binary search'], link: '/contest/2026/s4', hasSolution: false },
 	{ name: '2026 S5 - On the Fence', difficulty: 'Wicked', tags: ['math', 'optimization'], link: '/contest/2026/s5', hasSolution: false },
@@ -439,6 +439,7 @@ const contributors: Contributor[] = [
 	{ initials: "DG", name: "Daniel Galperin", school: "Waterloo Collegiate Institute", contributions: "2009 S5" },
 	{ initials: "DH", name: "Daniel Hui", school: "Woburn Collegiate Institute", contributions: "2012 S4" },
 	{ initials: "DS", name: "Dan Shan", school: "N/A", contributions: "2016 S4, 2018 S5"},
+	{ initials: "SD", name: "shawnduxy", school: "N/A", contributions: "2026 J1, 2026 J2, 2026 J3, 2026 J4, 2026 J5"},
 	{ initials: "DW", name: "Daniel Whitney", school: "Newmarket High School", contributions: "2015 S4, 2015 S5" },
 	{ initials: "DZ", name: "Daniel Zhang", school: "Pinetree Secondary School", contributions: "Website revamp, 2019 S4"},
 	{ initials: "ES", name: "Ethan Shen", school: "Orchard Park PS, London ON", contributions: "2023 S4, 2019 S5, 2017 J3, 2017 J4, 2016 S5" },

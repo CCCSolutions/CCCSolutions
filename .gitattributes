@@ -1,2 +1,2 @@
-*.in linguist-vendored
+c*.in linguist-vendored
 *.out linguist-vendored
