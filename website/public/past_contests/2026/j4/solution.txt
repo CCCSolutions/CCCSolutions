@@ -1,0 +1,45 @@
+// By shawnduxy
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  int m;
+  cin >> m;
+
+  unordered_set<string> grid;
+  grid.insert("0_0");
+  int t = 0;
+  string s;
+  int x = 0, y = 0;
+  for (int i = 0; i < m; i++) {
+    cin >> s;
+    char d = s[0];
+    int n = s[1] - '0';
+    if (s.length() > 2) {
+      n = n * 10 + s[2] - '0';
+    }
+    for (int j = 0; j < n; j++) {
+      switch (d) {
+        case 'S':
+          y--;
+          break;
+        case 'N':
+          y++;
+          break;
+        case 'W':
+          x--;
+          break;
+        case 'E':
+          x++;
+          break;
+      }
+      string pos = to_string(x) + "_" + to_string(y);
+      if (grid.find(pos) != grid.end()) {
+        t++;
+      } else {
+        grid.insert(pos);
+      }
+    }
+  }
+  cout << t << endl;
+}

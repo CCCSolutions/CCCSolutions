@@ -1,0 +1,28 @@
+// By shawnduxy
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  string n, m;
+  cin >> n;
+  cin >> m;
+  int ni = 0, mi = 0;
+  int nt = 0, mt = 0;
+  while (ni != n.length() && mi != m.length()) {
+    if (n[ni] == m[mi]) {
+      nt++;
+      mt++;
+      ni++;
+      mi++;
+    } else {
+      if ((n[ni] == 'R' && m[mi] == 'G') || (n[ni] == 'G' && m[mi] == 'B') || (n[ni] == 'B' && m[mi] == 'R')) {
+        nt++;
+        mi++;
+      } else {
+        mt++;
+        ni++;
+      }
+    }
+  }
+  cout << nt + n.length() - ni << endl << mt + m.length() - mi << endl;
+}
