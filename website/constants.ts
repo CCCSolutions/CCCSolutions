@@ -29,7 +29,7 @@ const problems: Problem[] = [
 	{ name: '2026 J5 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: true },
 
 	// 2026 Senior
-	{ name: '2026 S1 - Baby Hop, Giant Hop', difficulty: 'Normal', tags: ['math', 'greedy'], link: '/contest/2026/s1', hasSolution: false },
+	{ name: '2026 S1 - Baby Hop, Giant Hop', difficulty: 'Normal', tags: ['math', 'greedy'], link: '/contest/2026/s1', hasSolution: true },
 	{ name: '2026 S2 - Beams of Light', difficulty: 'Normal', tags: ['prefix sums', 'implementation'], link: '/contest/2026/s2', hasSolution: true },
 	{ name: '2026 S3 - Common Card Choice', difficulty: 'Hard', tags: ['number theory', 'constructive'], link: '/contest/2026/s3', hasSolution: false },
 	{ name: '2026 S4 - Minecarts', difficulty: 'Insane', tags: ['greedy', 'stack', 'binary search'], link: '/contest/2026/s4', hasSolution: false },
@@ -434,6 +434,7 @@ const contributors: Contributor[] = [
 	{ initials: "AT", name: "Alex Tung", school: "Hong Kong", contributions: "2014 S4" },
 	{ initials: "AV", name: "Aaron Voelker", school: "Bell High School", contributions: "2007 S3: 2000 S4: 1999 P5" },
 	{ initials: "BB", name: "Brian Bi", school: "Woburn Collegiate Institute", contributions: "2009 S5" },
+	{ initials: "BB2", name: "BBBSTOM", school: "N/A", contributions: "2026 S1"},
 	{ initials: "CL", name: "Calvin Liu", school: "Glenforest Secondary School", contributions: "2003 S4: 2014 S4, 2015 S4" },
 	{ initials: "DC", name: "Daniel Cressman", school: "Westdale Secondary School", contributions: "2011 J5: 2012 S1: 2012 S4" },
 	{ initials: "DG", name: "Daniel Galperin", school: "Waterloo Collegiate Institute", contributions: "2009 S5" },
