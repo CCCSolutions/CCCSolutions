@@ -66,7 +66,7 @@ const SearchBar = ({ problems }: SearchBarProps) => {
       </div>
       {/* Dropdown that displays results */}
       {isDropdownOpen && (
-        <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+        <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
           {filteredProblems.length > 0 ? (
             <ul className="space-y-2 p-2">
               {filteredProblems.map((problem) => (
