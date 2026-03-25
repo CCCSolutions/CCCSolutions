@@ -13,3 +13,7 @@ Forum, solutions, and contribution guides all in one place.
 ## Contributing
 
 We welcome contributions! Feel free to open a pull-request or issue with any change you'd like to be made, and we'll review it accordingly.
+
+## Test Data 
+
+To note, any raw test data on the repository will be moved to [this new repository](https://github.com/CCCSolutions/CCCTestData) as a part of major migrations and an overhaul to the site. Stay tuned for more information!
