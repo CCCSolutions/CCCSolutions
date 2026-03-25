@@ -3,9 +3,7 @@
 
 **CCCSolutions** is an open-source repository of detailed solutions to the Canadian Computing Competition (CCC), covering problems from 1996 to the present. You can find test cases, code examples, and multiple approaches to help you understand and master almost every single CCC problem to date.
  
-**270+ solutions**  
-**2,800+ users**  
-[Fully open source](LICENSE)
+We are also [Fully open source!](LICENSE)
 
 ## Check it out!
 
