@@ -1,0 +1,52 @@
+# By BBBSTOM
+n = abs(int(input())-int(input()))
+
+g = int(input())
+
+t = int(input())
+
+
+
+if n==0:
+
+    if t==1:
+
+        print(0)
+
+    else:
+
+        print(2)
+
+else:
+
+    quo = n//g
+
+    rem = n%g
+
+    a = quo+rem
+
+    b = quo+1+g-rem
+
+    first = min(a,b)
+
+    second = min(max(a,b),first+2)
+
+
+
+    if g==2:
+
+        second = first + 1
+
+    elif first == second:
+
+        second += 2
+
+
+
+    if t==1:
+
+        print(first)
+
+    else:
+
+        print(second)
