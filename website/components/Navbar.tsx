@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,12 +34,15 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white">
+    <nav className="bg-background border-b border-border-default">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center">
-            <Image src="/images/mmhs_logo.png" alt="MMHS Logo" width={40} height={40} className="h-10 w-auto mr-3" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center">
+              <Image src="/images/mmhs_logo_transparent.png" alt="MMHS Logo" width={40} height={40} className="h-10 w-auto" />
+            </Link>
+            <ThemeToggle />
+          </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
@@ -50,8 +54,8 @@ const Navbar = () => {
                     relative
                     ${
                       pathname === item.path
-                        ? 'text-blue-600'
-                        : 'text-gray-700 hover:text-blue-600'
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-foreground-light hover:text-blue-600 dark:hover:text-blue-400'
                     }
                     transition-all duration-300
                     group
@@ -60,7 +64,7 @@ const Navbar = () => {
                   {item.name}
                   <span
                     className={`
-                      absolute bottom-0 left-0 w-full h-0.5 bg-blue-600
+                      absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400
                       transform origin-bottom scale-x-0 transition-transform duration-300 ease-out
                       ${pathname === item.path ? 'scale-x-100' : 'group-hover:scale-x-100'}
                     `}
@@ -72,7 +76,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-foreground-light hover:text-blue-600 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
@@ -108,7 +112,7 @@ const Navbar = () => {
                 {item.name}
                 <span
                   className={`
-                    absolute bottom-0 left-0 w-full h-0.5 bg-blue-600
+                    absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400
                     transform ${pathname === item.path ? 'translate-x-0' : '-translate-x-full'}
                     transition-transform duration-300 ease-out
                   `}

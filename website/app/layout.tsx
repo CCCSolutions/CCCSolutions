@@ -1,7 +1,7 @@
 import './globals.css';
-import { Theme } from '@radix-ui/themes';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { Providers } from '../components/Providers';
 
 export const metadata = {
   metadataBase: new URL('https://cccsolutions.ca'),
@@ -35,7 +35,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-LD181T6802" />
@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "description": "The most comprehensive Canadian Computing Competition solution repository with 270+ solutions from 1996 to 2025",
               "educationalLevel": ["High School", "University"],
               "teaches": ["Competitive Programming", "Algorithms", "Data Structures", "Problem Solving"],
-              "sameAs": ["https://github.com/Tankman61/CCCSolutions"],
+              "sameAs": ["https://github.com/CCCSolutions/CCCSolutions"],
               "audience": {
                 "@type": "EducationalAudience",
                 "educationalRole": "student"
@@ -140,8 +140,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="bg-white">
-        <Theme accentColor="indigo" grayColor="slate" radius="medium" scaling="100%">
+      <body className="bg-background">
+        <Providers>
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-grow">
@@ -149,7 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
             <Footer />
           </div>
-        </Theme>
+        </Providers>
       </body>
     </html>
   );
