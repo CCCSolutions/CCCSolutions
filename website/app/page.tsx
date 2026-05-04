@@ -12,6 +12,7 @@ import {
   ExternalLinkIcon,
 } from '@radix-ui/react-icons';
 import { FlickeringGrid } from '../components/FlickeringGrid';
+import { SolutionPreview } from '../components/SolutionPreview';
 import { Button } from '../components/ui/button';
 import {
   Card,
@@ -100,23 +101,31 @@ const Home = async () => {
         </div>
 
         <SectionContainer
-          size="medium"
-          className="relative z-10 py-12 text-center"
+          size="large"
+          className="relative z-10 py-12 max-w-[1440px]"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl tracking-tight font-semibold">
-            <span className="block text-foreground">The most comprehensive</span>
-            <span className="block text-brand">CCC solution repository</span>
-          </h1>
-          <p className="mt-6 text-base lg:text-lg text-foreground-light max-w-2xl mx-auto">
-            Detailed solutions to the Canadian Computing Competition, all in one place.
-          </p>
-          <div className="mt-10 flex justify-center gap-3">
-            <Button asChild type="primary" size="large">
-              <Link href="/solutions">Explore solutions</Link>
-            </Button>
-            <Button asChild type="default" size="large">
-              <Link href="/forum">Visit forum</Link>
-            </Button>
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-20 items-center">
+            {/* Left: hero copy — centered on mobile, left-aligned on desktop */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
+                <span className="block text-foreground">The most comprehensive</span>
+                <span className="block text-brand">CCC solution repository</span>
+              </h1>
+              <p className="mt-6 text-base lg:text-lg text-foreground-light max-w-xl mx-auto lg:mx-0 text-pretty">
+                  Detailed Canadian Computing Competition solutions, all in one place.
+              </p>
+              <div className="mt-10 flex justify-center lg:justify-start gap-3">
+                <Button asChild type="primary" size="large">
+                  <Link href="/solutions">Explore solutions</Link>
+                </Button>
+                <Button asChild type="default" size="large">
+                  <Link href="/forum">Visit forum</Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Right: solution-page mockup */}
+            <SolutionPreview />
           </div>
         </SectionContainer>
       </div>
@@ -247,3 +256,4 @@ const Home = async () => {
 };
 
 export default Home;
+
