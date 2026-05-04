@@ -797,3 +797,15 @@ CCCSolutions/
 | **Phase 4** | Semantic search, AI editorial + hint generation (Opus 4.6), OpenGraph cards, analytics events |
 
 Each phase produces something shippable. If time runs short, every completed phase stands on its own as a meaningful upgrade.
+
+---
+
+## Backlog (post-Phase-4 v2 additions)
+
+These aren't blocking the v2 launch, but they're worth doing once the core platform is stable.
+
+**Curated external resources page**
+- Build out the `/resources` page beyond a list of links. Group external resources by topic (DP, graphs, greedy, strings, etc.) with a one-line note on what each resource is good for.
+- Include things like USACO Guide, CSES Problem Set, CP-Algorithms, DMOJ tutorials, AtCoder DP contest, etc.
+- Distinct from "curated study plans" (deferred to v3 in Out of Scope) — this is just a vetted directory of existing material, not original guided learning paths.
+- Low-effort to start (a Markdown table with categories is fine). Iterate based on what users ask for in the forum.
