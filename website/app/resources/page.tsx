@@ -1,129 +1,169 @@
-'use client';
+import {
+  ReaderIcon,
+  GlobeIcon,
+  ExternalLinkIcon,
+  GitHubLogoIcon,
+} from '@radix-ui/react-icons';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { SectionContainer } from '../../components/ui/section-container';
 
-import React from 'react';
-import { Card, Heading, Text } from '@radix-ui/themes';
-import { ReaderIcon, GlobeIcon } from '@radix-ui/react-icons';
-
-interface Book {
+interface Resource {
   title: string;
-  author?: string;
-  link?: string;
-  edition?: string;
-  course?: string;
-}
-
-interface Website {
-  title: string;
-  link?: string;
+  link: string;
   description?: string;
-  author?: string;
+  meta?: string;
 }
 
-const Resources = () => {
-  const books: Book[] = [
-    {
-      title: "Competitive Programmer's Handbook",
-      author: 'Antti Laaksonen',
-      link: 'https://cses.fi/book/book.pdf',
-    },
-  ];
+const websites: Resource[] = [
+  {
+    title: 'DMOJ',
+    link: 'https://dmoj.ca/',
+    description:
+      'A modern online judge with an extensive problem library, including every CCC contest.',
+  },
+  {
+    title: 'Codeforces',
+    link: 'https://codeforces.com/',
+    description:
+      'One of the most popular competitive programming platforms — regular contests and a huge problem archive sorted by difficulty.',
+  },
+  {
+    title: 'AtCoder',
+    link: 'https://atcoder.jp/',
+    description:
+      'Japanese contest platform known for clean, well-tested problems and beginner-friendly contests every weekend.',
+  },
+  {
+    title: 'CSES Problem Set',
+    link: 'https://cses.fi/problemset/',
+    description:
+      '200+ classical problems covering sorting, graphs, DP, and more. Pairs perfectly with the Competitive Programmer\'s Handbook.',
+    meta: 'by Antti Laaksonen',
+  },
+  {
+    title: 'USACO Guide',
+    link: 'https://usaco.guide',
+    description:
+      'Comprehensive USACO prep guide with harder problems and editorials, mostly targeted at C++ users.',
+  },
+  {
+    title: 'CP-Algorithms',
+    link: 'https://cp-algorithms.com/',
+    description:
+      'Encyclopedic reference for competitive programming algorithms with explanations, code, and complexity analysis for almost every standard technique.',
+  },
+];
 
-  const websites: Website[] = [
-    {
-      title: 'DMOJ: Modern Online Judge',
-      link: 'https://dmoj.ca/',
-      description: 'A modern platform for programming contests with an extensive problem library and support for multiple programming languages.',
-    },
-    {
-      title: 'Codeforces',
-      link: 'https://codeforces.com/',
-      description: 'One of the most popular competitive programming platforms featuring regular contests and a vast problem archive sorted by difficulty.',
-    },
-    {
-      title: 'USACO Guide',
-      link: 'https://usaco.guide',
-      description: 'Contains harder problems for those seeking a challenge, although mostly targeted towards C++ users.',
-    },
-  ];
+const books: Resource[] = [
+  {
+    title: "Competitive Programmer's Handbook",
+    link: 'https://cses.fi/book/book.pdf',
+    description:
+      'Free PDF book covering algorithms and data structures used in competitive programming.',
+    meta: 'by Antti Laaksonen',
+  },
+  {
+    title: 'Competitive Programming 3',
+    link: 'https://files.gitter.im/SamZhangQingChuan/sam/DA1g/Steven-Halim_-Felix-Halim-Competitive-Programming-3_-The-New-Lower-Bound-of-Programming-Contests-Lulu.com-_2013_.pdf',
+    description:
+      'A widely-used textbook covering basics to advanced topics with hundreds of UVa problem references for practice.',
+    meta: 'by Steven & Felix Halim',
+  },
+];
 
+function ResourceCard({ r }: { r: Resource }) {
   return (
-    <div>
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-indigo-900 text-white py-16 px-4">
-        <div className="relative z-10 container mx-auto flex flex-col items-center text-center">
-          <h1 className="text-5xl font-bold mb-4">Resources</h1>
-          <p className="text-xl md:text-2xl max-w-2xl mb-5">
-            A list of useful resources to prepare for the CCC.
+    <a
+      href={r.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-highlight rounded-lg"
+    >
+      <Card className="h-full hover:bg-surface-200/50 transition-colors">
+        <CardContent className="flex flex-col gap-2 py-6 px-5 border-none">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-base font-bold text-foreground group-hover:text-brand transition-colors">
+              {r.title}
+            </h3>
+            <ExternalLinkIcon
+              width="14"
+              height="14"
+              className="text-foreground-lighter group-hover:text-brand transition-colors shrink-0"
+            />
+          </div>
+          {r.meta && <p className="text-xs text-foreground-lighter">{r.meta}</p>}
+          {r.description && (
+            <p className="text-sm text-foreground-light leading-relaxed">{r.description}</p>
+          )}
+        </CardContent>
+      </Card>
+    </a>
+  );
+}
+
+export default function ResourcesPage() {
+  return (
+    <div className="bg-background text-foreground">
+      {/* Page header — simple, on bg-background. No solid color block. */}
+      <SectionContainer size="large" className="pt-16 pb-12">
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+          Resources
+        </h1>
+        <p className="mt-4 text-base md:text-lg text-foreground-light max-w-2xl">
+          Useful sites and books for CCC prep.
+        </p>
+      </SectionContainer>
+
+      {/* Online judges + tutorials */}
+      <SectionContainer size="large" className="pb-16">
+        <div className="flex items-center gap-2 mb-6">
+          <GlobeIcon width="18" height="18" className="text-brand" />
+          <h2 className="text-xl font-bold text-foreground">Online judges and tutorials</h2>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {websites.map((r) => (
+            <ResourceCard key={r.title} r={r} />
+          ))}
+        </div>
+      </SectionContainer>
+
+      {/* Books */}
+      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
+        <div className="flex items-center gap-2 mb-6">
+          <ReaderIcon width="18" height="18" className="text-brand" />
+          <h2 className="text-xl font-bold text-foreground">Books</h2>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {books.map((r) => (
+            <ResourceCard key={r.title} r={r} />
+          ))}
+        </div>
+      </SectionContainer>
+
+      {/* Contribute callout */}
+      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-20">
+        <div className="text-center max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Have a resource we should add?
+          </h2>
+          <p className="mt-3 text-base text-foreground-light">
+            Open a pull request on GitHub or suggest one in the forum.
           </p>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto py-12 px-4 space-y-10">
-        {/* Books Section */}
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <ReaderIcon width="24" height="24" className="shrink-0 text-indigo-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Books</h2>
-          </div>
-          <div className="space-y-4">
-            {books.map((book, index) => (
-              <Card key={index} size="3" variant="surface">
-                <Heading as="h3" size="3" weight="bold">{book.title}</Heading>
-                <Text as="p" size="2" color="gray" mt="1">
-                  {book.author}
-                  {book.edition && ` — ${book.edition}`}
-                  {book.course && ` (${book.course})`}
-                </Text>
-                {book.link && (
-                  <a
-                    href={book.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:underline text-sm mt-2 inline-block"
-                  >
-                    Download PDF
-                  </a>
-                )}
-              </Card>
-            ))}
+          <div className="mt-6 flex justify-center">
+            <Button asChild type="default" size="medium">
+              <a
+                href="https://github.com/CCCSolutions/CCCSolutions"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GitHubLogoIcon width="18" height="18" />
+                <span>GitHub</span>
+              </a>
+            </Button>
           </div>
         </div>
-
-        <hr className="border-gray-200" />
-
-        {/* Websites Section */}
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <GlobeIcon width="24" height="24" className="shrink-0 text-indigo-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Websites</h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            {websites.map((site, index) => (
-              <Card key={index} size="3" variant="surface">
-                <Heading as="h3" size="3" weight="bold">{site.title}</Heading>
-                {site.author && (
-                  <Text as="p" size="2" color="gray">by {site.author}</Text>
-                )}
-                {site.description && (
-                  <Text as="p" size="2" color="gray" mt="1">{site.description}</Text>
-                )}
-                {site.link && (
-                  <a
-                    href={site.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:underline text-sm mt-2 inline-block"
-                  >
-                    Visit Site
-                  </a>
-                )}
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
+      </SectionContainer>
     </div>
   );
-};
-
-export default Resources;
+}
