@@ -131,7 +131,7 @@ const Home = async () => {
       </div>
 
       {/* Feature cards — bare icons (no tinted square wrapper) */}
-      <SectionContainer size="large" className="py-10">
+      <SectionContainer size="large" className="py-20">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-12 max-w-3xl">
           <span className="text-foreground">Everything you need to prepare. </span>
           <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
@@ -150,7 +150,7 @@ const Home = async () => {
       </SectionContainer>
 
       {/* Stats card */}
-      <SectionContainer size="large" className="pb-15">
+      <SectionContainer size="large" className="py-20">
         <Card>
           <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
             <div>
@@ -170,7 +170,7 @@ const Home = async () => {
       </SectionContainer>
 
       {/* Get started */}
-      <SectionContainer size="large" className="py-15">
+      <SectionContainer size="large" className="py-20">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 max-w-3xl mx-auto">
           <span className="text-foreground">Three ways to get started:</span>
         </h2>
@@ -221,7 +221,7 @@ const Home = async () => {
       </SectionContainer>
 
       {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
-      <SectionContainer size="large" className="py-24">
+      <SectionContainer size="large" className="py-20">
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">
             Free and open source.
