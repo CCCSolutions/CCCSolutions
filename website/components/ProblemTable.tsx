@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
-import { Button } from '@radix-ui/themes';
+import { Button } from './ui/button';
 import { problems } from '../constants';
 
 const ProblemsTable = () => {
@@ -13,13 +14,11 @@ const ProblemsTable = () => {
 
   const problemsPerPage = 20;
 
-  // Get the problems for the current page
   const currentProblems = problems.slice(
     (currentPage - 1) * problemsPerPage,
     currentPage * problemsPerPage
   );
 
-  // Update URL when page changes (use replaceState to avoid Suspense flash and scroll jump)
   useEffect(() => {
     window.history.replaceState(null, '', `?page=${currentPage}`);
   }, [currentPage]);
@@ -34,70 +33,95 @@ const ProblemsTable = () => {
   const getDifficultyClass = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case 'normal':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
       case 'hard':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
       case 'insane':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-surface-200 text-foreground-light';
     }
   };
 
   return (
-    <div className="light-mode overflow-x-auto m-8 px-8">
-      <table className="w-full text-gray-700 bg-white">
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-100 border-b border-gray-200">
-            <th className="pl-6 py-3 text-left text-md font-normal">Solution</th>
-            <th className="pl-6 py-3 text-left text-md font-normal">Problem Name</th>
-            <th className="pr-6 py-3 text-left text-md font-normal">
-              <div className="flex items-center space-x-2 relative">
+          <tr className="bg-surface-300 border-b border-border-default text-foreground">
+            <th className="pl-6 py-3 text-left font-semibold">Solution</th>
+            <th className="pl-6 py-3 text-left font-semibold">Problem Name</th>
+            <th className="pr-6 py-3 text-left font-semibold">
+              <div className="flex items-center gap-2 relative">
                 <span>Difficulty</span>
                 <div className="relative group">
-                  <InfoCircledIcon width="16" height="16" className="text-gray-500 cursor-pointer" />
-                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-slate-200 rounded z-10 whitespace-nowrap">
-                    <div className="mb-1"><strong>Easy</strong> - an average grade 11 student should get this</div>
-                    <div className="mb-1"><strong>Normal</strong> - an average grade 12 student should get this</div>
-                    <div className="mb-1"><strong>Hard</strong> - a good grade 12 student MIGHT get this</div>
-                    <div className="mb-1"><strong>Insane</strong> - the best grade 12 student MIGHT get this, given enough time</div>
-                    <div><strong>Wicked</strong> - the teacher will get this after many days, or maybe never :-)</div>
+                  <InfoCircledIcon
+                    width="16"
+                    height="16"
+                    className="text-foreground-lighter cursor-pointer"
+                  />
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-nowrap">
+                    <div className="mb-1">
+                      <strong className="text-foreground">Easy</strong> — an average grade 11 student should get this
+                    </div>
+                    <div className="mb-1">
+                      <strong className="text-foreground">Normal</strong> — an average grade 12 student should get this
+                    </div>
+                    <div className="mb-1">
+                      <strong className="text-foreground">Hard</strong> — a good grade 12 student MIGHT get this
+                    </div>
+                    <div className="mb-1">
+                      <strong className="text-foreground">Insane</strong> — the best grade 12 student MIGHT get this, given enough time
+                    </div>
+                    <div>
+                      <strong className="text-foreground">Wicked</strong> — the teacher will get this after many days, or maybe never :-)
+                    </div>
                   </div>
                 </div>
               </div>
             </th>
-            <th className="pl-6 py-3 text-left text-md font-normal">Tags</th>
+            <th className="pl-6 py-3 text-left font-semibold">Tags</th>
           </tr>
         </thead>
         <tbody>
           {currentProblems.map((problem, index) => (
-            <tr key={index} className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-              <td className="py-3 whitespace-nowrap text-sm font-medium">
+            <tr
+              key={index}
+              className="border-b border-border-default hover:bg-surface-200/50 transition-colors"
+            >
+              <td className="py-3 whitespace-nowrap">
                 {problem.hasSolution ? (
-                  <div className="px-10 text-green-400">
+                  <div className="px-10 text-green-600 dark:text-green-400">
                     <ReaderIcon width="20" height="20" />
                   </div>
                 ) : (
-                  <div className="px-10 text-red-600">
+                  <div className="px-10 text-destructive">
                     <Cross2Icon width="20" height="20" />
                   </div>
                 )}
               </td>
-              <td className="pl-4 md:px-6 py-3 whitespace-nowrap text-sm font-medium">
-                <a href={problem.link} className="truncate text-blue-600 font-semibold hover:underline" style={{ maxWidth: '20rem' }}>
+              <td className="pl-4 md:px-6 py-3 whitespace-nowrap">
+                <Link
+                  href={problem.link}
+                  className="truncate text-brand font-semibold hover:underline inline-block"
+                  style={{ maxWidth: '20rem' }}
+                >
                   {problem.name}
-                </a>
+                </Link>
               </td>
               <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
-                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-xs ${getDifficultyClass(problem.difficulty)}`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-xs ${getDifficultyClass(
+                    problem.difficulty
+                  )}`}
+                >
                   {problem.difficulty}
                 </span>
               </td>
-              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-sm font-medium">
+              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-foreground-light">
                 {problem.tags.join(', ')}
               </td>
             </tr>
@@ -105,26 +129,24 @@ const ProblemsTable = () => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-6 px-2">
         <Button
+          type="default"
+          size="small"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          color="indigo"
-          variant="solid"
-          size="2"
         >
           Previous
         </Button>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-foreground-light">
           Page {currentPage} of {totalPages}
         </div>
         <Button
+          type="primary"
+          size="small"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          color="indigo"
-          variant="solid"
-          size="2"
         >
           Next
         </Button>

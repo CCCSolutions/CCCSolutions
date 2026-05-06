@@ -1,32 +1,59 @@
 'use client';
 
-import React, { Suspense } from "react";
-import ProblemsTable from "../../components/ProblemTable";
-import SearchBar from "../../components/Searchbar";
-import { problems } from "../../constants";
-
+import React, { Suspense } from 'react';
+import ProblemsTable from '../../components/ProblemTable';
+import SearchBar from '../../components/Searchbar';
+import { SectionContainer } from '../../components/ui/section-container';
+import { FlickeringGrid } from '../../components/FlickeringGrid';
+import { problems } from '../../constants';
 
 function SolutionsContent() {
   return (
-    <div>
-      <div className="relative bg-blue-900 text-white py-16 px-4">
-
-        <div className="relative z-10 container mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">Curated Solutions</h1>
-          <p className="text-2xl">Find all solutions to past Canadian Computing Competition problems.</p>
-          <div className="flex justify-center text-justify text-black">
+    <div className="bg-background text-foreground">
+      {/* Header — always dark themed (white text on dark blue) regardless of global mode.
+          Title/subtitle use explicit light colors; data-theme="dark" propagates to SearchBar. */}
+      <div data-theme="dark" className="relative bg-blue-950 overflow-hidden border-b border-border-default">
+        <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+          <FlickeringGrid
+            className="size-full"
+            squareSize={4}
+            gridGap={6}
+            color="hsl(239, 84%, 67%)"
+            maxOpacity={0.12}
+            flickerChance={0.03}
+          />
+        </div>
+        <SectionContainer size="large" className="relative z-10 pt-16 pb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+            Solutions
+          </h1>
+          <p className="mt-4 text-base md:text-lg text-white/75 max-w-2xl mx-auto">
+            Every CCC problem from 1996 to 2026, with detailed solutions and test data.
+          </p>
+          <div className="mt-8 max-w-2xl mx-auto">
             <SearchBar problems={problems} />
           </div>
-        </div>
+        </SectionContainer>
       </div>
-      <ProblemsTable />
+
+      <SectionContainer size="large" className="pt-12 pb-20">
+        <ProblemsTable />
+      </SectionContainer>
     </div>
   );
 }
 
 export default function Solutions() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="bg-background text-foreground">
+          <SectionContainer size="large" className="py-16">
+            <p className="text-foreground-light">Loading…</p>
+          </SectionContainer>
+        </div>
+      }
+    >
       <SolutionsContent />
     </Suspense>
   );

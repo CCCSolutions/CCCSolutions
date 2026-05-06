@@ -1,11 +1,166 @@
 @import "tailwindcss" source(none);
-@import "@radix-ui/themes/styles.css";
 
 @source "../app";
 @source "../components";
 
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  --colors-black: 0deg 0% 0%;
+  --colors-white: 0deg 0% 100%;
+
+    --brand-default: 239deg 84% 67%;
+    --brand-link: 244deg 76% 58%;
+    --brand-600: 244deg 58% 51%;
+    --brand-500: 239deg 84% 67%;
+    --brand-400: 234deg 89% 74%;
+    --brand-300: 226deg 100% 94%;
+    --brand-200: 226deg 100% 97%;
+    --brand-highlight: hsl(235, 80%, 62%);
+
+  --colors-gray-dark-100: 0deg 0% 8.6%;
+  --colors-gray-dark-200: 0deg 0% 11%;
+  --colors-gray-dark-300: 0deg 0% 13.7%;
+  --colors-gray-dark-400: 0deg 0% 15.7%;
+  --colors-gray-dark-500: 0deg 0% 18%;
+  --colors-gray-dark-600: 0deg 0% 20.4%;
+  --colors-gray-dark-700: 0deg 0% 24.3%;
+  --colors-gray-dark-800: 0deg 0% 31.4%;
+  --colors-gray-dark-900: 0deg 0% 43.9%;
+  --colors-gray-dark-1000: 0deg 0% 49.4%;
+  --colors-gray-dark-1100: 0deg 0% 62.7%;
+  --colors-gray-dark-1200: 0deg 0% 92.9%;
+
+  --colors-gray-light-100: 0deg 0% 98.8%;
+  --colors-gray-light-200: 0deg 0% 97.3%;
+  --colors-gray-light-300: 0deg 0% 95.3%;
+  --colors-gray-light-400: 0deg 0% 92.9%;
+  --colors-gray-light-500: 0deg 0% 91%;
+  --colors-gray-light-600: 0deg 0% 88.6%;
+  --colors-gray-light-700: 0deg 0% 85.9%;
+  --colors-gray-light-800: 0deg 0% 78%;
+  --colors-gray-light-900: 0deg 0% 56.1%;
+  --colors-gray-light-1000: 0deg 0% 52.2%;
+  --colors-gray-light-1100: 0deg 0% 43.5%;
+  --colors-gray-light-1200: 0deg 0% 9%;
+}
+
+[data-theme='dark'],
+.dark {
+  /* Brand: indigo. brand-500 = primary button bg (vivid),
+     brand = hover blend, brand-600/brand-highlight = focus ring + hover border. */
+  --brand-default: 239deg 84% 70%;
+  --brand-link: 234deg 89% 78%;
+  --brand-600: 230deg 95% 80%;
+  --brand-500: 244deg 80% 55%;
+  --brand-400: 244deg 70% 38%;
+  --brand-300: 244deg 60% 24%;
+  --brand-200: 244deg 50% 14%;
+  /* Lighter than the button bg so the ring reads as a highlight, not an outline */
+    --brand-highlight: hsl(235, 80%, 62%);
+
+  --warning-default: 38.9deg 100% 42.9%;
+  --warning-600: 38.9deg 100% 42.9%;
+  --warning-500: 34.8deg 90.9% 21.6%;
+  --warning-400: 33.2deg 100% 14.5%;
+  --warning-300: 32.3deg 100% 10.2%;
+  --warning-200: 36.6deg 100% 8%;
+
+  --destructive-default: 10.2deg 77.9% 53.9%;
+  --destructive-600: 9.7deg 85.2% 62.9%;
+  --destructive-500: 7.9deg 71.6% 29%;
+  --destructive-400: 6.7deg 60% 20.6%;
+  --destructive-300: 7.5deg 51.3% 15.3%;
+  --destructive-200: 10.9deg 23.4% 9.2%;
+
+  --border-default: 0deg 0% 18%;
+  --border-muted: 0deg 0% 14.1%;
+  --border-strong: 0deg 0% 21.2%;
+  --border-stronger: 0deg 0% 27.1%;
+  --border-button-default: 0deg 0% 22.4%;
+  --border-button-hover: 0deg 0% 30%;
+  --border-overlay: 0deg 0% 20%;
+  --border-control: 0deg 0% 22.4%;
+
+  --background-default: 0deg 0% 7.1%;
+  --background-200: 0deg 0% 9%;
+  --background-surface-75: 0deg 0% 9%;
+  --background-surface-100: 0deg 0% 12.2%;
+  --background-surface-200: 0deg 0% 12.9%;
+  --background-surface-300: 0deg 0% 16.1%;
+  --background-surface-400: 0deg 0% 16.1%;
+  --background-muted: 0deg 0% 14.1%;
+  --background-selection: 0deg 0% 19.2%;
+  --background-alternative-default: 0deg 0% 5.9%;
+  --background-control: 0deg 0% 14.1%;
+
+  --foreground-default: 0deg 0% 98%;
+  --foreground-light: 0deg 0% 70.6%;
+  --foreground-lighter: 0deg 0% 53.7%;
+  --foreground-muted: 0deg 0% 30.2%;
+  --foreground-contrast: 0deg 0% 8.6%;
+  --hi-contrast: 0deg 0% 100%;
+}
+
+[data-theme='light'],
+.light {
+  --brand-default: 239deg 84% 67%;
+  --brand-link: 244deg 76% 50%;
+  --brand-600: 244deg 76% 35%;
+  --brand-500: 239deg 84% 60%;
+  --brand-400: 234deg 89% 74%;
+  --brand-300: 226deg 100% 94%;
+  --brand-200: 226deg 100% 97%;
+  /* Light mode: same hue family as the button bg, slightly lower saturation,
+     a hint darker. Reads as a natural shadow of the bg, not a different color. */
+  --brand-highlight: hsl(239deg 65% 52%);
+
+  --warning-default: 30.3deg 80.3% 47.8%;
+  --warning-600: 30.3deg 80.3% 47.8%;
+  --warning-500: 36.3deg 85.7% 67.1%;
+  --warning-400: 41.9deg 100% 81.8%;
+  --warning-300: 44.3deg 100% 91.8%;
+  --warning-200: 40deg 81.8% 97.8%;
+
+  --destructive-default: 10.2deg 77.9% 53.9%;
+  --destructive-600: 9.9deg 82% 43.5%;
+  --destructive-500: 10.4deg 77.1% 79.4%;
+  --destructive-400: 7.1deg 91.3% 91%;
+  --destructive-300: 7.1deg 100% 96.7%;
+  --destructive-200: 0deg 100% 99.4%;
+
+  --border-default: 0deg 0% 87.5%;
+  --border-strong: 0deg 0% 83.1%;
+  --border-stronger: 0deg 0% 56.1%;
+  --border-muted: var(--colors-gray-light-400);
+  --border-button-default: var(--colors-gray-light-800);
+  --border-button-hover: var(--colors-gray-light-900);
+  --border-overlay: var(--colors-gray-light-500);
+  --border-control: var(--colors-gray-light-800);
+
+  --background-default: var(--colors-gray-light-100);
+  --background-200: var(--colors-gray-light-200);
+  --background-surface-75: 0deg 0% 100%;
+  --background-surface-100: 0deg 0% 98.8%;
+  --background-surface-200: 0deg 0% 95.3%;
+  --background-surface-300: 0deg 0% 92.9%;
+  --background-surface-400: 0deg 0% 89.8%;
+  --background-muted: 0deg 0% 96.9%;
+  --background-selection: var(--colors-gray-light-400);
+  --background-alternative-default: 0deg 0% 99.2%;
+  --background-control: var(--colors-gray-light-300);
+
+  --foreground-default: var(--colors-gray-light-1200);
+  --foreground-light: 0deg 0% 32.2%;
+  --foreground-lighter: 0deg 0% 43.9%;
+  --foreground-muted: 0deg 0% 69.8%;
+  --foreground-contrast: 0deg 0% 98.4%;
+  --hi-contrast: 0deg 0% 0%;
+}
+
 @theme {
-  --font-sans: 'Roboto', 'Arial', sans-serif;
+  --font-sans: 'Lato', 'Roboto', 'Arial', sans-serif;
+
   --color-pastel-green: #c1e1c1;
   --color-pastel-blue: #c6e4ee;
   --color-pastel-red: #f6c6c6;
@@ -13,6 +168,62 @@
   --color-pastel-purple: #d6aaff;
   --color-pastel-gray: #e3e3e3;
 
+  --color-background: hsl(var(--background-default));
+  --color-foreground: hsl(var(--foreground-default));
+  --color-foreground-light: hsl(var(--foreground-light));
+  --color-foreground-lighter: hsl(var(--foreground-lighter));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+
+  --color-surface-75: hsl(var(--background-surface-75));
+  --color-surface-100: hsl(var(--background-surface-100));
+  --color-surface-200: hsl(var(--background-surface-200));
+  --color-surface-300: hsl(var(--background-surface-300));
+  --color-surface-400: hsl(var(--background-surface-400));
+
+  --color-border-default: hsl(var(--border-default));
+  --color-border-muted: hsl(var(--border-muted));
+  --color-border-strong: hsl(var(--border-strong));
+  --color-border-stronger: hsl(var(--border-stronger));
+
+  /* Aliases used by adapted Supabase Button primitive */
+  --color-default: hsl(var(--border-default));
+  --color-strong: hsl(var(--border-strong));
+  --color-stronger: hsl(var(--border-stronger));
+  --color-button: hsl(var(--border-button-default));
+  --color-button-hover: hsl(var(--border-button-hover));
+  --color-overlay: hsl(var(--border-overlay));
+  --color-control: hsl(var(--border-control));
+
+  --color-alternative: hsl(var(--background-alternative-default));
+  --color-muted: hsl(var(--background-muted));
+  --color-selection: hsl(var(--background-selection));
+  --color-hi-contrast: hsl(var(--hi-contrast));
+
+  --color-brand: hsl(var(--brand-default));
+  --color-brand-200: hsl(var(--brand-200));
+  --color-brand-300: hsl(var(--brand-300));
+  --color-brand-400: hsl(var(--brand-400));
+  --color-brand-500: hsl(var(--brand-500));
+  --color-brand-600: hsl(var(--brand-600));
+  --color-brand-highlight: var(--brand-highlight);
+
+  --color-destructive: hsl(var(--destructive-default));
+  --color-destructive-200: hsl(var(--destructive-200));
+  --color-destructive-300: hsl(var(--destructive-300));
+  --color-destructive-400: hsl(var(--destructive-400));
+  --color-destructive-500: hsl(var(--destructive-500));
+  --color-destructive-600: hsl(var(--destructive-600));
+
+  --color-warning: hsl(var(--warning-default));
+  --color-warning-200: hsl(var(--warning-200));
+  --color-warning-300: hsl(var(--warning-300));
+  --color-warning-400: hsl(var(--warning-400));
+  --color-warning-500: hsl(var(--warning-500));
+  --color-warning-600: hsl(var(--warning-600));
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
 @layer base {
@@ -26,10 +237,6 @@ body {
     padding: 0;
     font-family: 'Lato', sans-serif;
     line-height: 1.6;
-}
-
-.radix-themes {
-    --default-font-family: 'Lato', sans-serif;
 }
 
 .evil-purple-glow {
@@ -73,4 +280,3 @@ body {
     transform: translateX(100%) skew(-45deg);
   }
 }
-

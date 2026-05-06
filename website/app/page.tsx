@@ -1,130 +1,255 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { Button, Card, Heading, Text } from '@radix-ui/themes';
-import { PersonIcon, FileTextIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
+import {
+  PersonIcon,
+  FileTextIcon,
+  GitHubLogoIcon,
+  CodeIcon,
+  CheckCircledIcon,
+  MagnifyingGlassIcon,
+  ChatBubbleIcon,
+  ReaderIcon,
+  ExternalLinkIcon,
+} from '@radix-ui/react-icons';
 import { FlickeringGrid } from '../components/FlickeringGrid';
+import { Button } from '../components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '../components/ui/card';
+import { SectionContainer } from '../components/ui/section-container';
 
 import { stats } from '../constants';
+import { kFormatter } from '../lib/utils';
+import { SolutionPreview } from '../components/SolutionPreview';
 
-const Home = () => {
+async function getGithubStars(): Promise<number | null> {
+  try {
+    const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
+      next: { revalidate: 3600 },
+      headers: { Accept: 'application/vnd.github+json' },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
+  } catch {
+    return null;
+  }
+}
+
+const features = [
+  {
+    icon: <PersonIcon width="28" height="28" className="text-brand" />,
+    title: 'Interactive Forum',
+    body: 'Discuss with peers to tackle challenging CCC problems and improve your skills.',
+  },
+  {
+    icon: <FileTextIcon width="28" height="28" className="text-brand" />,
+    title: 'Comprehensive Solutions',
+    body: 'Explanations, test files, and multiple approaches to problems back to 1996.',
+  },
+  {
+    icon: <CodeIcon width="28" height="28" className="text-brand" />,
+    title: 'Multiple Languages',
+    body: 'Solutions in C++, Python, and Java so you can read in the language you know.',
+  },
+  {
+    icon: <CheckCircledIcon width="28" height="28" className="text-brand" />,
+    title: 'Test Cases Included',
+    body: 'Verify your own solutions against the official test data for every problem.',
+  },
+  {
+    icon: <MagnifyingGlassIcon width="28" height="28" className="text-brand" />,
+    title: 'Searchable Archive',
+    body: 'Find problems by year, division, or keyword with instant search built into the site.',
+  },
+  {
+    icon: <GitHubLogoIcon width="28" height="28" className="text-brand" />,
+    title: 'Open Source',
+    body: 'Check out our GitHub repository, contribute, or suggest improvements.',
+  },
+];
+
+const Home = async () => {
+  const githubStars = await getGithubStars();
   return (
-    <div>
-      {/* Announcement Banner */}
-      <div className="bg-indigo-600 text-white text-center py-2.5 px-4 font-semibold relative z-10 shadow-sm">
-        <Link href="/forum" className="text-white hover:text-indigo-100 transition-colors">
-          Help us expand our repository! Submit your 2026 solutions <u>here</u>.
+    <div className="bg-background text-foreground">
+      {/* Announcement strip — original Tailwind indigo (more violet than our brand-600) */}
+      <div className="bg-indigo-600 text-white text-center px-4">
+        <Link
+          href="/forum"
+          className="block py-2 px-4 text-center text-sm text-white hover:text-indigo-100 transition-colors"
+        >
+          Help us expand our repository — submit your 2026 solutions{' '}
+          <span className="underline underline-offset-2">here</span>.
         </Link>
       </div>
 
-      <div className="bg-gray-100">
-      {/* Hero Section */}
-      <div className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 bg-gradient-to-b from-blue-900 to-indigo-950 overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      {/* Hero */}
+      <div className="relative bg-background overflow-hidden min-h-[85vh] flex flex-col justify-center">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <FlickeringGrid
             className="size-full"
             squareSize={4}
             gridGap={6}
-            color="#6366f1"
-            maxOpacity={0.3}
-            flickerChance={0.05}
+            color="hsl(239, 84%, 67%)"
+            maxOpacity={0.15}
+            flickerChance={0.03}
           />
         </div>
-        <div className="relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-            The{' '}
-            <span className="bg-linear-to-tr from-indigo-400 via-indigo-300 to-blue-200 bg-clip-text text-transparent">
-              most comprehensive
-            </span>{' '}
-            CCC solution repository
-          </h1>
-          <p className="text-xl md:text-2xl max-w-2xl mb-10 mx-auto" style={{ color: 'rgba(255,255,255,0.9)' }}>
-            Find <span className="font-bold">detailed solutions</span> to the Canadian Computing Competition, all in one place
-          </p>
-          <div className="flex justify-center gap-2">
-            <Button asChild color="indigo" variant="solid" size="3">
-              <Link href="/solutions">
-                Explore Solutions
-              </Link>
-            </Button>
-            <Button asChild color="gray" variant="soft" size="3">
-              <Link href="/forum" className="!bg-white !text-blue-700">
-                Visit Forum
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      </div>
-
-      {/* Content Section */}
-      <div className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16 text-black">
-            Find CCC solutions{' '}
-            <span className="bg-linear-to-r from-yellow-400 to-amber-400 px-2 py-1 rounded">
-              From 1996 To Present
-            </span>
-          </h2>
-
-          {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-8 mb-10 mx-16">
-            {[
-              {
-                title: 'Interactive Forum',
-                content: 'Discuss with peers through the forum to tackle challenging CCC problems and improve your skills.',
-                icon: <PersonIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
-              },
-              {
-                title: 'Comprehensive Solutions',
-                content: 'Access explanations, test files, and multiple approaches to solve CCC problems dating back to 1996.',
-                icon: <FileTextIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
-              },
-              {
-                title: 'Open Source',
-                content: 'Check out our GitHub repository. Contribute, suggest improvements, or learn from the codebase.',
-                icon: <GitHubLogoIcon width="28" height="28" className="shrink-0 text-indigo-600" />,
-              },
-            ].map((feature, index) => (
-              <Card key={index} size="3" variant="surface" className="h-full">
-                <div className="flex flex-col items-start gap-4">
-                  {feature.icon}
-                  <div>
-                    <Heading as="h3" size="4" weight="bold" color="indigo">
-                      {feature.title}
-                    </Heading>
-                    <Text as="p" size="3" color="gray" mt="2">
-                      {feature.content}
-                    </Text>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Statistics */}
-          <Card size="3" variant="surface" className="mx-16">
-            <div className="grid md:grid-cols-3 gap-16">
-              <div className="text-center p-3">
-                <Text as="p" size="7" weight="bold" color="indigo">{stats.activeUsers}</Text>
-                <Text as="p" size="2" color="gray">Active Users</Text>
-              </div>
-              <div className="text-center p-3">
-                <Text as="p" size="7" weight="bold" color="indigo">{stats.numSolutions}</Text>
-                <Text as="p" size="2" color="gray">CCC Solutions</Text>
-              </div>
-              <div className="text-center p-3">
-                <Text as="p" size="7" weight="bold" color="indigo">{stats.history}</Text>
-                <Text as="p" size="2" color="gray">Providing Answers</Text>
+        <SectionContainer
+          size="large"
+          className="relative z-10 py-12 max-w-[1440px]"
+        >
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-20 items-center">
+            {/* Left: hero copy — centered on mobile, left-aligned on desktop */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
+                <span className="block text-foreground">The most comprehensive</span>
+                <span className="block text-brand">CCC solution repository</span>
+              </h1>
+              <p className="mt-6 text-base lg:text-lg text-foreground-light max-w-xl mx-auto lg:mx-0 text-pretty">
+                  Detailed Canadian Computing Competition solutions, all in one place.
+              </p>
+              <div className="mt-10 flex justify-center lg:justify-start gap-3">
+                <Button asChild type="primary" size="large">
+                  <Link href="/solutions">Explore solutions</Link>
+                </Button>
+                <Button asChild type="default" size="large">
+                  <Link href="/forum">Visit forum</Link>
+                </Button>
               </div>
             </div>
+
+            {/* Right: solution-page mockup */}
+            <SolutionPreview />
+          </div>
+        </SectionContainer>
+      </div>
+
+      {/* Feature cards — bare icons (no tinted square wrapper) */}
+      <SectionContainer size="large" className="py-20">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-12 max-w-3xl">
+          <span className="text-foreground">Everything you need to prepare. </span>
+          <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
+        </h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map(({ icon, title, body }) => (
+            <Card key={title}>
+              <CardContent className="flex flex-col gap-4 py-8 px-6 border-none">
+                {icon}
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{body}</CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+          <Card className="mt-4">
+              <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.activeUsers}</p>
+                      <p className="mt-1 text-base text-foreground-light">Active Users</p>
+                  </div>
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.numSolutions}</p>
+                      <p className="mt-1 text-base text-foreground-light">CCC Solutions</p>
+                  </div>
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.history}</p>
+                      <p className="mt-1 text-base text-foreground-light">Providing Answers</p>
+                  </div>
+              </CardContent>
+          </Card>
+      </SectionContainer>
+
+      {/* Get started */}
+      <SectionContainer size="large" className="py-20">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 max-w-3xl mx-auto">
+          <span className="text-foreground">Three ways to get started:</span>
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card className="flex flex-col">
+            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+              <ChatBubbleIcon width="28" height="28" className="text-brand" />
+              <CardTitle>Start a forum post</CardTitle>
+              <CardDescription>
+                Stuck on a problem or have a better approach to share?
+              </CardDescription>
+              <div className="mt-auto pt-2">
+                <Button asChild type="primary" size="small">
+                  <Link href="/create-post">Write post</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="flex flex-col">
+            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+              <ReaderIcon width="28" height="28" className="text-brand" />
+              <CardTitle>Browse the archive</CardTitle>
+              <CardDescription>
+                Every CCC problem + test data from 1996 to 2026.
+              </CardDescription>
+              <div className="mt-auto pt-2">
+                <Button asChild type="primary" size="small">
+                  <Link href="/solutions">View archive</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="flex flex-col">
+            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+              <ExternalLinkIcon width="28" height="28" className="text-brand" />
+              <CardTitle>Resources</CardTitle>
+              <CardDescription>
+                Helpful links to other CP sites, editorials, and references.
+              </CardDescription>
+              <div className="mt-auto pt-2">
+                <Button asChild type="primary" size="small">
+                  <Link href="/resources">See links</Link>
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         </div>
-      </div>
+      </SectionContainer>
+
+      {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
+      <SectionContainer size="large" className="py-20">
+        <div className="text-center max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">
+            Free and open source.
+          </h2>
+          <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">
+            CCCSolutions is maintained through GitHub. Read the code, create an issue, or open a pull
+            request. Every contribution helps!
+          </p>
+          <div className="mt-10 flex justify-center">
+            <Button asChild type="default" size="medium">
+              <a
+                href="https://github.com/CCCSolutions/CCCSolutions"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GitHubLogoIcon width="18" height="18" />
+                <span>cccsolutions</span>
+                {githubStars !== null && (
+                  <>
+                    <span className="text-foreground-muted px-1">|</span>
+                    <span>{kFormatter(githubStars)}</span>
+                  </>
+                )}
+              </a>
+            </Button>
+          </div>
+        </div>
+      </SectionContainer>
+
     </div>
   );
 };
 
 export default Home;
+
