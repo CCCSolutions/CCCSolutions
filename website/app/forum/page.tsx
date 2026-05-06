@@ -61,9 +61,15 @@ export default function ForumPage() {
       if (!post) return;
       const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
       await pb.collection('posts').update(postId, { upvotes: updatedVotes });
-      setPosts((prev) =>
-        prev.map((p) => (p.id === postId ? { ...p, upvotes: updatedVotes } : p))
-      );
+      setPosts((prev) => {
+        const next = prev.map((p) =>
+          p.id === postId ? { ...p, upvotes: updatedVotes } : p
+        );
+        if (sortBy === 'top') {
+          next.sort((a, b) => b.upvotes - a.upvotes);
+        }
+        return next;
+      });
     } catch (error) {
       console.error('Error voting on post:', error);
     }

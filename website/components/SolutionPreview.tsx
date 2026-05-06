@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
+import dynamic from 'next/dynamic';
+
+const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
+  ssr: false,
+  loading: () => <div className="p-4 text-foreground-lighter">Loading code...</div>
+});
 
 // Real solutions for CCC 2025 S4 (Floor is Lava) — Insane / graph theory.
 // Pulled verbatim from public/past_contests/2025/s4/
