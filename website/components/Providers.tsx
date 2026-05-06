@@ -1,22 +1,6 @@
 'use client';
 
-import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
-import { Theme } from '@radix-ui/themes';
-import { useEffect, useState } from 'react';
-
-function RadixThemeBridge({ children }: { children: React.ReactNode }) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  const appearance = mounted ? (resolvedTheme === 'dark' ? 'dark' : 'light') : 'light';
-
-  return (
-    <Theme appearance={appearance} accentColor="indigo" grayColor="slate" radius="medium" scaling="100%">
-      {children}
-    </Theme>
-  );
-}
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -27,7 +11,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <RadixThemeBridge>{children}</RadixThemeBridge>
+      {children}
     </NextThemesProvider>
   );
 }
