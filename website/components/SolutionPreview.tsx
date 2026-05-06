@@ -207,7 +207,7 @@ export function SolutionPreview() {
                 onClick={() => setActive(i)}
                 type={i === active ? 'primary' : 'default'}
                 size="tiny"
-                className="font-mono text-[11px]"
+                className="text-[11px]"
                 aria-pressed={i === active}
               >
                 {s.language}

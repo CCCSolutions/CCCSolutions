@@ -147,26 +147,22 @@ const Home = async () => {
             </Card>
           ))}
         </div>
-      </SectionContainer>
-
-      {/* Stats card */}
-      <SectionContainer size="large" className="py-20">
-        <Card>
-          <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
-            <div>
-              <p className="text-4xl md:text-5xl font-bold text-brand">{stats.activeUsers}</p>
-              <p className="mt-1 text-base text-foreground-light">Active Users</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold text-brand">{stats.numSolutions}</p>
-              <p className="mt-1 text-base text-foreground-light">CCC Solutions</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold text-brand">{stats.history}</p>
-              <p className="mt-1 text-base text-foreground-light">Providing Answers</p>
-            </div>
-          </CardContent>
-        </Card>
+          <Card className="mt-4">
+              <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.activeUsers}</p>
+                      <p className="mt-1 text-base text-foreground-light">Active Users</p>
+                  </div>
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.numSolutions}</p>
+                      <p className="mt-1 text-base text-foreground-light">CCC Solutions</p>
+                  </div>
+                  <div>
+                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.history}</p>
+                      <p className="mt-1 text-base text-foreground-light">Providing Answers</p>
+                  </div>
+              </CardContent>
+          </Card>
       </SectionContainer>
 
       {/* Get started */}
@@ -228,7 +224,7 @@ const Home = async () => {
           </h2>
           <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">
             CCCSolutions is maintained through GitHub. Read the code, create an issue, or open a pull
-            request. Every bit helps the next person preparing for the contest.
+            request. Every contribution helps!
           </p>
           <div className="mt-10 flex justify-center">
             <Button asChild type="default" size="medium">

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { MagnifyingGlassIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { Problem } from '../constants';
 
 interface SearchBarProps {
@@ -15,72 +17,84 @@ const SearchBar = ({ problems }: SearchBarProps) => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    setIsDropdownOpen(query.length > 0); // Open dropdown if query is not empty
+    setIsDropdownOpen(query.length > 0);
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    setIsDropdownOpen(false); // Close dropdown when clearing
+    setIsDropdownOpen(false);
   };
 
-  // Click outside detection
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false); // Close dropdown if clicked outside
+        setIsDropdownOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filtered problems based on the search query
-  const filteredProblems = problems.filter((problem) =>
-    problem.name.toLowerCase().includes(searchQuery) ||
-    problem.difficulty.toLowerCase().includes(searchQuery) ||
-    problem.tags.some((tag) => tag.toLowerCase().includes(searchQuery))
+  const filteredProblems = problems.filter(
+    (problem) =>
+      problem.name.toLowerCase().includes(searchQuery) ||
+      problem.difficulty.toLowerCase().includes(searchQuery) ||
+      problem.tags.some((tag) => tag.toLowerCase().includes(searchQuery))
   );
 
   return (
-    <div ref={searchBarRef} className="w-full max-w-lg m-6 relative">
+    <div ref={searchBarRef} className="w-full relative">
       <div className="relative">
+        <MagnifyingGlassIcon
+          width="16"
+          height="16"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground-lighter pointer-events-none"
+        />
         <input
           type="text"
-          placeholder="Search for a problem..."
+          placeholder="Search for a problem…"
           value={searchQuery}
           onChange={handleSearch}
-          className="w-full p-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full h-10 pl-10 pr-10 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight"
         />
-        {/* Clear Button */}
         {searchQuery && (
           <button
             onClick={clearSearch}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-lighter hover:text-foreground focus:outline-none"
           >
-            &times;
+            <Cross2Icon width="14" height="14" />
           </button>
         )}
       </div>
-      {/* Dropdown that displays results */}
+
       {isDropdownOpen && (
-        <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+        <div className="absolute w-full mt-2 bg-surface-100 border border-border-default rounded-md z-50 max-h-72 overflow-y-auto">
           {filteredProblems.length > 0 ? (
-            <ul className="space-y-2 p-2">
+            <ul>
               {filteredProblems.map((problem) => (
-                <li key={problem.name} className="p-4 border-b last:border-none bg-white hover:bg-gray-100 transition">
-                  <a href={problem.link} className="text-indigo-600 font-medium">
+                <li
+                  key={problem.name}
+                  className="p-4 border-b border-border-default last:border-none hover:bg-surface-200/60 transition-colors"
+                >
+                  <Link
+                    href={problem.link}
+                    className="text-brand font-medium hover:underline"
+                  >
                     {problem.name}
-                  </a>
-                  <p className="text-sm text-gray-500">Difficulty: {problem.difficulty}</p>
-                  <p className="text-xs text-gray-400">Tags: {problem.tags.join(', ')}</p>
+                  </Link>
+                  <p className="text-sm text-foreground-light mt-1">
+                    Difficulty: {problem.difficulty}
+                  </p>
+                  <p className="text-xs text-foreground-lighter mt-0.5">
+                    Tags: {problem.tags.join(', ')}
+                  </p>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 p-4">No problems found.</p>
+            <p className="text-foreground-light p-4 text-sm">No problems found.</p>
           )}
         </div>
       )}
