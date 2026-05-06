@@ -144,7 +144,7 @@ export default function CreatePost() {
             />
           </div>
 
-          <Button type="primary" size="medium">
+          <Button type="primary" size="medium" htmlType="submit">
             Create post
           </Button>
         </form>

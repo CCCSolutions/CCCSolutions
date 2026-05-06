@@ -12,7 +12,6 @@ import {
   ExternalLinkIcon,
 } from '@radix-ui/react-icons';
 import { FlickeringGrid } from '../components/FlickeringGrid';
-import { SolutionPreview } from '../components/SolutionPreview';
 import { Button } from '../components/ui/button';
 import {
   Card,
@@ -24,6 +23,7 @@ import { SectionContainer } from '../components/ui/section-container';
 
 import { stats } from '../constants';
 import { kFormatter } from '../lib/utils';
+import { SolutionPreview } from '../components/SolutionPreview';
 
 async function getGithubStars(): Promise<number | null> {
   try {
@@ -190,7 +190,7 @@ const Home = async () => {
               <ReaderIcon width="28" height="28" className="text-brand" />
               <CardTitle>Browse the archive</CardTitle>
               <CardDescription>
-                Every CCC problem + test data from 1996 to 2025.
+                Every CCC problem + test data from 1996 to 2026.
               </CardDescription>
               <div className="mt-auto pt-2">
                 <Button asChild type="primary" size="small">

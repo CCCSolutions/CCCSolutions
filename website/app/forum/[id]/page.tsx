@@ -213,7 +213,7 @@ export default function PostPage() {
             className="w-full p-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
-          <Button type="primary" size="medium" disabled={!isLoggedIn}>
+          <Button type="primary" size="medium" htmlType="submit" disabled={!isLoggedIn}>
             Add comment
           </Button>
         </form>

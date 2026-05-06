@@ -21,6 +21,7 @@ const buttonBase = `
   focus-visible:outline-4
   focus-visible:outline-offset-1
   border
+  disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
 `;
 
 const buttonVariants = cva(buttonBase, {
@@ -75,14 +76,18 @@ export interface ButtonProps
   asChild?: boolean;
   iconLeft?: React.ReactNode;
   iconRight?: React.ReactNode;
+  htmlType?: 'button' | 'submit' | 'reset';
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, type, size, block, asChild, iconLeft, iconRight, children, ...props },
+    { className, type, size, block, asChild, iconLeft, iconRight, htmlType, children, ...props },
     ref
   ) => {
     const Comp = asChild ? Slot : 'button';
+    // Default native button type to "button" so a <Button> inside a <form>
+    // doesn't accidentally submit when the caller hasn't opted in.
+    const nativeType = asChild ? undefined : (htmlType ?? 'button');
     const content = asChild ? (
       children
     ) : (
@@ -95,6 +100,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
+        type={nativeType}
         className={cn(buttonVariants({ type, size, block }), className)}
         {...props}
       >
