@@ -1,11 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { InfoCircledIcon, CodeIcon, FileTextIcon } from "@radix-ui/react-icons";
-import { Problem as ProblemType, problems } from "../../../../constants";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import { useTheme } from 'next-themes';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {
+  InfoCircledIcon,
+  CodeIcon,
+  FileTextIcon,
+  ArrowLeftIcon,
+} from '@radix-ui/react-icons';
+import { Card, CardContent } from '../../../../components/ui/card';
+import { SectionContainer } from '../../../../components/ui/section-container';
+import { Problem as ProblemType, problems } from '../../../../constants';
 
 interface TestCaseData {
   input: string | null;
@@ -18,35 +27,41 @@ interface TestCaseSize {
 }
 
 const Problem = () => {
-  const { contestYear, problemCode } = useParams<{ contestYear: string; problemCode: string }>();
+  const { contestYear, problemCode } = useParams<{
+    contestYear: string;
+    problemCode: string;
+  }>();
   const [solutions, setSolutions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
-  const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: "", output: "" });
-  const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [availableTestCases, setAvailableTestCases] = useState(10); // Will be determined dynamically
-  const [testCaseSizes, setTestCaseSizes] = useState<Record<number, TestCaseSize>>({}); // Store file sizes: { "1": { inputKB: 50, outputKB: 10 }, ... }
+  const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: '', output: '' });
+  const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    'idle'
+  );
+  const [availableTestCases, setAvailableTestCases] = useState(10);
+  const [testCaseSizes, setTestCaseSizes] = useState<Record<number, TestCaseSize>>({});
   const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch problem info from the problems table
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const codeStyle = mounted && resolvedTheme === 'dark' ? oneDark : oneLight;
+
   useEffect(() => {
     const fetchProblemInfo = async () => {
       try {
-        // First try to find exact match
-        const problemData = problems.find(p =>
-          p.link === `/contest/${contestYear}/${problemCode}`
+        const problemData = problems.find(
+          (p) => p.link === `/contest/${contestYear}/${problemCode}`
         );
         setProblemInfo(problemData || null);
-
       } catch (error) {
-        console.error("Error fetching problem info:", error);
-        // Fallback title
+        console.error('Error fetching problem info:', error);
         setProblemInfo({
           name: `${contestYear} ${(problemCode as string).toUpperCase()}`,
           difficulty: 'Unknown',
           tags: [],
           link: '',
-          hasSolution: false
+          hasSolution: false,
         });
       }
     };
@@ -54,7 +69,6 @@ const Problem = () => {
     fetchProblemInfo();
   }, [contestYear, problemCode]);
 
-  // Fetch solutions
   useEffect(() => {
     const fetchSolutions = async () => {
       setLoading(true);
@@ -63,16 +77,13 @@ const Problem = () => {
 
       for (let i = 1; i <= 3; i++) {
         try {
-          const fetchUrl = `${basePath}/solution${i === 1 ? "" : i}.txt`;
+          const fetchUrl = `${basePath}/solution${i === 1 ? '' : i}.txt`;
           const response = await fetch(fetchUrl);
 
-          if (!response.ok) {
-            continue;
-          }
-
+          if (!response.ok) continue;
           const text = await response.text();
 
-          if (!text.toLowerCase().includes("<!doctype html>")) {
+          if (!text.toLowerCase().includes('<!doctype html>')) {
             solutionsArray.push(text);
           }
         } catch (error) {
@@ -84,7 +95,7 @@ const Problem = () => {
         setSolutions(solutionsArray);
       } else {
         setSolutions([
-          "Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!",
+          'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!',
         ]);
       }
       setLoading(false);
@@ -93,24 +104,22 @@ const Problem = () => {
     fetchSolutions();
   }, [contestYear, problemCode]);
 
-  // Set document title
   useEffect(() => {
     if (problemInfo) {
       document.title = problemInfo.name;
       return () => {
-        document.title = "CCCSolutions";
+        document.title = 'CCCSolutions';
       };
     }
   }, [problemInfo]);
 
   const fetchTestCase = async (idx: number) => {
     setTestCaseState('loading');
-    setTestCaseData({ input: "", output: "" });
+    setTestCaseData({ input: '', output: '' });
     const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
     const caseNum = idx + 1;
 
     try {
-      // All test cases are now sequential (1, 2, 3...)
       const inputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.in`);
       const outputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.out`);
 
@@ -118,7 +127,7 @@ const Problem = () => {
         setTestCaseState('error');
         setTestCaseData({
           input: inputResponse.ok ? await inputResponse.text() : null,
-          output: outputResponse.ok ? await outputResponse.text() : null
+          output: outputResponse.ok ? await outputResponse.text() : null,
         });
         return;
       }
@@ -126,9 +135,10 @@ const Problem = () => {
       const inputText = await inputResponse.text();
       const outputText = await outputResponse.text();
 
-      // Check if response is actually HTML error page
-      if (inputText.toLowerCase().includes("<!doctype html>") ||
-          outputText.toLowerCase().includes("<!doctype html>")) {
+      if (
+        inputText.toLowerCase().includes('<!doctype html>') ||
+        outputText.toLowerCase().includes('<!doctype html>')
+      ) {
         setTestCaseState('error');
         setTestCaseData({ input: null, output: null });
         return;
@@ -148,54 +158,46 @@ const Problem = () => {
     fetchTestCase(idx);
   };
 
-  // Determine number of available test cases and their file sizes
   useEffect(() => {
     const checkTestCases = async () => {
       const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
       let count = 0;
       const sizes: Record<number, TestCaseSize> = {};
 
-      // Check up to 20 test cases (all files now use sequential numbering)
       for (let i = 1; i <= 20; i++) {
         try {
           const inputResponse = await fetch(`${basePath}/${problemCode}.${i}.in`);
           if (inputResponse.ok) {
             const inputText = await inputResponse.text();
-            // Make sure it's not an error page
             if (!inputText.toLowerCase().includes('<!doctype html>')) {
               count = i;
-
-              // Store file size
               const inputKB = (inputText.length / 1024).toFixed(1);
 
-              // Also check output file size
               try {
                 const outputResponse = await fetch(`${basePath}/${problemCode}.${i}.out`);
                 if (outputResponse.ok) {
                   const outputText = await outputResponse.text();
                   const outputKB = (outputText.length / 1024).toFixed(1);
-
                   sizes[i] = {
                     inputKB: parseFloat(inputKB),
-                    outputKB: parseFloat(outputKB)
+                    outputKB: parseFloat(outputKB),
                   };
                 }
               } catch {
-                // If output check fails, just store input size
                 sizes[i] = { inputKB: parseFloat(inputKB), outputKB: 0 };
               }
             } else {
-              break; // Found error page, stop checking
+              break;
             }
           } else {
-            break; // 404 or error, stop checking
+            break;
           }
         } catch {
-          break; // Network error, stop checking
+          break;
         }
       }
 
-      setAvailableTestCases(count > 0 ? count : 10); // Default to 10 if check fails
+      setAvailableTestCases(count > 0 ? count : 10);
       setTestCaseSizes(sizes);
     };
 
@@ -211,36 +213,34 @@ const Problem = () => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty?.toLowerCase()) {
       case 'easy':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case 'normal':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
       case 'hard':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
       case 'insane':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-surface-200 text-foreground-light';
     }
   };
 
   const getLanguageFromCode = (code: string) => {
     const trimmedCode = code.trim();
 
-    // Turing (old educational language used in early CCC)
     if (
-      /^var\s+\w+\s*:/m.test(code) || // var x : int
-      /\bput\s+/.test(code) || // put "output"
-      /\bget\s+/.test(code) || // get input
-      /^loop\s*$/m.test(code) || // loop ... end loop
+      /^var\s+\w+\s*:/m.test(code) ||
+      /\bput\s+/.test(code) ||
+      /\bget\s+/.test(code) ||
+      /^loop\s*$/m.test(code) ||
       /\bend\s+loop/m.test(code) ||
-      /\b:=\b/.test(code) // := assignment
+      /\b:=\b/.test(code)
     ) {
-      return "turing";
+      return 'turing';
     }
 
-    // Check C++ FIRST (has most specific patterns)
     if (
       /#include\s*</.test(code) ||
       /using\s+namespace\s+std/.test(code) ||
@@ -250,10 +250,9 @@ const Problem = () => {
       /vector</.test(code) ||
       /int\s+main\s*\(/m.test(code)
     ) {
-      return "cpp";
+      return 'cpp';
     }
 
-    // Check Java (after C++, since both use // comments)
     if (
       /import java\./m.test(code) ||
       /package /m.test(code) ||
@@ -265,10 +264,9 @@ const Problem = () => {
       /String\[\]\s+args/m.test(code) ||
       /Integer\.parseInt/m.test(code)
     ) {
-      return "java";
+      return 'java';
     }
 
-    // Python - check AFTER Java/C++
     if (
       /^(import|from) \w+/m.test(trimmedCode) ||
       /^def \w+\s*\(/m.test(trimmedCode) ||
@@ -280,49 +278,47 @@ const Problem = () => {
       /\.readline\(\)/.test(code) ||
       /\.append\(/.test(code) ||
       /\beval\(/.test(code) ||
-      /^#\s*[A-Z]/.test(trimmedCode) || // Python comments often start with #
-      /\bfor\s+\w+\s+in\s+/.test(code) || // for x in ...
-      /\bif\s+.*:\s*$/m.test(code) // if statement with colon
+      /^#\s*[A-Z]/.test(trimmedCode) ||
+      /\bfor\s+\w+\s+in\s+/.test(code) ||
+      /\bif\s+.*:\s*$/m.test(code)
     ) {
-      return "python";
+      return 'python';
     }
 
-    // Fallback: check for OOP keywords (likely Java)
-    if (/\bpublic\b|\bprivate\b|\bprotected\b/.test(code)) return "java";
+    if (/\bpublic\b|\bprivate\b|\bprotected\b/.test(code)) return 'java';
 
-    // Default to cpp
-    return "cpp";
+    return 'cpp';
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div className="bg-background text-foreground min-h-screen">
       {/* SEO structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://cccsolutions.ca"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Solutions",
-              "item": "https://cccsolutions.ca/solutions"
-            },{
-              "@type": "ListItem",
-              "position": 3,
-              "name": `CCC ${contestYear}`,
-              "item": `https://cccsolutions.ca/solutions?year=${contestYear}`
-            },{
-              "@type": "ListItem",
-              "position": 4,
-              "name": problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`
-            }]
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://cccsolutions.ca' },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Solutions',
+                item: 'https://cccsolutions.ca/solutions',
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: `CCC ${contestYear}`,
+                item: `https://cccsolutions.ca/solutions?year=${contestYear}`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 4,
+                name: problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`,
+              },
+            ],
           }),
         }}
       />
@@ -330,193 +326,229 @@ const Problem = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "TechArticle",
-            "headline": problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`,
-            "description": `Solution to ${problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`} from the Canadian Computing Competition`,
-            "author": {
-              "@type": "Organization",
-              "name": "CCC Solutions Community"
+            '@context': 'https://schema.org',
+            '@type': 'TechArticle',
+            headline:
+              problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`,
+            description: `Solution to ${
+              problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`
+            } from the Canadian Computing Competition`,
+            author: { '@type': 'Organization', name: 'CCC Solutions Community' },
+            publisher: {
+              '@type': 'Organization',
+              name: 'CCC Solutions',
+              logo: { '@type': 'ImageObject', url: 'https://cccsolutions.ca/icon.png' },
             },
-            "publisher": {
-              "@type": "Organization",
-              "name": "CCC Solutions",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://cccsolutions.ca/icon.png"
-              }
-            },
-            "datePublished": `${contestYear}-02-01`,
-            "dateModified": `${contestYear}-02-01`,
-            "proficiencyLevel": problemInfo?.difficulty || "Intermediate",
-            "dependencies": problemInfo?.tags?.join(', ') || "algorithms"
+            datePublished: `${contestYear}-02-01`,
+            dateModified: `${contestYear}-02-01`,
+            proficiencyLevel: problemInfo?.difficulty || 'Intermediate',
+            dependencies: problemInfo?.tags?.join(', ') || 'algorithms',
           }),
         }}
       />
 
-      <div className="mx-auto">
-        <div className="bg-white rounded-lg shadow-xs overflow-hidden mb-8">
-          {/* Problem Header */}
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">
-              {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              {problemInfo?.difficulty && (
-                <span className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getDifficultyColor(problemInfo.difficulty)}`}>
-                  {problemInfo.difficulty}
-                </span>
-              )}
-              {problemInfo?.tags?.map((tag, idx) => (
-                <span key={idx} className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {tag}
-                </span>
-              ))}
-            </div>
+      <SectionContainer size="large" className="pt-12 pb-20">
+        {/* Back link */}
+        <Link
+          href="/solutions"
+          className="inline-flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeftIcon width="14" height="14" />
+          Back to solutions
+        </Link>
+
+        {/* Problem header */}
+        <div className="mb-10">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+            {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
+          </h1>
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            {problemInfo?.difficulty && (
+              <span
+                className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(
+                  problemInfo.difficulty
+                )}`}
+              >
+                {problemInfo.difficulty}
+              </span>
+            )}
+            {problemInfo?.tags?.map((tag, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-surface-200 text-foreground-light border border-border-default"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Solutions section */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <CodeIcon width="18" height="18" className="text-brand" />
+            <h2 className="text-xl font-bold text-foreground">
+              {loading
+                ? 'Loading solutions...'
+                : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
+            </h2>
           </div>
 
-          {/* Solutions Section */}
-          <div className="p-6">
-            <div className="flex items-center mb-4">
-              <CodeIcon width="20" height="20" className="mr-2 text-blue-800" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                {loading ? "Loading Solutions..." : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} Available`}
-              </h2>
+          {loading ? (
+            <div className="animate-pulse">
+              <div className="h-64 bg-surface-200 rounded-lg" />
             </div>
-
-            {loading ? (
-              <div className="animate-pulse flex space-x-4">
-                <div className="flex-1 space-y-6 py-1">
-                  <div className="h-64 bg-gray-200 rounded"></div>
-                </div>
-              </div>
-            ) : (
-              solutions.map((solution, idx) => (
-                <div key={idx} className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="bg-gray-100 px-4 py-2 flex justify-between items-center">
-                    <h3 className="font-medium text-gray-700">Solution {idx + 1}</h3>
-                    <span className="text-xs font-medium text-gray-500">
-                      {getLanguageFromCode(solution).toUpperCase()}
+          ) : (
+            <div className="flex flex-col gap-4">
+              {solutions.map((solution, idx) => (
+                <Card key={idx} className="overflow-hidden">
+                  <div className="bg-surface-200 px-4 py-2 flex justify-between items-center border-b border-border-default">
+                    <h3 className="font-medium text-foreground-light text-sm">
+                      Solution {idx + 1}
+                    </h3>
+                    <span className="text-xs font-medium text-foreground-lighter uppercase">
+                      {getLanguageFromCode(solution)}
                     </span>
                   </div>
                   <SyntaxHighlighter
                     language={getLanguageFromCode(solution)}
-                    style={solarizedlight}
+                    style={codeStyle}
                     showLineNumbers
-                    customStyle={{ margin: 0, borderRadius: 0 }}
+                    customStyle={{
+                      margin: 0,
+                      borderRadius: 0,
+                      background: 'transparent',
+                      fontSize: '13px',
+                    }}
+                    codeTagProps={{ style: { background: 'transparent' } }}
+                    lineProps={{ style: { background: 'transparent' } }}
                   >
                     {solution}
                   </SyntaxHighlighter>
-                </div>
-              ))
-            )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Test cases section */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <FileTextIcon width="18" height="18" className="text-brand" />
+            <h2 className="text-xl font-bold text-foreground">Test cases</h2>
           </div>
 
-          {/* Test Cases Section */}
-          <div className="border-t border-gray-200 p-6">
-            <div className="flex items-center mb-4">
-              <FileTextIcon width="20" height="20" className="mr-2 text-blue-800" />
-              <h2 className="text-xl font-semibold text-gray-900">Test Cases</h2>
+          <Card>
+            {/* Tab strip */}
+            <div className="flex items-center p-3 border-b border-border-default overflow-x-auto">
+              {Array.from({ length: availableTestCases }, (_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleTabClick(idx)}
+                  className={`px-3 py-1 mr-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                    activeTab === idx
+                      ? 'bg-brand-500 text-white'
+                      : 'bg-surface-200 text-foreground-light hover:bg-surface-300 hover:text-foreground'
+                  }`}
+                >
+                  Case {idx + 1}
+                </button>
+              ))}
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg shadow-xs overflow-hidden">
-              <div className="flex items-center p-4 border-b border-gray-200 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-                {Array.from({ length: availableTestCases }, (_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleTabClick(idx)}
-                    className={`px-3 py-1 mr-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-                      activeTab === idx
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
-                  >
-                    Case {idx + 1}
-                  </button>
-                ))}
-              </div>
-
-              <div className="p-4">
-                {activeTab === null ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Select a test case to view input and output</p>
-                  </div>
-                ) : testCaseState === 'loading' ? (
-                  <div className="text-center py-8">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    {(() => {
-                      const caseNum = activeTab + 1;
-                      const sizes = testCaseSizes[caseNum];
-                      if (sizes) {
-                        const maxSize = Math.max(sizes.inputKB, sizes.outputKB);
-                        if (maxSize > 50) {
-                          const sizeDisplay = maxSize > 1024
+            <div className="p-4">
+              {activeTab === null ? (
+                <div className="text-center py-8 text-foreground-lighter text-sm">
+                  Select a test case to view input and output
+                </div>
+              ) : testCaseState === 'loading' ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand" />
+                  {(() => {
+                    const caseNum = activeTab + 1;
+                    const sizes = testCaseSizes[caseNum];
+                    if (sizes) {
+                      const maxSize = Math.max(sizes.inputKB, sizes.outputKB);
+                      if (maxSize > 50) {
+                        const sizeDisplay =
+                          maxSize > 1024
                             ? `${(maxSize / 1024).toFixed(1)}MB`
                             : `${maxSize.toFixed(1)}KB`;
-                          return (
-                            <div>
-                              <p className="mt-2 text-gray-600">Loading large test case ({sizeDisplay})...</p>
-                              <p className="mt-1 text-sm text-yellow-700">⚠️ This may take a moment</p>
-                            </div>
-                          );
-                        }
+                        return (
+                          <div>
+                            <p className="mt-2 text-foreground-light">
+                              Loading large test case ({sizeDisplay})...
+                            </p>
+                            <p className="mt-1 text-sm text-warning">
+                              ⚠️ This may take a moment
+                            </p>
+                          </div>
+                        );
                       }
-                      return <p className="mt-2 text-gray-600">Loading test case...</p>;
-                    })()}
-                  </div>
-                ) : testCaseState === 'error' ? (
-                  <div className="flex items-center justify-center py-8 text-red-600">
-                    <InfoCircledIcon width="20" height="20" className="mr-2" />
-                    <p className="font-medium">Test case not available. See GitHub repo for test data.</p>
-                  </div>
-                ) : testCaseState === 'success' ? (
-                  <div>
-                    {(getFileSizeWarning(testCaseData.input) || getFileSizeWarning(testCaseData.output)) && (
-                      <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                        <p className="text-sm text-yellow-800">
-                          ⚠️ {getFileSizeWarning(testCaseData.input) || getFileSizeWarning(testCaseData.output)} - May load slowly
-                        </p>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h3 className="font-medium text-gray-700 mb-2">
-                          Input:
-                          {getFileSizeWarning(testCaseData.input) && (
-                            <span className="text-xs text-gray-500 ml-2">
-                              ({(testCaseData.input!.length / 1024).toFixed(1)}KB)
-                            </span>
-                          )}
-                        </h3>
-                        <textarea
-                          className="w-full h-48 p-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-md resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          readOnly
-                          value={testCaseData.input || ''}
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-700 mb-2">
-                          Output:
-                          {getFileSizeWarning(testCaseData.output) && (
-                            <span className="text-xs text-gray-500 ml-2">
-                              ({(testCaseData.output!.length / 1024).toFixed(1)}KB)
-                            </span>
-                          )}
-                        </h3>
-                        <textarea
-                          className="w-full h-48 p-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-md resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          readOnly
-                          value={testCaseData.output || ''}
-                        />
-                      </div>
+                    }
+                    return (
+                      <p className="mt-2 text-foreground-light">Loading test case...</p>
+                    );
+                  })()}
+                </div>
+              ) : testCaseState === 'error' ? (
+                <div className="flex items-center justify-center py-8 text-destructive">
+                  <InfoCircledIcon width="20" height="20" className="mr-2" />
+                  <p className="font-medium">
+                    Test case not available. See GitHub repo for test data.
+                  </p>
+                </div>
+              ) : testCaseState === 'success' ? (
+                <div>
+                  {(getFileSizeWarning(testCaseData.input) ||
+                    getFileSizeWarning(testCaseData.output)) && (
+                    <div className="mb-4 p-3 bg-warning-200 border border-warning-400 rounded-md">
+                      <p className="text-sm text-warning-600">
+                        ⚠️{' '}
+                        {getFileSizeWarning(testCaseData.input) ||
+                          getFileSizeWarning(testCaseData.output)}{' '}
+                        — May load slowly
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-medium text-foreground-light mb-2 text-sm">
+                        Input
+                        {getFileSizeWarning(testCaseData.input) && (
+                          <span className="text-xs text-foreground-lighter ml-2">
+                            ({(testCaseData.input!.length / 1024).toFixed(1)}KB)
+                          </span>
+                        )}
+                      </h3>
+                      <textarea
+                        className="w-full h-48 p-3 bg-surface-100 text-foreground border border-border-strong rounded-md resize-y font-mono text-sm focus:outline-none focus:border-brand-highlight"
+                        readOnly
+                        value={testCaseData.input || ''}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-foreground-light mb-2 text-sm">
+                        Output
+                        {getFileSizeWarning(testCaseData.output) && (
+                          <span className="text-xs text-foreground-lighter ml-2">
+                            ({(testCaseData.output!.length / 1024).toFixed(1)}KB)
+                          </span>
+                        )}
+                      </h3>
+                      <textarea
+                        className="w-full h-48 p-3 bg-surface-100 text-foreground border border-border-strong rounded-md resize-y font-mono text-sm focus:outline-none focus:border-brand-highlight"
+                        readOnly
+                        value={testCaseData.output || ''}
+                      />
                     </div>
                   </div>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
             </div>
-          </div>
-        </div>
-      </div>
+          </Card>
+        </section>
+      </SectionContainer>
     </div>
   );
 };

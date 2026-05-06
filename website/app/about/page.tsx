@@ -1,161 +1,216 @@
-import React from 'react';
 import Image from 'next/image';
-import { Avatar, Card } from '@radix-ui/themes';
+import { GitCommit } from 'lucide-react';
+import { Card, CardContent } from '../../components/ui/card';
+import { SectionContainer } from '../../components/ui/section-container';
+import { NoiseTexture } from '../../components/NoiseTexture';
 import { contributors } from '../../constants';
 
-const About = () => {
-  const timeline = [
-    {
-      year: 2001,
-      title: 'The Beginning',
-      content: 'Chris Robart of Milliken Mills High School started offering CCC solutions using Turing and Ready: Java.',
-    },
-    {
-      year: 2011,
-      title: 'Transition to Python',
-      content: 'Solutions were transitioned to Python, continuing the legacy of comprehensive CCC solutions.',
-    },
-    {
-      year: 2024,
-      title: 'Ongoing Contributions',
-      content: 'The repository has been modernized with a new forum feature added for users to submit new solutions for C++, Python, and Java.',
-    },
-  ];
+const timeline = [
+  {
+    year: 2001,
+    title: 'The beginning',
+    body: 'Chris Robart at Milliken Mills HS started publishing CCC solutions in Turing and Java for his students.',
+  },
+  {
+    year: 2011,
+    title: 'Transition to Python',
+    body: 'Solutions were ported to Python as it became the dominant teaching language for high-school CS.',
+  },
+  {
+    year: 2024,
+    title: 'Modernization',
+    body: 'The repository was rebuilt as an open-source site with multi-language solutions, full test data, and a community-editable archive.',
+  },
+  {
+    year: 2026,
+    title: 'Refresh',
+    body: 'A visual rebuild of the site, along with a new forum and backend. Coming soon :)',
+  },
+];
 
-  const teachers = [
-    {
-      name: 'Chris Robart',
-      role: 'Computer Science, 1996–2015',
-      image: 'https://live.staticflickr.com/5725/buddyicons/7374177@N03_l.jpg?1451326165',
-    },
-    {
-      name: 'Don Smith',
-      role: 'Math & Computer Science, 1988–2022',
-      image: '/images/donsmith.jpeg',
-    },
-  ];
+const teachers = [
+  {
+    name: 'Chris Robart',
+    role: 'Computer Science · 1996–2015',
+    image: 'https://live.staticflickr.com/5725/buddyicons/7374177@N03_l.jpg?1451326165',
+  },
+  {
+    name: 'Don Smith',
+    role: 'Math & Computer Science · 1988–2022',
+    image: '/images/donsmith.jpeg',
+  },
+];
 
+export default function About() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-blue-900 text-white py-20 px-4">
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">About CCCSolutions</h1>
-          <p className="text-xl max-w-2xl mx-auto">
+    <div className="bg-background text-foreground">
+      {/* Hero band — header + stats wrapped together with brand-tinted noise.
+          The band's border-b doubles as the section separator (no hairline below). */}
+      <div className="relative bg-surface-100/40 overflow-hidden border-b border-border-default">
+        <NoiseTexture opacity={0.12} color="hsl(239, 84%, 67%)" />
+
+        <SectionContainer size="large" className="relative z-10 pt-16 pb-10">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+            About
+          </h1>
+          <p className="mt-4 text-base md:text-lg text-foreground-light max-w-2xl">
             Learn more about our journey in becoming the most comprehensive platform for Canadian Computing Competition solutions since 1996.
           </p>
-        </div>
+        </SectionContainer>
+
+        <SectionContainer size="large" className="relative z-10 pb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
+            <Card>
+              <CardContent className="py-6 px-5 border-none">
+                <p className="text-3xl md:text-4xl font-bold text-brand">30</p>
+                <p className="mt-1 text-sm text-foreground-light">Years of CCC covered</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="py-6 px-5 border-none">
+                <p className="text-3xl md:text-4xl font-bold text-brand">270+</p>
+                <p className="mt-1 text-sm text-foreground-light">Solutions published</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="py-6 px-5 border-none">
+                <p className="text-3xl md:text-4xl font-bold text-brand">50+</p>
+                <p className="mt-1 text-sm text-foreground-light">Contributors</p>
+              </CardContent>
+            </Card>
+          </div>
+        </SectionContainer>
       </div>
 
-      {/* Timeline Section */}
-      <div className="py-10 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Our Journey</h2>
-
-          <div className="space-y-6">
-            {timeline.map((item, index) => (
-              <div key={index} className="relative">
-                <Card size="2" variant="surface">
-                  <div className="flex items-center gap-2 mb-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-indigo-600 shrink-0">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm text-indigo-600 font-semibold">{item.year}</p>
+      {/* Timeline — Supabase changelog pattern: 12-col grid, year column on left
+          with icon badge, item column on right, vertical line connecting */}
+      <SectionContainer size="large" className="pt-16 pb-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Our journey</h2>
+        <div className="relative lg:border-l border-border-muted lg:ml-2 lg:pl-8">
+          {timeline.map((t, i) => (
+            <section
+              key={t.year}
+              className={`grid lg:grid-cols-12 lg:gap-4 ${
+                i === timeline.length - 1 ? '' : 'pb-12 lg:pb-16'
+              }`}
+            >
+              {/* Year column with icon badge — sticky on lg+ */}
+              <div className="relative hidden lg:col-span-2 lg:block">
+                <div className="ml-[-42px] lg:sticky lg:top-[calc(65px+1rem)] lg:pt-1">
+                  <div className="flex items-center gap-2 text-foreground-light">
+                    <div className="bg-surface-200 border border-border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded-sm">
+                      <GitCommit size={14} strokeWidth={1.5} />
+                    </div>
+                    <span className="text-base leading-none">{t.year}</span>
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{item.title}</div>
-                  <p className="text-gray-600 text-sm">{item.content}</p>
-                </Card>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      <hr className="mx-auto max-w-5xl border-gray-200" />
-
-      {/* Tribute Section */}
-      <div className="py-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">A Special Thanks</h2>
-          <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
-            We are incredibly grateful for two teachers from MMHS who have been key in creating and
-            maintaining this website. Enjoy your retirement!
-          </p>
-          <div className="flex flex-wrap justify-center gap-10">
-            {teachers.map((teacher, index) => (
-              <Card key={index} size="3" variant="surface" className="w-64" style={{ boxShadow: '-4px -2px 24px 2px rgba(59, 130, 246, 0.10), 0 0 28px 4px rgba(139, 92, 246, 0.07)' }}>
-                <div className="flex flex-col items-center text-center gap-3">
-                  <Avatar
-                    size="7"
-                    src={teacher.image}
-                    fallback={teacher.name[0]}
-                    radius="full"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{teacher.name}</h3>
-                    <p className="text-gray-500 text-sm mt-1">{teacher.role}</p>
-                  </div>
+              {/* Mobile year header */}
+              <div className="lg:hidden mb-2 flex items-center gap-2 text-foreground-light">
+                <div className="bg-surface-200 border border-border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded-sm">
+                  <GitCommit size={14} strokeWidth={1.5} />
                 </div>
-              </Card>
-            ))}
-          </div>
+                <span className="text-sm leading-none">{t.year}</span>
+              </div>
+
+              {/* Content column */}
+              <div className="min-w-0 lg:col-span-10">
+                <h3 className="text-lg font-bold text-foreground mb-1">{t.title}</h3>
+                <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
+              </div>
+            </section>
+          ))}
         </div>
-      </div>
+      </SectionContainer>
 
-      <hr className="mx-auto max-w-5xl border-gray-200" />
-
-      {/* Contributors Section */}
-      <div className="py-10 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">Major Contributors</h2>
-          <p className="text-gray-600 text-center mb-8">
-            Thank you to those who have helped contribute solutions to this website!
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contributors.map((contributor, index) => (
-              <Card key={index} size="2" variant="surface">
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    size="3"
-                    fallback={contributor.initials}
-                    color="indigo"
-                    variant="solid"
-                    radius="full"
+      {/* Teachers tribute */}
+      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">A special thanks</h2>
+        <p className="text-base text-foreground-light max-w-2xl mb-8">
+          The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
+        </p>
+        <div className="grid md:grid-cols-2 gap-4 max-w-3xl">
+          {teachers.map((t) => (
+            <Card key={t.name}>
+              <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
+                <div className="relative h-16 w-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
+                  <Image
+                    src={t.image}
+                    alt={t.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                    unoptimized={t.image.startsWith('http')}
                   />
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm">{contributor.name}</h3>
-                    <p className="text-xs text-gray-500 truncate">{contributor.school}</p>
-                    <p className="text-xs text-gray-400 truncate">{contributor.contributions}</p>
-                  </div>
                 </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-foreground">{t.name}</h3>
+                  <p className="text-sm text-foreground-light">{t.role}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </SectionContainer>
+
+      {/* Contributors */}
+      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Contributors</h2>
+        <p className="text-base text-foreground-light max-w-2xl mb-8">
+          Thank you to those who have helped contribute solutions to this website!
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {contributors.map((c) => {
+            const school = c.school || c.schools;
+            return (
+              <Card key={c.initials}>
+                <CardContent className="flex items-start gap-3 py-4 px-4 border-none">
+                  <div className="h-10 w-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-bold text-xs shrink-0">
+                    {c.initials}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-foreground truncate">{c.name}</h3>
+                    {school && (
+                      <p className="text-xs text-foreground-lighter truncate">{school}</p>
+                    )}
+                    <p className="text-xs text-foreground-lighter mt-1 line-clamp-2">
+                      {c.contributions}
+                    </p>
+                  </div>
+                </CardContent>
               </Card>
-            ))}
+            );
+          })}
+        </div>
+      </SectionContainer>
+
+      {/* School origin — keeps the connection without leading with the school name */}
+      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-20">
+        <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-center max-w-5xl">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+              Where it started
+            </h2>
+            <p className="text-base text-foreground-light leading-relaxed">
+              Milliken Mills High School is a public school offering the IB Diploma Programme in
+              Markham, Ontario, Canada. The CCCSolutions archive began as a CS class resource and
+              has been rebuilt and maintained with help from the MMHS Computer Science club and
+              contributors from many other schools.
+            </p>
+          </div>
+          <div className="relative aspect-video rounded-lg overflow-hidden bg-surface-200">
+            <Image
+              src="/images/mmhs_4.jpg"
+              alt="Milliken Mills High School"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
           </div>
         </div>
-      </div>
+      </SectionContainer>
 
-      <hr className="mx-auto max-w-5xl border-gray-200" />
-
-      {/* About the School Section */}
-      <div className="py-10 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">About Milliken Mills High School</h2>
-          <p className="text-gray-600">
-            Milliken Mills High School is a public school offering the IB Diploma Programme in
-            Markham, Ontario, Canada. This site has been re-built and maintained with the help of the
-            MMHS Computer Science club and several other contributors.
-          </p>
-          <Image
-            src="/images/mmhs_4.jpg"
-            alt="Milliken Mills High School"
-            width={800}
-            height={450}
-            className="mt-6 rounded-lg mx-auto"
-          />
-        </div>
-      </div>
     </div>
   );
-};
-
-export default About;
+}

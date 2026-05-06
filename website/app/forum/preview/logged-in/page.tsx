@@ -43,7 +43,7 @@ export default function ForumPreviewLoggedIn() {
                 placeholder="Search…"
                 className="w-full h-10 pl-10 pr-4 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight"
               />
-              <span className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-1 px-1.5 py-0.5 rounded border border-border-default text-[10px] text-foreground-lighter font-mono">
+              <span className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-1 px-1.5 py-0.5 rounded border border-border-default text-[10px] text-foreground-lighter">
                 ⌘K
               </span>
             </div>
