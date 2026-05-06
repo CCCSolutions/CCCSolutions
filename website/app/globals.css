@@ -1,5 +1,4 @@
 @import "tailwindcss" source(none);
-@import "@radix-ui/themes/styles.css";
 
 @source "../app";
 @source "../components";
@@ -238,10 +237,6 @@ body {
     padding: 0;
     font-family: 'Lato', sans-serif;
     line-height: 1.6;
-}
-
-.radix-themes {
-    --default-font-family: 'Lato', sans-serif;
 }
 
 .evil-purple-glow {
