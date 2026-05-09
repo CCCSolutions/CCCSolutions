@@ -109,7 +109,7 @@ export default function AuthForm() {
                 />
               </div>
 
-              <Button type="primary" size="medium" block>
+              <Button type="primary" size="medium" block htmlType="submit">
                 {isLogin ? 'Sign in' : 'Create account'}
               </Button>
             </form>

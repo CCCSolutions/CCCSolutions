@@ -76,7 +76,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-foreground-light hover:text-blue-600 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-foreground-light hover:text-blue-600 dark:hover:text-blue-400 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 dark:focus:ring-blue-400"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
@@ -102,8 +102,8 @@ const Navbar = () => {
                   relative overflow-hidden
                   ${
                     pathname === item.path
-                      ? 'text-blue-600'
-                      : 'text-gray-700 hover:text-blue-600'
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-foreground-light hover:text-blue-600 dark:hover:text-blue-400'
                   }
                   transition-all duration-300
                 `}
