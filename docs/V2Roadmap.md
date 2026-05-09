@@ -33,6 +33,19 @@ The v2 rebuild is about making the site genuinely useful for studying. Not just 
 
 Code execution and online judging are handled by DMOJ. We focus on the content, the explanations, and the discussion around them.
 
+### Principles
+
+These are non-negotiable guardrails for every feature we build. If a proposal violates one, it's out — no matter how much it might increase engagement.
+
+1. **Content stays free, forever.** No paywalls, no rep gates on problems, editorials, hints, code, or comments. The site loads the same content for a logged-out first-time visitor as it does for a 5,000-rep contributor.
+2. **No feature gating.** Bookmarks, search, filters, profiles — all features available to all logged-in users. We earn engagement by being useful, not by withholding utility.
+3. **No behavioral tracking surfaces.** Prompts and surfaces are driven by *page state* ("this section has no comments yet") never by *user tracking* ("we noticed you viewed 5 solutions today"). The user must never feel watched.
+4. **No recommendation algorithms.** Personalization is limited to tag subscriptions the user explicitly sets. No collaborative filtering, no "you might like," no behavior-based ordering. Sort options are recency, votes, and activity — that's it.
+5. **No gamification beyond reputation and badges.** Reputation is a number that goes up when others find your work useful. Badges mark concrete contribution milestones. That's it. No streak counters, no streak-break warnings, no daily-login mechanics, no progress bars to "next level," no celebratory confetti, no nudges designed to manufacture habit. The site is a study tool, not Duolingo. If a feature would feel out of place on Wikipedia, it doesn't belong here.
+6. **Vote-driven quality, not editorial policing.** We rely on upvotes, soft-hide at −5, and rep-weighted reports for quality control. We do not build StackOverflow-style closure/duplicate-merge systems or moderator-led content judgment beyond clear spam/abuse.
+
+These principles bias the design toward "open and inviting" over "engagement-optimized." We accept lower-ceiling engagement metrics in exchange for a tool students actually trust.
+
 ---
 
 ## Current State
@@ -78,9 +91,9 @@ The homepage (logged out) shows: site overview, problem of the day, featured hig
 
 After one-click GitHub/Google sign-in and a quick onboarding flow (link DMOJ handle, pick level, select topics), they see:
 
-1. **Homepage becomes their activity feed** - recent editorials, active discussions, highly-upvoted comments, problem of the day, their streak counter, and a progress summary.
+1. **Homepage becomes a utility surface** - "Help Needed" gap-surfacing block, problem of the day with a one-line approach composer, recent activity in their subscribed tags, and "Continue" for problems they've marked Attempting. No feed, no streak counter, no engagement-optimized blocks.
 2. **Problem pages show their personal status** - "Solved," "Attempting," etc. with the ability to toggle.
-3. **Their profile** - reputation score, badges, contribution history, streak heatmap (GitHub-style), DMOJ-verified solve count, shareable URL.
+3. **Their profile** - reputation score, badges, contribution history, GitHub-style activity heatmap (year-view, no streak counter), DMOJ-verified solve count, shareable URL.
 4. **Notifications bell** - lights up when someone replies to their comment, upvotes their content, or edits an editorial they authored.
 
 ### Contributor (Writing Editorials / Solutions)
@@ -106,7 +119,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 | State | What the user sees |
 |---|---|
 | **Logged out** | Landing page: site overview, problem of the day, featured editorials, sign-up CTA |
-| **Logged in** | Activity feed: recent activity, streak counter, progress summary, problem of the day, personalized by topics of interest |
+| **Logged in** | Utility surface: "Help Needed" gap-surfacing block, problem of the day with one-line approach composer, recent activity in subscribed tags, "Continue" for in-progress problems. No feed, no streak counter. |
 
 ---
 
@@ -185,7 +198,7 @@ Everything that needs to be queried, filtered, joined, or related to a user.
 - Forum comments and threads (raw Markdown)
 - Votes (upvotes/downvotes with UNIQUE constraints)
 - Notifications
-- Progress tracking states and activity timestamps (for streaks)
+- Progress tracking states and activity timestamps (for the profile activity heatmap)
 - Community difficulty votes
 - Vector embeddings for semantic search (pgvector)
 - Full-text search indexes (`tsvector`) on comments and forum posts
@@ -428,12 +441,10 @@ This phase is the highest-impact work. It turns the site into something people c
 - Dashboard view with visual progress indicators by year, contest, difficulty, or tag
 - Stored in Supabase, served via API
 
-**2.8 - Streak Tracking**
-- Log a timestamp whenever a user completes qualifying activity
-- **Activity streak** (for all users): A streak day counts when the user does any of: marks a problem as Solved or Attempting, posts a comment or forum reply, submits or edits an editorial. It's an engagement streak.
-- **Verified solve streak** (for DMOJ-linked users): Tied exclusively to DMOJ-verified ACs. Displayed with a distinct badge, visually different from the activity streak.
-- GitHub-style activity heatmap on user profiles
-- Streak counter displayed on the homepage feed for logged-in users
+**2.8 - Activity Heatmap (Profile Only, No Streaks)**
+- Log a timestamp whenever a user contributes (posts a comment, submits or edits an editorial, marks a problem as Solved or Attempting).
+- Render a GitHub-style activity heatmap on the user's profile — a year-view calendar with cells shaded by contribution count.
+- This is a **data visualization**, not a streak system. There is no consecutive-day counter, no "current streak" or "longest streak" number, no break warnings, no recovery mechanics, no display of streak data anywhere outside the profile heatmap. The heatmap exists for a user to look at their own contribution history; it is not surfaced on the home, in the navbar, or in notifications.
 
 **2.9 - DMOJ Integration**
 - Users can link their DMOJ handle in their profile (during onboarding or later in settings)
@@ -443,23 +454,37 @@ This phase is the highest-impact work. It turns the site into something people c
 - Only counts solves that occurred before the time of syncing to prevent gaming
 - This is a feature nobody else has. USACO Guide progress tracking is entirely self-reported.
 
-**2.10 - Activity Feed**
-- The homepage for logged-in users becomes an activity feed showing recent activity across the whole site:
-    - New editorials and solutions submitted
-    - Comments receiving high upvotes
-    - Problems with active discussion
-    - New community difficulty ratings
-    - Problem of the day (featured prominently)
-- Sorted by recency with vote-weighted boosting so high-quality contributions surface
-- Authenticated users can filter by tags or difficulty they care about (informed by their onboarding topic selections)
-- This is the primary discovery mechanism. Without it, content stays buried on individual problem pages. The feed puts new comments and editorials in front of every active user, which drives responses and discussion.
+**2.10 - Logged-In Home (Useful, Not a Feed)**
+
+The logged-in home is the single biggest lever for converting consumers into contributors. The v1 forum failed because it surfaced "what happened" without surfacing "what's useful or what's missing." v2 inverts this: the home is a **utility surface**, not a feed.
+
+The bar: every block on this page must answer the question *"why is this here for me to use right now?"* with a concrete, content-grounded answer. If the only justification is "to drive engagement," it doesn't ship. We are not Reddit, Instagram, or any infinite-scroll feed. We are a study tool whose home page should look more like a Wikipedia portal or a course landing page than a social app.
+
+Layout, top to bottom:
+
+1. **Today's Problem** (Phase 2.13 POTD) — the problem statement, the editorial summary, and a *one-line* "share your approach" composer below. Posting writes a comment on that problem's `Approach` section. The point is the problem itself; the composer is one click away if the user has something to add.
+2. **Help Needed** — the centerpiece. A list of 3–5 concrete contribution opportunities surfaced from *data*, not *behavior*:
+    - Problems whose only editorial is `is_ai_draft = true` (Phase 4.2)
+    - Problems missing a solution in a major language (no Java/Python entry)
+    - Questions in comments older than 7 days with zero replies, in tags the user subscribes to
+    - Problems where community-difficulty votes diverge from the official rating by ≥ 2 tiers (could use a fresh look)
+
+   Each item is a real, useful thing to do, not a hook. Surfaced from queries that anyone could write themselves if they had database access.
+3. **Recent in your tags** — newest comments, editorials, and forum threads filtered by the user's subscribed tags. Sorted by recency only. No "trending," no vote-weighted boosting on the home, no algorithmic ordering.
+4. **Continue** — problems the user has marked `Attempting`. Plain list, no nudging copy, no "you haven't worked on this in N days" framing.
+
+That's the entire page. No streak banner. No daily-progress meter. No "your week in review." No leaderboard. No "people you might know." No "trending in your area." If it feels like content from a social app, it's not on this page.
+
+Filtering is exclusively by the user's tag subscriptions, set during onboarding (Phase 1.4) and editable in profile settings. There is no behavior-based personalization, no "for you" tab, no recommendation engine.
+
+Sort options across the page are limited to: recency, vote score, and activity (new comments). No "popularity" or "engagement" black-box sort.
 
 **2.11 - User Profiles**
 - Public profile page for each user showing:
     - Reputation score and badges
     - Contribution history (solutions submitted, editorials written, highly-upvoted comments)
     - Progress stats (problems solved by year/difficulty/tag)
-    - Streak heatmap (GitHub-style activity graph)
+    - Activity heatmap (GitHub-style year-view contribution graph, no streak counter)
     - Linked DMOJ handle with verified solve count
 - Shareable URL (e.g., `cccsolutions.ca/user/username`)
 
@@ -473,6 +498,7 @@ This phase is the highest-impact work. It turns the site into something people c
 - Feature a random problem on the homepage/feed daily
 - Rotate by difficulty so it's accessible to both Junior and Senior students
 - Gets people looking at problems they wouldn't otherwise visit
+- **One-line "share your approach" composer** right under the POTD card on the home. Submitting writes a comment to the problem's `Approach` section. The intent is one fresh thread per day, every day, seeding organic discussion. This is a prompt, not a requirement — solving/skipping doesn't force a comment.
 - Drives activity and discussion on the featured problem's comment section
 
 **2.14 - Notifications (In-App)**
@@ -486,6 +512,57 @@ This phase is the highest-impact work. It turns the site into something people c
 - Search endpoint for finding discussions by keyword (e.g., "that comment about using a monotonic stack for the mountain problem")
 - Separate from semantic search (Phase 4), which is for finding problems by concept
 
+**2.16 - Contribution Loops**
+
+The platform's biggest risk is the v1 pattern: people consume content and leave. Reputation, votes, and badges reward contribution *after* it happens, but nothing in the consumption flow *invites* contribution at natural moments. This subsection makes the invitation explicit, while staying within the principles above (no tracking, no gating).
+
+- **Gap surfacing — "Help Needed" block (home).** Already detailed in 2.10. A live query against the database of editorial completeness, solution language coverage, and unanswered questions. Refreshed nightly. Surfaces opportunities, not behaviors.
+- **"Missing piece" badges (problem pages).** Small, neutral indicators next to sections that are AI-draft only, missing a language, or have zero comments. Clicking jumps to the contribution flow for that section. No shaming, just data.
+- **"Open Questions" surface (per problem).** A pinned tab in the comments section showing comments tagged as questions with no replies. Sorted by age. When a reply lands, the question moves to the regular thread. Makes "answer something" a one-tap action from the problem page.
+- **Page-context prompts — never user-tracking.** A handful of quiet, dismissible prompts triggered by *page state*, not user history:
+    - When a user opens the solution tab and the comments under "Approach" are empty: a one-line "Be the first to discuss this approach." composer above the empty section.
+    - When a user marks a problem as `Solved` (Phase 2.7): a one-line "What was the trick? (optional)" comment box. Skipping does not nag.
+    - When a problem's only editorial is AI-draft: a banner reading "AI-generated draft — improve this editorial." with an Edit button.
+- **Tag subscription management.** First-class settings page where users add/remove tag subscriptions. The home's "Recent in your tags" block (2.10) reads from this. No algorithmic suggestions for tags to subscribe to — the user picks them all themselves.
+- **Comment minimum length (30 chars).** A trivial bar that filters "+1" / "thanks" replies without policing. Applies to comments and forum replies. Not a moderation system, just a textarea attribute.
+
+What we are deliberately **not** building: behavioral pattern displays ("you've viewed N solutions today"), reciprocity gating ("contribute to read more"), per-user recommendation algorithms, push notifications for streak preservation, or closure/dup-merge moderation tools.
+
+**2.17 - Cohorts (Limited Classroom)**
+
+Most engaged study communities aren't strangers — they're classmates. Cohorts let a teacher, club lead, or friend group create a private space inside CCCSolutions without scope-creeping into a full social platform.
+
+A cohort is intentionally minimal: one chat channel, a shared list of pinned problems, opt-in activity sharing. That's the entire surface area. The teacher use case ("limited Google Classroom") is the design target.
+
+- **Entities (4 tables):**
+    - `cohorts` — id, name, description, invite_code, created_by, created_at, is_active
+    - `cohort_members` — cohort_id, user_id, role (`owner` | `member`), joined_at
+    - `cohort_messages` — id, cohort_id, user_id, content (Markdown), created_at, deleted_at
+    - `cohort_problems` — cohort_id, problem_id, pinned_by, pin_order, note (optional)
+- **Creation & joining:**
+    - Any logged-in user can create a cohort and becomes its `owner`. They get a shareable invite link with a unique `invite_code`.
+    - Anyone with the link joins as `member` (no approval queue — friction stays low).
+    - Owner can kick, transfer ownership, or disband. Members can leave anytime.
+- **Cohort page (`/cohorts/[id]`):**
+    - Left: rolling chat (Markdown + code blocks + KaTeX, same renderer as comments). Type, enter, sent. Real-time via Supabase Realtime channel subscription. Per-user rate limit shared with the comment limit.
+    - Right (or stacked on mobile): pinned problems (up to 10) with an optional note per problem ("this week's focus").
+    - That's the whole page. No threads, no reactions, no @mentions in v1, no file uploads.
+- **Pinned problems:**
+    - Owner can pin/unpin up to 10 problems with an optional Markdown note (e.g., "this week we're working on 2018 S1–S3").
+    - Members see them on the cohort page and as a small block on the home (collapsible).
+    - No grading, no submission tracking, no due dates beyond the free-text note.
+- **Opt-out solve announcements (in-chat):**
+    - When a member marks a problem as `Solved`, a system message posts to the cohort chat: *"@user solved 2018 S2."* That's it — title + link, no timing, no attempt count, no relative ranking, no other event types.
+    - **Scope is deliberately tight: solves only, problems only.** No announcements for forum posts, editorial edits, comments, status changes to `Attempting`, or any non-problem activity. Anything broader becomes a generic feed and creeps toward surveillance.
+    - **Default ON, opt-out per cohort.** Reasoning: opt-in would result in near-zero adoption — nobody discovers the toggle. Defaulting on makes the feature actually populate the chat, which is the whole point of having it. Privacy is preserved by:
+        1. The join screen explicitly states *"Solving a problem will post a message to this cohort's chat. You can disable this in cohort settings."* No silent enrollment.
+        2. A one-click toggle in cohort settings (not buried in global account settings) — "Don't announce my solves in this cohort."
+        3. Toggling off retroactively hides past solve announcements from the chat history.
+    - Real-time delivery via the same Supabase Realtime channel used for chat. No additional infra.
+    - This is the *only* activity surface inside cohorts and the *only* personalization feature.
+- **RLS:** chat messages and cohort metadata are visible only to members. Enforced at the Supabase row level, not application level.
+- **Out of cohort scope (to prevent creep):** subchannels, threads, DMs, file uploads, voice/video, scheduled events, attendance tracking, auto-grading, teacher-side analytics dashboards (no behavior surveillance), push notifications, email digests, cohort-wide leaderboards.
+
 ### Definition of Done
 
 - Problem pages have section-level comment threads directly below editorial sections
@@ -494,7 +571,7 @@ This phase is the highest-impact work. It turns the site into something people c
 - Users have reputation scores and threshold-based privileges
 - Editorials are user-editable with full revision history and contributor attribution
 - Progress tracking dashboard works with 5 statuses
-- Activity and verified solve streaks display on profiles
+- Activity heatmap (no streak mechanics) displays on profiles
 - DMOJ integration syncs verified solves on a schedule
 - Activity feed is the homepage for logged-in users
 - User profiles are public and shareable
@@ -502,6 +579,9 @@ This phase is the highest-impact work. It turns the site into something people c
 - Problem of the day rotates daily on the feed
 - Notification bell shows unread activity
 - Full-text search works across comments and forum posts
+- Logged-in home leads with "Help Needed" gap-surfacing block, not a passive activity feed
+- "Missing piece" badges and "Open Questions" surfaces are live on every problem page
+- Cohorts work end-to-end: create, invite, chat, pin problems, opt-in activity sharing
 
 ---
 
@@ -763,6 +843,13 @@ These features are not part of the v2 rebuild.
 | **Mobile app** | The site is responsive. |
 | **Paid features / monetization** | Open-source educational tool. |
 | **Curated study plans** | Interesting idea but scope creep for v2. Could revisit in v3. |
+| **Recommendation algorithms (behavior-based)** | Violates Principle 4. Personalization is limited to user-set tag subscriptions. No collaborative filtering, no "for you" feeds. |
+| **Behavioral tracking displays** | Violates Principle 3. We never surface the user's own activity stats back at them as a manipulation tactic ("you've viewed N solutions today"). |
+| **Reciprocity / contribution gating** | Violates Principle 1. Content is never withheld pending contribution. Soft prompts only. |
+| **Streaks and Duolingo-style gamification** | Violates Principle 5. No streak counters, no daily-login mechanics, no break warnings or recovery flows, no level-up bars, no celebratory animations. Reputation, badges, and a profile activity heatmap are the only progress surfaces. |
+| **StackOverflow-style closure/dup-merge tools** | Violates Principle 6. Vote-driven sort + soft-hide at −5 is the quality system. |
+| **Cohort subchannels / threads / DMs / files** | Cohorts stay minimal: one chat per cohort, pinned problems, opt-in activity. Anything beyond becomes a social platform we don't want to maintain. |
+| **Teacher analytics dashboards in cohorts** | No surveillance surfaces inside the classroom feature. Teachers see what members opt to share, nothing more. |
 
 ---
 
@@ -792,7 +879,7 @@ CCCSolutions/
 |---|---|
 | **Phase 0** ✅ | TypeScript + Next.js migration, Tailwind v4, Radix UI. Dark mode and Cloudflare Pages deployment still pending. |
 | **Phase 1** | Supabase schema, Hono API, auth, onboarding, R2 migration, multi-lang tabs, filtering, editorial structure, hints, problem page layout, related problems |
-| **Phase 2** | Section-level comments, forum with categories, voting, optimistic UI, reputation, wiki editorials, progress tracking, streaks, DMOJ integration, activity feed, user profiles, community difficulty voting, problem of the day, notifications, full-text search |
+| **Phase 2** | Section-level comments, forum with categories, voting, optimistic UI, reputation, wiki editorials, progress tracking, profile activity heatmap (no streaks), DMOJ integration, gap-first logged-in home, user profiles, community difficulty voting, problem of the day, notifications, full-text search, contribution loops (gap surfacing, page-context prompts, open questions), cohorts (limited classroom) |
 | **Phase 3** | Turnstile, rate limiting (IP + per-user), Zod validation, XSS sanitization (allowlist), soft deletes, edit history, cursor pagination, short JWT expiry, CORS lockdown |
 | **Phase 4** | Semantic search, AI editorial + hint generation (Opus 4.6), OpenGraph cards, analytics events |
 
