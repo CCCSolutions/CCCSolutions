@@ -186,7 +186,7 @@ export function SolutionPreview() {
 
   return (
     <div className="relative mx-auto w-full max-w-[620px] min-w-0">
-      <Card className="relative w-full min-w-0 overflow-hidden flex flex-col h-[520px] sm:h-[580px]">
+      <Card className="relative w-full min-w-0 overflow-hidden flex flex-col h-[520px] sm:h-[580px] lg:h-auto lg:aspect-[620/580] lg:max-h-[calc(100svh-180px)]">
         {/* Header bar — title + difficulty (matches ProblemTable.tsx Insane styling) */}
         <div className="flex-none items-center justify-between px-5 py-4 border-b border-border-default bg-surface-200/50 flex">
           <div className="min-w-0">

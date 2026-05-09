@@ -6,6 +6,9 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 :root {
+  /* Navbar total height: h-16 (4rem) + 1px border-b. Single source of truth — keep in sync with Navbar.tsx */
+  --nav-h: calc(4rem + 1px);
+
   --colors-black: 0deg 0% 0%;
   --colors-white: 0deg 0% 100%;
 

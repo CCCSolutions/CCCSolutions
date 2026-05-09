@@ -76,19 +76,22 @@ const Home = async () => {
   const githubStars = await getGithubStars();
   return (
     <div className="bg-background text-foreground">
-      {/* Announcement strip — original Tailwind indigo (more violet than our brand-600) */}
-      <div className="bg-indigo-600 text-white text-center px-4">
-        <Link
-          href="/forum"
-          className="block py-2 px-4 text-center text-sm text-white hover:text-indigo-100 transition-colors"
-        >
-          Help us expand our repository — submit your 2026 solutions{' '}
-          <span className="underline underline-offset-2">here</span>.
-        </Link>
-      </div>
+      {/* Announcement + Hero share the first viewport — flex column sized to (100svh - navbar).
+          Hero uses flex-1, so flex auto-subtracts the announcement's natural height. */}
+      <div className="flex flex-col min-h-[calc(100svh-var(--nav-h))]">
+        {/* Announcement strip — original Tailwind indigo (more violet than our brand-600) */}
+        <div className="bg-indigo-600 text-white text-center px-4 flex-none">
+          <Link
+            href="/forum"
+            className="block py-2 px-4 text-center text-sm text-white hover:text-indigo-100 transition-colors"
+          >
+            Help us expand our repository — submit your 2026 solutions{' '}
+            <span className="underline underline-offset-2">here</span>.
+          </Link>
+        </div>
 
-      {/* Hero */}
-      <div className="relative bg-background overflow-hidden min-h-[85vh] flex flex-col justify-center">
+        {/* Hero */}
+        <div className="relative bg-background overflow-hidden flex-1 flex flex-col justify-center">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <FlickeringGrid
             className="size-full"
@@ -128,10 +131,11 @@ const Home = async () => {
             <SolutionPreview />
           </div>
         </SectionContainer>
+        </div>
       </div>
 
       {/* Feature cards — bare icons (no tinted square wrapper) */}
-      <SectionContainer size="large" className="py-20">
+      <SectionContainer size="large" className="py-14">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-12 max-w-3xl">
           <span className="text-foreground">Everything you need to prepare. </span>
           <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
@@ -166,7 +170,7 @@ const Home = async () => {
       </SectionContainer>
 
       {/* Get started */}
-      <SectionContainer size="large" className="py-20">
+      <SectionContainer size="large" className="py-14">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 max-w-3xl mx-auto">
           <span className="text-foreground">Three ways to get started:</span>
         </h2>
@@ -217,7 +221,7 @@ const Home = async () => {
       </SectionContainer>
 
       {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
-      <SectionContainer size="large" className="py-20">
+      <SectionContainer size="large" className="py-14">
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">
             Free and open source.
