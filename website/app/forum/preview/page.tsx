@@ -1,4 +1,4 @@
-import { FlickeringGrid } from '../../../components/FlickeringGrid';
+import { FlickeringGrid } from '../../../components/effects/FlickeringGrid';
 import { Button } from '../../../components/ui/button';
 import { SectionContainer } from '../../../components/ui/section-container';
 

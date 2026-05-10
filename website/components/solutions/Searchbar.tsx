@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { MagnifyingGlassIcon, Cross2Icon } from '@radix-ui/react-icons';
-import { Problem } from '../constants';
+import { Problem } from '../../constants';
 
 interface SearchBarProps {
   problems: Problem[];

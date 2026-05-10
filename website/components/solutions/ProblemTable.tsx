@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
-import { Button } from './ui/button';
-import { problems } from '../constants';
+import { Button } from '../ui/button';
+import { problems } from '../../constants';
 
 const ProblemsTable = () => {
   const searchParams = useSearchParams();

@@ -8,7 +8,7 @@ const Footer = () => {
           <div>
             <h4 className="font-bold mb-3 text-sm text-foreground-lighter">Navigate</h4>
             <ul className="space-y-2.5 text-sm text-foreground-light">
-              <li><Link href="/" className="hover:text-foreground hover:underline">Home</Link></li>
+              <li><Link href="/website/public" className="hover:text-foreground hover:underline">Home</Link></li>
               <li><Link href="/solutions" className="hover:text-foreground hover:underline">Solutions</Link></li>
               <li><Link href="/forum" className="hover:text-foreground hover:underline">Forum</Link></li>
               <li><Link href="/resources" className="hover:text-foreground hover:underline">Resources</Link></li>

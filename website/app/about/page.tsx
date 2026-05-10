@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { GitCommit } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
-import { NoiseTexture } from '../../components/NoiseTexture';
+import { NoiseTexture } from '../../components/effects/NoiseTexture';
 import { contributors } from '../../constants';
 
 const timeline = [
