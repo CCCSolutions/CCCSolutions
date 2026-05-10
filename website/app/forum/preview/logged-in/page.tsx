@@ -63,11 +63,11 @@ export default function ForumPreviewLoggedIn() {
                   <div className="flex flex-col items-center justify-start gap-3 pt-1 shrink-0 w-12">
                     <div className="flex flex-col items-center text-foreground">
                       <ArrowUpIcon width="14" height="14" className="text-foreground-lighter" />
-                      <span className="text-sm font-semibold">—</span>
+                      <span className="text-sm font-semibold">0</span>
                     </div>
                     <div className="flex flex-col items-center text-foreground-lighter">
                       <ChatBubbleIcon width="14" height="14" />
-                      <span className="text-xs">—</span>
+                      <span className="text-xs">0</span>
                     </div>
                   </div>
 

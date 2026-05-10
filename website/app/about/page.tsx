@@ -62,19 +62,19 @@ export default function About() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
             <Card>
               <CardContent className="py-6 px-5 border-none">
-                <p className="text-3xl md:text-4xl font-bold text-brand">30</p>
+                <p className="text-3xl md:text-4xl font-semibold text-brand">30</p>
                 <p className="mt-1 text-sm text-foreground-light">Years of CCC covered</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="py-6 px-5 border-none">
-                <p className="text-3xl md:text-4xl font-bold text-brand">270+</p>
+                <p className="text-3xl md:text-4xl font-semibold text-brand">270+</p>
                 <p className="mt-1 text-sm text-foreground-light">Solutions published</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="py-6 px-5 border-none">
-                <p className="text-3xl md:text-4xl font-bold text-brand">50+</p>
+                <p className="text-3xl md:text-4xl font-semibold text-brand">50+</p>
                 <p className="mt-1 text-sm text-foreground-light">Contributors</p>
               </CardContent>
             </Card>
@@ -85,7 +85,7 @@ export default function About() {
       {/* Timeline — Supabase changelog pattern: 12-col grid, year column on left
           with icon badge, item column on right, vertical line connecting */}
       <SectionContainer size="large" className="pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Our journey</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-8">Our journey</h2>
         <div className="relative lg:border-l border-border-muted lg:ml-2 lg:pl-8">
           {timeline.map((t, i) => (
             <section
@@ -98,7 +98,7 @@ export default function About() {
               <div className="relative hidden lg:col-span-2 lg:block">
                 <div className="ml-[-42px] lg:sticky lg:top-[calc(65px+1rem)] lg:pt-1">
                   <div className="flex items-center gap-2 text-foreground-light">
-                    <div className="bg-surface-200 border border-border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded-sm">
+                    <div className="bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
                       <GitCommit size={14} strokeWidth={1.5} />
                     </div>
                     <span className="text-base leading-none">{t.year}</span>
@@ -108,7 +108,7 @@ export default function About() {
 
               {/* Mobile year header */}
               <div className="lg:hidden mb-2 flex items-center gap-2 text-foreground-light">
-                <div className="bg-surface-200 border border-border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded-sm">
+                <div className="bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
                   <GitCommit size={14} strokeWidth={1.5} />
                 </div>
                 <span className="text-sm leading-none">{t.year}</span>
@@ -116,7 +116,7 @@ export default function About() {
 
               {/* Content column */}
               <div className="min-w-0 lg:col-span-10">
-                <h3 className="text-lg font-bold text-foreground mb-1">{t.title}</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-1">{t.title}</h3>
                 <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
               </div>
             </section>
@@ -126,7 +126,7 @@ export default function About() {
 
       {/* Teachers tribute */}
       <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">A special thanks</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">A special thanks</h2>
         <p className="text-base text-foreground-light max-w-2xl mb-8">
           The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
         </p>
@@ -134,7 +134,7 @@ export default function About() {
           {teachers.map((t) => (
             <Card key={t.name}>
               <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
-                <div className="relative h-16 w-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
+                <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
                   <Image
                     src={t.image}
                     alt={t.name}
@@ -145,7 +145,7 @@ export default function About() {
                   />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-base font-bold text-foreground">{t.name}</h3>
+                  <h3 className="text-base font-semibold text-foreground">{t.name}</h3>
                   <p className="text-sm text-foreground-light">{t.role}</p>
                 </div>
               </CardContent>
@@ -156,7 +156,7 @@ export default function About() {
 
       {/* Contributors */}
       <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Contributors</h2>
+        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">Contributors</h2>
         <p className="text-base text-foreground-light max-w-2xl mb-8">
           Thank you to those who have helped contribute solutions to this website!
         </p>
@@ -165,8 +165,8 @@ export default function About() {
             const school = c.school || c.schools;
             return (
               <Card key={c.initials}>
-                <CardContent className="flex items-start gap-3 py-4 px-4 border-none">
-                  <div className="h-10 w-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-bold text-xs shrink-0">
+                <CardContent className="flex items-start gap-3 p-4 border-none">
+                  <div className="size-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-semibold text-xs shrink-0">
                     {c.initials}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -189,7 +189,7 @@ export default function About() {
       <SectionContainer size="large" className="border-t border-border-default pt-16 pb-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-center max-w-5xl">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
               Where it started
             </h2>
             <p className="text-base text-foreground-light leading-relaxed">
