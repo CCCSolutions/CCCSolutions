@@ -170,7 +170,7 @@ export default function PostPage() {
         </Card>
 
         {/* Comments */}
-        <h2 className="text-xl font-bold text-foreground mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
         </h2>
 
@@ -180,7 +180,7 @@ export default function PostPage() {
           ) : (
             comments.map((comment) => (
               <Card key={comment.id}>
-                <CardContent className="py-5 px-5 border-none">
+                <CardContent className="p-5 border-none">
                   <p className="text-foreground-light whitespace-pre-wrap">{comment.body}</p>
                   <p className="mt-3 text-xs text-foreground-lighter">
                     By{' '}

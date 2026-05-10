@@ -65,19 +65,19 @@ const ProblemsTable = () => {
                   />
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-nowrap">
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Easy</strong> — an average grade 11 student should get this
+                      <strong className="text-foreground font-medium">Easy</strong>: an average grade 11 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Normal</strong> — an average grade 12 student should get this
+                      <strong className="text-foreground font-medium">Normal</strong>: an average grade 12 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Hard</strong> — a good grade 12 student MIGHT get this
+                      <strong className="text-foreground font-medium">Hard</strong>: a good grade 12 student MIGHT get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Insane</strong> — the best grade 12 student MIGHT get this, given enough time
+                      <strong className="text-foreground font-medium">Insane</strong>: the best grade 12 student MIGHT get this, given enough time
                     </div>
                     <div>
-                      <strong className="text-foreground font-medium">Wicked</strong> — the teacher will get this after many days, or maybe never :-)
+                      <strong className="text-foreground font-medium">Wicked</strong>: the teacher will get this after many days, or maybe never :-)
                     </div>
                   </div>
                 </div>
@@ -87,9 +87,9 @@ const ProblemsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {currentProblems.map((problem, index) => (
+          {currentProblems.map((problem) => (
             <tr
-              key={index}
+              key={problem.link}
               className="border-b border-border-default hover:bg-surface-200/50 transition-colors"
             >
               <td className="py-3 whitespace-nowrap">

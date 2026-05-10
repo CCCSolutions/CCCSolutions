@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic';
 
 const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
   ssr: false,
-  loading: () => <div className="p-4 text-foreground-lighter">Loading code...</div>
+  loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>
 });
 
 interface TestCaseData {
@@ -297,7 +297,7 @@ const Problem = () => {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      {/* SEO structured data */}
+      {/* SEO structured data — escape "<" to prevent breaking out of the <script> tag */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -324,7 +324,7 @@ const Problem = () => {
                 name: problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`,
               },
             ],
-          }),
+          }).replace(/</g, '\\u003c'),
         }}
       />
       <script
@@ -348,7 +348,7 @@ const Problem = () => {
             dateModified: `${contestYear}-02-01`,
             proficiencyLevel: problemInfo?.difficulty || 'Intermediate',
             dependencies: problemInfo?.tags?.join(', ') || 'algorithms',
-          }),
+          }).replace(/</g, '\\u003c'),
         }}
       />
 
@@ -377,9 +377,9 @@ const Problem = () => {
                 {problemInfo.difficulty}
               </span>
             )}
-            {problemInfo?.tags?.map((tag, idx) => (
+            {problemInfo?.tags?.map((tag) => (
               <span
-                key={idx}
+                key={tag}
                 className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-surface-200 text-foreground-light border border-border-default"
               >
                 {tag}
@@ -392,9 +392,9 @@ const Problem = () => {
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <CodeIcon width="18" height="18" className="text-brand" />
-            <h2 className="text-xl font-bold text-foreground">
+            <h2 className="text-xl font-semibold text-foreground">
               {loading
-                ? 'Loading solutions...'
+                ? 'Loading solutions…'
                 : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
             </h2>
           </div>
@@ -440,7 +440,7 @@ const Problem = () => {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <FileTextIcon width="18" height="18" className="text-brand" />
-            <h2 className="text-xl font-bold text-foreground">Test cases</h2>
+            <h2 className="text-xl font-semibold text-foreground">Test cases</h2>
           </div>
 
           <Card>
@@ -468,7 +468,7 @@ const Problem = () => {
                 </div>
               ) : testCaseState === 'loading' ? (
                 <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand" />
+                  <div className="inline-block animate-spin rounded-full size-8 border-b-2 border-brand" />
                   {(() => {
                     const caseNum = activeTab + 1;
                     const sizes = testCaseSizes[caseNum];
@@ -482,7 +482,7 @@ const Problem = () => {
                         return (
                           <div>
                             <p className="mt-2 text-foreground-light">
-                              Loading large test case ({sizeDisplay})...
+                              Loading large test case ({sizeDisplay})…
                             </p>
                             <p className="mt-1 text-sm text-warning">
                               ⚠️ This may take a moment
@@ -492,7 +492,7 @@ const Problem = () => {
                       }
                     }
                     return (
-                      <p className="mt-2 text-foreground-light">Loading test case...</p>
+                      <p className="mt-2 text-foreground-light">Loading test case…</p>
                     );
                   })()}
                 </div>
@@ -512,7 +512,7 @@ const Problem = () => {
                         ⚠️{' '}
                         {getFileSizeWarning(testCaseData.input) ||
                           getFileSizeWarning(testCaseData.output)}{' '}
-                        — May load slowly
+                        , may load slowly
                       </p>
                     </div>
                   )}

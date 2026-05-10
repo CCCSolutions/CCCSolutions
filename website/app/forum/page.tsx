@@ -22,7 +22,7 @@ export default function ForumPage() {
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
   const [user, setUser] = useState<AuthModel | null>(null);
 
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     setUser(pb.authStore.model);
@@ -127,7 +127,7 @@ export default function ForumPage() {
               {' · '}
               <button
                 className="cursor-pointer underline not-italic hover:text-foreground"
-                onClick={() => router.push('/login')}
+                onClick={() => push('/login')}
               >
                 Login
               </button>
@@ -164,7 +164,7 @@ export default function ForumPage() {
       {/* Posts */}
       <SectionContainer size="large" className="pb-20">
         {loading ? (
-          <div className="text-center text-foreground-light py-12">Loading posts...</div>
+          <div className="text-center text-foreground-light py-12">Loading posts…</div>
         ) : posts.length === 0 ? (
           <div className="text-center text-foreground-light py-12">
             No posts yet. Be the first to{' '}

@@ -17,7 +17,7 @@ export default function ThemeToggle() {
       type="button"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="inline-flex h-9 w-9 items-center justify-center text-foreground-light hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+      className="inline-flex size-9 items-center justify-center text-foreground-light hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
     >
       {mounted ? (
         isDark ? <SunIcon width="18" height="18" /> : <Moon size={18} strokeWidth={1.75} />

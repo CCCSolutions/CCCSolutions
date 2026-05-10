@@ -18,27 +18,27 @@ export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
-      router.push('/login');
+      push('/login');
     }
-  }, [router]);
+  }, [push]);
 
   const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!pb.authStore.isValid) {
       setError('You need to log in to create a post.');
-      router.push('/login');
+      push('/login');
       return;
     }
 
     try {
       if (!pb.authStore.model) {
         setError('Session expired. Please log in again.');
-        router.push('/login');
+        push('/login');
         return;
       }
 
@@ -51,7 +51,7 @@ export default function CreatePost() {
 
       const createdPost = await pb.collection('posts').create(data);
 
-      router.push(`/forum/${createdPost.id}`);
+      push(`/forum/${createdPost.id}`);
 
       setNewPostTitle('');
       setNewPostBody('');

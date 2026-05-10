@@ -85,7 +85,7 @@ const Home = async () => {
             href="/forum"
             className="block py-2 px-4 text-center text-sm text-white hover:text-indigo-100 transition-colors"
           >
-            Help us expand our repository — submit your 2026 solutions{' '}
+            Help us expand our repository, submit your 2026 solutions{' '}
             <span className="underline underline-offset-2">here</span>.
           </Link>
         </div>
@@ -136,7 +136,7 @@ const Home = async () => {
 
       {/* Feature cards — bare icons (no tinted square wrapper) */}
       <SectionContainer size="large" className="py-14">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-12 max-w-3xl">
+        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-3xl">
           <span className="text-foreground">Everything you need to prepare. </span>
           <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
         </h2>
@@ -154,15 +154,15 @@ const Home = async () => {
           <Card className="mt-4">
               <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
                   <div>
-                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.activeUsers}</p>
+                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.activeUsers}</p>
                       <p className="mt-1 text-base text-foreground-light">Active Users</p>
                   </div>
                   <div>
-                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.numSolutions}</p>
+                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.numSolutions}</p>
                       <p className="mt-1 text-base text-foreground-light">CCC Solutions</p>
                   </div>
                   <div>
-                      <p className="text-4xl md:text-5xl font-bold text-brand">{stats.history}</p>
+                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.history}</p>
                       <p className="mt-1 text-base text-foreground-light">Providing Answers</p>
                   </div>
               </CardContent>
@@ -171,7 +171,7 @@ const Home = async () => {
 
       {/* Get started */}
       <SectionContainer size="large" className="py-14">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12 max-w-3xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12 max-w-3xl mx-auto">
           <span className="text-foreground">Three ways to get started:</span>
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
@@ -223,7 +223,7 @@ const Home = async () => {
       {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
       <SectionContainer size="large" className="py-14">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">
+          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-foreground">
             Free and open source.
           </h2>
           <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">

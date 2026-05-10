@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 
 const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
   ssr: false,
-  loading: () => <div className="p-4 text-foreground-lighter">Loading code...</div>
+  loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>
 });
 
 // Real solutions for CCC 2025 S4 (Floor is Lava) — Insane / graph theory.
@@ -193,7 +193,7 @@ export function SolutionPreview() {
             <p className="text-[11px] uppercase tracking-wider text-foreground-lighter">
               CCC 2025 · Senior
             </p>
-            <h3 className="text-base font-bold text-foreground truncate">S4 — Floor is Lava</h3>
+            <h3 className="text-base font-semibold text-foreground truncate">S4: Floor is Lava</h3>
           </div>
           <span className="inline-flex items-center shrink-0 px-3 py-1 text-xs font-semibold rounded-xs bg-red-100 text-red-800">
             Insane

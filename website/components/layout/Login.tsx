@@ -16,7 +16,7 @@ export default function AuthForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const router = useRouter();
+  const { push } = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,7 +27,7 @@ export default function AuthForm() {
       if (isLogin) {
         await pb.collection('users').authWithPassword(username, password);
         setSuccess('Login successful!');
-        router.push('/forum');
+        push('/forum');
       } else {
         const data = {
           username,
@@ -39,7 +39,7 @@ export default function AuthForm() {
         setSuccess('User created successfully!');
 
         await pb.collection('users').authWithPassword(username, password);
-        router.push('/forum');
+        push('/forum');
       }
     } catch (error) {
       setError(
