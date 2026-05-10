@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
-import { FlickeringGrid } from './FlickeringGrid';
-import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
+import { FlickeringGrid } from '../effects/FlickeringGrid';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 
 const pb = new PocketBase('https://mmhs.pockethost.io');
 

@@ -8,7 +8,7 @@ import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
-import { FlickeringGrid } from '../../components/FlickeringGrid';
+import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });

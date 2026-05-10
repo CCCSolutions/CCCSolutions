@@ -1,10 +1,10 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import ProblemsTable from '../../components/ProblemTable';
-import SearchBar from '../../components/Searchbar';
+import ProblemsTable from '../../components/solutions/ProblemTable';
+import SearchBar from '../../components/solutions/Searchbar';
 import { SectionContainer } from '../../components/ui/section-container';
-import { FlickeringGrid } from '../../components/FlickeringGrid';
+import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
 import { problems } from '../../constants';
 
 function SolutionsContent() {

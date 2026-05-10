@@ -11,7 +11,7 @@ import {
   ReaderIcon,
   ExternalLinkIcon,
 } from '@radix-ui/react-icons';
-import { FlickeringGrid } from '../components/FlickeringGrid';
+import { FlickeringGrid } from '../components/effects/FlickeringGrid';
 import { Button } from '../components/ui/button';
 import {
   Card,
@@ -23,7 +23,7 @@ import { SectionContainer } from '../components/ui/section-container';
 
 import { stats } from '../constants';
 import { kFormatter } from '../lib/utils';
-import { SolutionPreview } from '../components/SolutionPreview';
+import { SolutionPreview } from '../components/solutions/SolutionPreview';
 
 async function getGithubStars(): Promise<number | null> {
   try {

@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
 import dynamic from 'next/dynamic';
 
 const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {

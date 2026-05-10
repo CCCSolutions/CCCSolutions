@@ -1,4 +1,4 @@
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 interface NoiseTextureProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 0–1, overall visibility. Default 0.04. */
