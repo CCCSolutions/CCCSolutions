@@ -89,7 +89,7 @@ const ProblemsTable = () => {
         <tbody>
           {currentProblems.map((problem) => (
             <tr
-              key={problem.link}
+              key={problem.name}
               className="border-b border-border-default hover:bg-surface-200/50 transition-colors"
             >
               <td className="py-3 whitespace-nowrap">
