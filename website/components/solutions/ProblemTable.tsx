@@ -52,9 +52,9 @@ const ProblemsTable = () => {
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-surface-300 border-b border-border-default text-foreground">
-            <th className="pl-6 py-3 text-left font-semibold">Solution</th>
-            <th className="pl-6 py-3 text-left font-semibold">Problem Name</th>
-            <th className="pr-6 py-3 text-left font-semibold">
+            <th className="pl-6 py-3 text-left font-medium">Solution</th>
+            <th className="pl-6 py-3 text-left font-medium">Problem Name</th>
+            <th className="pr-6 py-3 text-left font-medium">
               <div className="flex items-center gap-2 relative">
                 <span>Difficulty</span>
                 <div className="relative group">
@@ -65,25 +65,25 @@ const ProblemsTable = () => {
                   />
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-nowrap">
                     <div className="mb-1">
-                      <strong className="text-foreground">Easy</strong> — an average grade 11 student should get this
+                      <strong className="text-foreground font-medium">Easy</strong> — an average grade 11 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground">Normal</strong> — an average grade 12 student should get this
+                      <strong className="text-foreground font-medium">Normal</strong> — an average grade 12 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground">Hard</strong> — a good grade 12 student MIGHT get this
+                      <strong className="text-foreground font-medium">Hard</strong> — a good grade 12 student MIGHT get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground">Insane</strong> — the best grade 12 student MIGHT get this, given enough time
+                      <strong className="text-foreground font-medium">Insane</strong> — the best grade 12 student MIGHT get this, given enough time
                     </div>
                     <div>
-                      <strong className="text-foreground">Wicked</strong> — the teacher will get this after many days, or maybe never :-)
+                      <strong className="text-foreground font-medium">Wicked</strong> — the teacher will get this after many days, or maybe never :-)
                     </div>
                   </div>
                 </div>
               </div>
             </th>
-            <th className="pl-6 py-3 text-left font-semibold">Tags</th>
+            <th className="pl-6 py-3 text-left font-medium">Tags</th>
           </tr>
         </thead>
         <tbody>
@@ -106,7 +106,7 @@ const ProblemsTable = () => {
               <td className="pl-4 md:px-6 py-3 whitespace-nowrap">
                 <Link
                   href={problem.link}
-                  className="truncate text-brand font-semibold hover:underline inline-block"
+                  className="truncate text-brand font-medium hover:underline inline-block"
                   style={{ maxWidth: '20rem' }}
                 >
                   {problem.name}
@@ -114,7 +114,7 @@ const ProblemsTable = () => {
               </td>
               <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
                 <span
-                  className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-xs ${getDifficultyClass(
+                  className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-xs ${getDifficultyClass(
                     problem.difficulty
                   )}`}
                 >
