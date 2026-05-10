@@ -14,6 +14,9 @@ dist/
 # deps
 node_modules/
 .wrangler
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # env
 .env

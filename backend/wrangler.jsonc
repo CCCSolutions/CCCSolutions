@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "backend",
   "main": "src/index.ts",
-  "compatibility_date": "2026-03-21"
+  "compatibility_date": "2026-03-21",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -15,12 +15,14 @@
   //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   //   }
   // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
+   "r2_buckets": [
+     {
+       "binding": "TESTCASES_SOLUTIONS_BUCKET",
+       "bucket_name": "cccsolutions"
+     }
+   ]
+
+
   // "d1_databases": [
   //   {
   //     "binding": "MY_DB",
