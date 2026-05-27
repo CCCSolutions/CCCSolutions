@@ -85,7 +85,7 @@
   --border-overlay: 0deg 0% 20%;
   --border-control: 0deg 0% 22.4%;
 
-  --background-default: 0deg 0% 7.1%;
+  --background-default: 0deg 0% 9.8%;
   --background-200: 0deg 0% 9%;
   --background-surface-75: 0deg 0% 9%;
   --background-surface-100: 0deg 0% 12.2%;
@@ -141,9 +141,8 @@
   --border-overlay: var(--colors-gray-light-500);
   --border-control: var(--colors-gray-light-800);
 
-  /* Light mode: bg sits subtly below pure white so cards (surface-100) visibly lift.
-     ~3% delta — enough to read as elevated, not so much it feels dark. */
-  --background-default: 0deg 0% 97%;
+  /* Light mode: bg sits subtly below pure white so cards (surface-100) visibly lift. */
+  --background-default: 0deg 0% 98.5%;
   --background-200: var(--colors-gray-light-300);
   --background-surface-75: 0deg 0% 100%;
   --background-surface-100: 0deg 0% 100%;
