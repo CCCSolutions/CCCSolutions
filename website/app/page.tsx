@@ -137,7 +137,7 @@ const Home = async () => {
       {/* Feature cards — bare icons (no tinted square wrapper) */}
       <SectionContainer size="large" className="py-14">
         <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-3xl">
-          <span className="text-foreground">Everything you need to prepare. </span>
+          <span className="text-foreground">Everything you need to prepare: </span>
           <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
