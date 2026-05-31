@@ -7,6 +7,7 @@ import {
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
+import { NoiseTexture } from '../../components/effects/NoiseTexture';
 
 interface Resource {
   title: string;
@@ -105,18 +106,34 @@ function ResourceCard({ r }: { r: Resource }) {
 export default function ResourcesPage() {
   return (
     <div className="bg-background text-foreground">
-      {/* Page header — simple, on bg-background. No solid color block. */}
-      <SectionContainer size="large" className="pt-16 pb-12">
-        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
-          Resources
-        </h1>
-        <p className="mt-4 text-base md:text-lg text-foreground-light max-w-2xl">
-          Useful sites and books for CCC prep.
-        </p>
-      </SectionContainer>
+      {/* Header band — dark indigo "stage" with a light-from-above beam.
+          Forced dark; header centered so it sits directly under the light. */}
+      <div className="relative overflow-hidden border-b border-border-default text-white bg-[hsl(245_44%_25%)]">
+        {/* Soft light from above — static, long gradual falloff. The source sits
+            off-screen above the top edge, so only the soft tail shows (no hard
+            core or ring). The grain below also smooths any gradient banding. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(150% 140% at 50% -45%, hsl(244 78% 80% / 0.20), hsl(244 72% 66% / 0.06) 50%, transparent 96%)',
+          }}
+        />
+        {/* Film grain — cinematic texture. */}
+        <NoiseTexture opacity={0.16} />
+        <SectionContainer size="large" className="relative z-10 pt-20 pb-14 text-center">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+            Resources
+          </h1>
+          <p className="mt-4 text-base md:text-lg text-white/70 max-w-xl mx-auto">
+            Useful sites and books for CCC preparation.
+          </p>
+        </SectionContainer>
+      </div>
 
       {/* Online judges + tutorials */}
-      <SectionContainer size="large" className="pb-16">
+      <SectionContainer id="judges" size="large" className="scroll-mt-24 pt-12 pb-16">
         <div className="flex items-center gap-2 mb-6">
           <GlobeIcon width="18" height="18" className="text-brand" />
           <h2 className="text-xl font-bold text-foreground">Online judges and tutorials</h2>
@@ -129,7 +146,7 @@ export default function ResourcesPage() {
       </SectionContainer>
 
       {/* Books */}
-      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
+      <SectionContainer id="books" size="large" className="scroll-mt-24 border-t border-border-default pt-16 pb-16">
         <div className="flex items-center gap-2 mb-6">
           <ReaderIcon width="18" height="18" className="text-brand" />
           <h2 className="text-xl font-bold text-foreground">Books</h2>

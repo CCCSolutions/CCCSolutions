@@ -27,13 +27,20 @@ export function NoiseTexture({
   const svg = `<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${baseFrequency}' numOctaves='${numOctaves}' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>`;
   const url = `url("data:image/svg+xml,${svg}")`;
 
+  // Tile at a fixed pixel size (not stretched to the element) so the grain stays
+  // the same resolution regardless of the element's size.
+  const tile = '200px 200px';
   const tintedStyle: React.CSSProperties = color
     ? {
         backgroundColor: color,
         maskImage: url,
         WebkitMaskImage: url,
+        maskSize: tile,
+        WebkitMaskSize: tile,
+        maskRepeat: 'repeat',
+        WebkitMaskRepeat: 'repeat',
       }
-    : { backgroundImage: url };
+    : { backgroundImage: url, backgroundSize: tile, backgroundRepeat: 'repeat' };
 
   return (
     <div
