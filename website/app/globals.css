@@ -243,6 +243,22 @@ body {
     line-height: 1.6;
 }
 
+/* Highlighted graph-traversal nodes breathe slowly. Honors reduced-motion. */
+.graph-node-pulse {
+  animation: graph-node-pulse 4.5s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes graph-node-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph-node-pulse { animation: none; }
+}
+
 .evil-purple-glow {
   background-color: #631269;
   color: #fff;

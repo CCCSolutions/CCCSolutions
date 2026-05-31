@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { GitCommit } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
+import { GraphPattern } from '../../components/effects/GraphPattern';
 import { NoiseTexture } from '../../components/effects/NoiseTexture';
 import { contributors } from '../../constants';
 
@@ -44,16 +45,43 @@ const teachers = [
 export default function About() {
   return (
     <div className="bg-background text-foreground">
-      {/* Hero band — header + stats wrapped together with brand-tinted noise.
-          The band's border-b doubles as the section separator (no hairline below). */}
-      <div className="relative bg-surface-100/40 overflow-hidden border-b border-border-default">
-        <NoiseTexture opacity={0.12} color="hsl(239, 84%, 67%)" />
+      {/* Hero band — deep indigo brand background with a soft light from above,
+          film grain, and the graph structure on top. Forced dark so text/cards
+          stay legible. The band's border-b doubles as the section separator. */}
+      <div
+        data-theme="dark"
+        className="relative overflow-hidden border-b border-border-default text-white"
+        style={{ backgroundColor: 'hsl(244 47% 24%)' }}
+      >
+        {/* Soft light from above — static, long gradual falloff (source off-screen
+            above the top edge so no hard core/ring shows). */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(150% 140% at 50% -45%, hsl(244 82% 82% / 0.32), hsl(244 74% 68% / 0.10) 50%, transparent 96%)',
+          }}
+        />
+        {/* Film grain — cinematic texture. */}
+        <NoiseTexture opacity={0.16} />
+        {/* Graph asset: anchored right, faded toward the content so the left stays clean. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/4 lg:w-3/5"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 4%, black 46%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 4%, black 46%)',
+          }}
+        >
+          <GraphPattern className="h-full w-full text-white opacity-80" />
+        </div>
 
         <SectionContainer size="large" className="relative z-10 pt-16 pb-10">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
             About
           </h1>
-          <p className="mt-4 text-base md:text-lg text-foreground-light max-w-2xl">
+          <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl">
             Learn more about our journey in becoming the most comprehensive platform for Canadian Computing Competition solutions since 1996.
           </p>
         </SectionContainer>
@@ -82,75 +110,56 @@ export default function About() {
         </SectionContainer>
       </div>
 
-      {/* Timeline — Supabase changelog pattern: 12-col grid, year column on left
-          with icon badge, item column on right, vertical line connecting */}
+      {/* Our journey + A special thanks side by side — the journey entries are short
+          one-liners, so the thanks block fits in the freed horizontal space. */}
       <SectionContainer size="large" className="pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-8">Our journey</h2>
-        <div className="relative lg:border-l border-border-muted lg:ml-2 lg:pl-8">
-          {timeline.map((t, i) => (
-            <section
-              key={t.year}
-              className={`grid lg:grid-cols-12 lg:gap-4 ${
-                i === timeline.length - 1 ? '' : 'pb-12 lg:pb-16'
-              }`}
-            >
-              {/* Year column with icon badge — sticky on lg+ */}
-              <div className="relative hidden lg:col-span-2 lg:block">
-                <div className="ml-[-42px] lg:sticky lg:top-[calc(65px+1rem)] lg:pt-1">
-                  <div className="flex items-center gap-2 text-foreground-light">
-                    <div className="bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
+        <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-0">
+          <div className="lg:pr-14">
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">Our journey</h2>
+            <div className="relative border-l border-border-muted ml-2 pl-8">
+              {timeline.map((t, i) => (
+                <section key={t.year} className={i === timeline.length - 1 ? '' : 'pb-6'}>
+                  <div className="mb-2 flex items-center gap-2 text-foreground-light">
+                    <div className="ml-[-42px] bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
                       <GitCommit size={14} strokeWidth={1.5} />
                     </div>
-                    <span className="text-base leading-none">{t.year}</span>
+                    <span className="text-sm leading-none">{t.year}</span>
                   </div>
-                </div>
-              </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">{t.title}</h3>
+                  <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
+                </section>
+              ))}
+            </div>
+          </div>
 
-              {/* Mobile year header */}
-              <div className="lg:hidden mb-2 flex items-center gap-2 text-foreground-light">
-                <div className="bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
-                  <GitCommit size={14} strokeWidth={1.5} />
-                </div>
-                <span className="text-sm leading-none">{t.year}</span>
-              </div>
-
-              {/* Content column */}
-              <div className="min-w-0 lg:col-span-10">
-                <h3 className="text-lg font-semibold text-foreground mb-1">{t.title}</h3>
-                <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
-              </div>
-            </section>
-          ))}
-        </div>
-      </SectionContainer>
-
-      {/* Teachers tribute */}
-      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">A special thanks</h2>
-        <p className="text-base text-foreground-light max-w-2xl mb-8">
-          The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
-        </p>
-        <div className="grid md:grid-cols-2 gap-4 max-w-3xl">
-          {teachers.map((t) => (
-            <Card key={t.name}>
-              <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
-                <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
-                  <Image
-                    src={t.image}
-                    alt={t.name}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                    unoptimized={t.image.startsWith('http')}
-                  />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base font-semibold text-foreground">{t.name}</h3>
-                  <p className="text-sm text-foreground-light">{t.role}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <div className="lg:border-l lg:border-border-default lg:pl-14">
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">A special thanks</h2>
+            <p className="text-base text-foreground-light mb-10">
+              The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
+            </p>
+            <div className="grid gap-6">
+              {teachers.map((t) => (
+                <Card key={t.name}>
+                <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
+                    <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
+                      <Image
+                        src={t.image}
+                        alt={t.name}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                        unoptimized={t.image.startsWith('http')}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-semibold text-foreground">{t.name}</h3>
+                      <p className="text-sm text-foreground-light">{t.role}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </SectionContainer>
 
