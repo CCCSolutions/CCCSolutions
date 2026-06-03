@@ -1,0 +1,94 @@
+#CCC Problem 3 2026 Senior - Pretty pens
+mostpretty = 10**11
+leastpretty = 10**11
+total = 0
+
+n, m, q =map(int, input().split())
+
+cpu = [[0,0,0]]*n
+storage = [[0, 0, 0]]*(q+1)
+
+prettypercolor = [0]*(m+1)
+
+#Map the most pretty pen for each color u = 1
+for i in range(n):
+    c, p = map(int, input().split())    
+
+    if p > prettypercolor[c]:
+        prettypercolor[c] = p
+        cpu[i] = [c, p, 1]
+        if p < mostpretty:
+            mostpretty = p
+        for x in range(i):
+            if cpu[x][0] == c and cpu[x][2] == 1:
+                cpu[x][2] = 0
+                break
+    else:
+        cpu[i] = [c, p, 0]
+
+def main():
+    global mostpretty
+    leastpretty = 10**11
+    total = 0
+    #Map the leastpretty pretty pen to u = 2
+    for i in range(n):
+        if cpu[i][2] == 1 and cpu[i][1] < leastpretty:
+            leastpretty = cpu[i][1]
+            cpu[i][2]=2
+            for x in range(i):
+                if cpu[x][2] == 2:
+                    cpu[x][2] = 1
+                    break
+
+    #Map the Mostpretty pen to replace the least pretty pretty pen
+    for i in range(n):
+        if cpu[i][2] == 0 and cpu[i][1] > mostpretty:
+            mostpretty = cpu[i][1]
+            cpu[i][2]=3
+            for x in range(n):
+                if cpu[x][2] == 2:
+                    cpu[x][2] = 0
+            for x in range(i):
+                if cpu[x][2] == 3:
+                    cpu[x][2] = 0
+                    break
+
+    #Total the total pretty pens
+    for i in range(n):
+        if cpu[i][2] == 1 or cpu[i][2] == 2 or cpu[i][2] == 3:
+            total += cpu[i][1]
+    print(total)
+
+for i in range(q):
+    a, b, num = map(int, input().split())
+    storage[i] = [a, b, num]
+
+main()
+for i in range(q):
+    mostpretty = 10
+
+    if storage[i][0] == 1:
+        cpu[storage[i][1]-1][0] = storage[i][2]
+    else:
+        cpu[storage[i][1]-1][1] = storage[i][2]
+
+    for x in range(n):
+        cpu[x][2] = 0
+    
+    for x in range(m):
+        prettypercolor[x+1] = 0
+
+    #Reset the most pretty pen for each color
+    for x in range(n):
+        if cpu[x][1] >= prettypercolor[cpu[x][0]]:
+            prettypercolor[cpu[x][0]] = cpu[x][1]
+            cpu[x][2] = 1
+            mostpretty = cpu[x][1]
+            for y in range(x):
+                if cpu[y][0] == cpu[x][0] and cpu[y][2] == 1:
+                    cpu[y][2] = 0
+                    break
+        else:
+            cpu[x][2] = 0
+
+    main()
