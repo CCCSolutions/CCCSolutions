@@ -1,4 +1,4 @@
-#CCC Problem 3 2026 Senior - Pretty pens
+#submitted by OsunPerson
 mostpretty = 10**11
 leastpretty = 10**11
 total = 0
