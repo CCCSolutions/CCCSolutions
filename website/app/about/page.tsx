@@ -191,6 +191,18 @@ export default function About() {
               </Card>
             );
           })}
+          {/* Placeholder for the rest of our 50+ contributors until the new backend tracks them directly. */}
+          <Card>
+            <CardContent className="flex items-center gap-3 p-4 border-none">
+              <div className="size-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-semibold text-xs shrink-0">
+                …
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold text-foreground">and more…</h3>
+                <p className="text-xs text-foreground-lighter mt-1">Countless others over the years.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </SectionContainer>
 
