@@ -1,0 +1,46 @@
+# Simon Heidt (SimonHeidt)
+# py3 solution for 25' s4 - Floor is Lava
+# ~3x faster and ~2x less memory than the in-contest solution
+
+import sys
+import heapq
+
+n, m = map(int, sys.stdin.readline().split())
+graph = [[] for __ in range(n+1)]
+
+for i in range(m):
+    u, v, t = map(int, sys.stdin.readline().split())
+    graph[u].append((v, t))
+    graph[v].append((u, t))
+
+#Modified Dijkstra's
+
+INF = float('inf')
+cost = [[(INF, INF)] for __ in range(n+1)]
+
+cost[1] = [(0,0)]
+heap = [(0, 0, 1)]
+
+while heap:
+    c, arrival_temp, node = heapq.heappop(heap)
+
+    if (c, arrival_temp) not in cost[node]:
+        continue
+
+    if node == n:
+        print(c)
+        break
+
+    for nxt, temp in graph[node]:
+        nc = c + abs(arrival_temp - temp)
+
+        for i in cost[nxt]:
+            other_c, other_temp = i
+            if abs(nc - other_c) >= abs(temp - other_temp):
+                if other_c <= nc:
+                    break
+                else:
+                    cost[nxt].remove(i)
+        else:
+            cost[nxt].append((nc, temp))
+            heapq.heappush(heap, (nc, temp, nxt))
