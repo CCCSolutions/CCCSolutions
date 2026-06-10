@@ -185,12 +185,12 @@ src/
 │   └── moderation.ts           report, hide, revert
 ├── middleware/
 │   ├── auth.ts                 JWT verify, attaches user to context
-│   ├── rateLimit.ts            Upstash sliding window
+│   ├── rateLimit.ts            Workers Rate Limiting binding (DO for global)
 │   ├── turnstile.ts            siteverify on writes
 │   └── zod.ts                  validator helper, returns 400 on fail
 ├── lib/
-│   ├── supabase.ts             createClient with user JWT forwarded
-│   ├── cache.ts                CF Cache API + Upstash get/set/invalidate
+│   ├── supabase.ts             RLS-scoped client (consider @supabase/server)
+│   ├── cache.ts                CF Cache API + Workers KV get/set/invalidate
 │   ├── sanitize.ts             rehype-sanitize wrapper
 │   └── errors.ts               typed error helpers
 └── schemas/                    zod schemas, one file per route
@@ -221,7 +221,7 @@ Order matters. Each layer rejects so the next layer doesn't waste cycles.
 CORS check                  reject cross-origin
   → Cloudflare WAF/rate     (configured in CF dashboard, before Worker)
   → Turnstile (writes only) bot check on POST/PUT/DELETE
-  → Per-user rate limit     Upstash sliding window, keyed on user id (or IP if anon)
+  → Per-user rate limit     Workers Rate Limiting binding (DO for global), keyed on user id (or IP if anon)
   → JWT verification        attaches `c.set('user', { id, role })`
   → Zod payload validation  rejects malformed body before we read it
   → Route handler           business logic, calls Supabase with user JWT
@@ -254,8 +254,8 @@ Anything prefixed `NEXT_PUBLIC_` is bundled into the frontend and visible to any
 
 Three layers, in order of cheapness:
 
-1. **Cloudflare Cache API** — keyed by full URL. ~24h TTL on problem/solution GETs. Free.
-2. **Upstash Redis** — keyed by `<resource>:<id>:<variant>`. ~1h TTL. Warm fallback if CF edge missed.
+1. **Cloudflare Cache API** — keyed by full URL, per-colo. Long TTL on problem/solution/R2 GETs. Free.
+2. **Workers KV** — keyed by `<resource>:<id>:<variant>`, globally replicated. Warm layer when the per-colo Cache API missed. Replaces Upstash Redis (same role, on-platform, no edge→region hop).
 3. **Supabase** — only on full miss. Populates both caches on the way back.
 
 **Key format:** `cache:<resource>:<id>[:<variant>]`. Examples:
@@ -270,7 +270,7 @@ Three layers, in order of cheapness:
 await cache.invalidate(`cache:editorial:${problemId}:*`);
 ```
 
-Wildcard invalidation in Upstash uses SCAN + DEL. CF Cache API doesn't support wildcards — we delete exact keys we know about, which means our key naming has to be deterministic per write.
+Neither Cache API nor KV supports in-worker wildcard purge — we delete the exact keys we know about, so key naming must be deterministic per write. For broad purges, use Cache Tags + the Cache Purge API.
 
 ---
 

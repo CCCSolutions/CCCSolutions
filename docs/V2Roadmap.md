@@ -132,7 +132,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 | **Backend API** | Cloudflare Workers + Hono | Edge-first API, decoupled from frontend. Native integration with R2 and Turnstile. |
 | **Database** | Supabase (PostgreSQL + pgvector) | Managed Postgres with built-in auth, Row Level Security, and vector search. |
 | **Object Storage** | Cloudflare R2 | Test cases are too large for Postgres and currently bloat the git repo. R2 has 10GB free tier, zero egress fees. |
-| **Caching** | Cloudflare Cache API + Upstash Redis | Three-layer cache (Cloudflare edge, Redis, Supabase). Cloudflare Cache API handles edge caching natively in Workers. Redis serves as warm fallback and handles per-user rate limiting. |
+| **Caching** | Cloudflare Cache API + Workers KV | Cloudflare-native three layers: Cache API (per-colo edge responses), Workers KV (globally-replicated warm data), Supabase on full miss. All on-platform — no cross-internet Redis hop from the edge. |
 | **Bot Protection** | Cloudflare Turnstile | Invisible CAPTCHA, no traffic-light clicking. Cryptographic challenge runs in background. |
 | **Auth** | Supabase Auth (GitHub + Google OAuth) | One-click sign-in. Eliminates registration friction for a community that already has GitHub accounts. |
 | **Error Tracking** | Sentry (free tier) | Catches unhandled exceptions in prod with full stack traces. 5K errors/month on the free plan. |
@@ -232,11 +232,11 @@ Test cases range from 2-3 lines for easy problems to thousands of lines for hard
 
 Solutions and problem data rarely change. We use a three-layer cache to serve the vast majority of reads without hitting the database.
 
-1. **Cloudflare Cache API** - built into Workers, free. Cache full API responses at the edge with a ~24hr TTL. Handles most read traffic with zero external calls.
-2. **Upstash Redis** - warm fallback if the edge cache misses (cold location or expired TTL). Also handles per-user rate limit counters and solution/test case availability flags.
+1. **Cloudflare Cache API** - built into Workers, free, per-colo. Cache full API responses at the edge with a long TTL. Handles most read traffic with zero external calls.
+2. **Workers KV** - globally-replicated warm layer for the data behind a response. Fast edge reads, ideal for read-heavy rarely-written content (problems, solutions). Replaces the old Upstash Redis layer — same job, on-platform, no edge→region round-trip. (Per-user rate-limit counters move OUT of here to the native Workers Rate Limiting binding / Durable Objects.)
 3. **Supabase (Postgres)** - only hit on a full cache miss. Both caches are populated on the way back out.
 
-**Invalidation:** On any POST/PUT to a solution or editorial, the Hono handler purges that problem's cache key from both the Cloudflare Cache API and Redis. Edits are infrequent enough (a few times per week across the whole site) that nearly all traffic is served from cache.
+**Invalidation:** On any POST/PUT to a solution or editorial, the Hono handler purges that problem's cache key from both the Cloudflare Cache API and KV. Edits are infrequent enough (a few times per week across the whole site) that nearly all traffic is served from cache. Immutable content (R2 test cases) needs no invalidation — cache it indefinitely.
 
 ---
 
@@ -300,7 +300,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
 **1.3 - Authentication**
 - Supabase Auth with GitHub and Google OAuth
 - One-click sign-in, no registration forms. A student stuck on a problem at 11 PM shouldn't have to fill out a 5-field form to ask a question.
-- Hono middleware verifies Supabase JWTs on all protected routes
+- Hono middleware verifies Supabase JWTs on all protected routes. **Recommended:** `@supabase/server` (first-party, Hono adapter, Workers support) does JWT verification + builds an RLS-scoped client in one import, so we don't hand-write this middleware. Requires `nodejs_compat`.
 - Short JWT expiry (~15 minutes) with refresh tokens to limit token reuse after logout or ban
 - Role column on users table: `user`, `moderator`, `admin`
 - Frontend: login flow, session persistence, role-aware UI (moderators see mod buttons)
@@ -602,7 +602,7 @@ History: within 15 minutes of the original v1 launch, a user exploited PocketBas
 
 **3.2 - Rate Limiting**
 - **IP-level:** Cloudflare's built-in rate limiting rules handle basic IP-level protection at the edge, configured in the Cloudflare dashboard, no custom code needed
-- **Per-user:** Upstash Redis sliding window rate limiter in Hono middleware for authenticated user limits (e.g., ~5 comments per minute per user). Cloudflare can't do this because it doesn't know who's logged in, it only sees the IP.
+- **Per-user:** the native **Workers Rate Limiting binding** (`env.RL.limit({ key })`) in Hono middleware, keyed on user id (or IP when anon). Runs in-colo at the edge, no external Redis. For strict *global* counts, a **Durable Object** counter per key. (Cloudflare's IP rules can't see who's logged in; the binding/DO can, because the Worker holds the verified JWT.)
 - Returns `429 Too Many Requests` when exceeded
 
 **3.3 - IP Blocking**
