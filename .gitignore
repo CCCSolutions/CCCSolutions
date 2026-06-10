@@ -9,3 +9,6 @@ Thumbs.db
 # Node
 node_modules/
 npm-debug.log
+
+# Local scratch notes (personal, never committed)
+*.local.md
