@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'CCC Forum | Ask Questions & Discuss Canadian Computing Competition Solutions',
-  description: 'Join the CCC Solutions community forum. Ask questions, share solutions, and discuss Canadian Computing Competition problems with fellow competitive programmers. Active community of 2,700+ students.',
+  description: 'Join the CCCSolutions community forum. Ask questions, share solutions, and discuss Canadian Computing Competition problems with fellow competitive programmers. Active community of 2,700+ students.',
   keywords: 'CCC forum, Canadian Computing Competition forum, CCC discussion, CCC help, competitive programming community, CCC questions, algorithm discussion, programming help',
   robots: 'index, follow',
   alternates: {

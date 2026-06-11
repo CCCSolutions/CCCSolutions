@@ -338,10 +338,10 @@ const Problem = () => {
             description: `Solution to ${
               problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`
             } from the Canadian Computing Competition`,
-            author: { '@type': 'Organization', name: 'CCC Solutions Community' },
+            author: { '@type': 'Organization', name: 'CCCSolutions Community' },
             publisher: {
               '@type': 'Organization',
-              name: 'CCC Solutions',
+              name: 'CCCSolutions',
               logo: { '@type': 'ImageObject', url: 'https://cccsolutions.ca/icon.png' },
             },
             datePublished: `${contestYear}-02-01`,
