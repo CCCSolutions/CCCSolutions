@@ -6,7 +6,7 @@ import Script from 'next/script';
 
 export const metadata = {
   metadataBase: new URL('https://cccsolutions.ca'),
-  title: 'CCC Solutions 2026 | Canadian Computing Competition Solutions (1996-2026)',
+  title: 'CCCSolutions 2026 | Canadian Computing Competition Solutions (1996-2026)',
   description: 'Master the Canadian Computing Competition with 270+ detailed solutions in C++, Python & Java. Complete CCC solutions from 1996-2026 with test cases, multiple approaches & explanations. Prepare for University of Waterloo CCC.',
   keywords: 'CCC, Canadian Computing Competition, CCC solutions, CCC 2026, CCC 2025, CCC 2024, University of Waterloo, Waterloo CCC, CEMC, competitive programming, CCC preparation, CCC past problems, CCC contest, CCC test cases, programming contest Canada, algorithm practice, coding competition, CCC Senior, CCC Junior, s1 s2 s3 s4 s5, j1 j2 j3 j4 j5, graph theory, dynamic programming, data structures',
   authors: [{ name: 'CCCSolutions Community' }],
@@ -17,13 +17,13 @@ export const metadata = {
   openGraph: {
     type: 'website',
     url: 'https://cccsolutions.ca',
-    title: 'CCC Solutions 2026 | Canadian Computing Competition Solutions',
+    title: 'CCCSolutions 2026 | Canadian Computing Competition Solutions',
     description: 'Master the Canadian Computing Competition with 270+ detailed solutions in C++, Python & Java. Complete CCC solutions from 1996-2026 with test cases and explanations.',
-    siteName: 'CCC Solutions',
+    siteName: 'CCCSolutions',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CCC Solutions 2026 | Canadian Computing Competition Solutions',
+    title: 'CCCSolutions 2026 | Canadian Computing Competition Solutions',
     description: 'Master the Canadian Computing Competition with 270+ detailed solutions in C++, Python & Java from 1996-2026.',
   },
   other: {
@@ -50,8 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
-              "name": "CCC Solutions",
-              "alternateName": ["Canadian Computing Competition Solutions", "CCCSolutions"],
+              "name": "CCCSolutions",
+              "alternateName": ["Canadian Computing Competition Solutions", "CCC Solutions"],
               "url": "https://cccsolutions.ca",
               "logo": "https://cccsolutions.ca/icon.png",
               "description": "The most comprehensive Canadian Computing Competition solution repository with 270+ solutions from 1996 to 2026",
@@ -73,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "CCC Solutions",
+              "name": "CCCSolutions",
               "url": "https://cccsolutions.ca",
               "description": "Complete Canadian Computing Competition solution repository from 1996-2026",
               "potentialAction": {

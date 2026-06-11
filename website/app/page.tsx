@@ -159,7 +159,7 @@ const Home = async () => {
                   </div>
                   <div>
                       <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.numSolutions}</p>
-                      <p className="mt-1 text-base text-foreground-light">CCC Solutions</p>
+                      <p className="mt-1 text-base text-foreground-light">CCC solutions</p>
                   </div>
                   <div>
                       <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.history}</p>

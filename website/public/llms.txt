@@ -1,4 +1,4 @@
-# CCC Solutions - Canadian Computing Competition Solution Repository
+# CCCSolutions - Canadian Computing Competition Solution Repository
 
 > The most comprehensive Canadian Computing Competition (CCC) solution repository with 270+ solutions from 1996-2025
 
@@ -6,7 +6,7 @@
 - Home: https://cccsolutions.ca
 - All Solutions: https://cccsolutions.ca/solutions
 - Forum: https://cccsolutions.ca/forum
-- GitHub: https://github.com/Tankman61/CCCSolutions
+- GitHub: https://github.com/CCCSolutions/CCCSolutions
 
 ## What We Offer
 CCCSolutions is the definitive resource for Canadian Computing Competition preparation, featuring:
@@ -60,10 +60,10 @@ Greedy algorithms, ad hoc problem solving, string processing, computational geom
 The Canadian Computing Competition (CCC) is an annual programming contest organized by the Centre for Education in Mathematics and Computing (CEMC) at the University of Waterloo. It's open to students across Canada and internationally, with Junior and Senior divisions.
 
 ## Contributing
-This is a community-driven project. Contributors include students from across Canada who have solved and shared their approaches to CCC problems. Visit our GitHub repository to contribute: https://github.com/Tankman61/CCCSolutions
+This is a community-driven project. Contributors include students from across Canada who have solved and shared their approaches to CCC problems. Visit our GitHub repository to contribute: https://github.com/CCCSolutions/CCCSolutions
 
 ## Contact & Community
-- GitHub Issues: https://github.com/Tankman61/CCCSolutions/issues
+- GitHub Issues: https://github.com/CCCSolutions/CCCSolutions/issues
 - Forum: https://cccsolutions.ca/forum
 - Active community of 2,700+ users
 
