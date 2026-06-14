@@ -223,10 +223,12 @@ Massive, read-heavy blobs that don't need relational queries.
 
 ### The R2 serving strategy
 
-Test cases range from 2-3 lines for easy problems to thousands of lines for hard graph theory problems. We don't dump raw test case text into the browser.
+The bucket stays private. The Hono API is the only way in (no public custom domain). Test cases range from a few lines to thousands of lines, so we never dump raw test data into the browser.
 
-- **Preview endpoint:** Hono reads the first 50 lines from R2 and returns them. The frontend renders this as a preview.
-- **Download endpoint:** Hono generates a temporary signed R2 URL. Users download massive test cases locally.
+- **Preview endpoint:** Hono does a Range read of the first ~8 KB from R2 via the bucket binding (not a full GET) and returns the first 50 lines. A 69 MB file never streams through the Worker.
+- **Download endpoint:** Hono mints a short-lived (~60s) presigned S3 URL with `aws4fetch`. The browser fetches the bytes straight from R2.
+- **Keys** mirror the old file tree under a `contests/` prefix, e.g. `contests/2024/s5/test_data/s5.1.in`, `contests/2023/s1/solution.txt`.
+- **Cost and abuse:** R2 egress is free, so the bill risk is operation and request COUNT, not bandwidth. The primary defense is a Cloudflare WAF rate-limit rule, which runs before the Worker so blocked requests are never billed. Full design and threat model in `docs/planning/R2ServingAndAbuseDefense.md`.
 
 ### Caching Strategy
 
