@@ -227,7 +227,7 @@ The bucket stays private. The Hono API is the only way in (no public custom doma
 
 - **Preview endpoint:** Hono does a Range read of the first ~8 KB from R2 via the bucket binding (not a full GET) and returns the first 50 lines. A 69 MB file never streams through the Worker.
 - **Download endpoint:** Hono mints a short-lived (~60s) presigned S3 URL with `aws4fetch`. The browser fetches the bytes straight from R2.
-- **Keys** mirror the old file tree under a `contests/` prefix, e.g. `contests/2024/s5/test_data/s5.1.in`, `contests/2023/s1/solution.txt`.
+- **Keys** are normalized under `contests/`: `tests/{n}.in|out` (renumbered, code stripped), `tests/sample/{n}.in|out`, `solutions/{n}.{cpp,py,java,t,txt}` (language detected once). See `docs/R2Migration.md`.
 - **Cost and abuse:** R2 egress is free, so the bill risk is operation and request COUNT, not bandwidth. The primary defense is a Cloudflare WAF rate-limit rule, which runs before the Worker so blocked requests are never billed. Full design and threat model in `docs/planning/R2ServingAndAbuseDefense.md`.
 
 ### Caching Strategy
