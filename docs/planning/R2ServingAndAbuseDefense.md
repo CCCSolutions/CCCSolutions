@@ -8,9 +8,10 @@ Decisions for serving test cases and solutions out of R2, and keeping the public
 - Two endpoints on the Hono Worker:
   - **Preview:** reads via the R2 binding `c.env.TESTCASES_SOLUTIONS_BUCKET`, returns the first N lines. Use a Range read (first ~8 KB) rather than getting the whole object, so a 69 MB file never streams through the Worker.
   - **Download:** Worker mints a short-lived (~60s) presigned S3 URL with `aws4fetch`; the browser fetches the bytes from R2 directly.
-- Key layout mirrors the old file tree under a `contests/` prefix:
-  - `contests/2024/s5/test_data/s5.1.in`
-  - `contests/2023/s1/solution.txt`
+- Keys (authoritative source: `docs/R2Migration.md` + `scripts/stage-r2.js`):
+  - `contests/{year}/{code}/tests/{n}.in` and `.out` (renumbered dense from 1, problem code stripped, `test_data/` becomes `tests/`)
+  - `contests/{year}/{code}/tests/sample/{n}.in` and `.out` (sample cases in a `sample/` subfolder)
+  - `contests/{year}/{code}/solutions/{n}.{cpp,py,java,t,txt}` (language detected once at staging; turing is `t`, fallback `txt`)
 - R2 is already populated (uploaded via `backend/scripts/uploadSolutionsToR2.ts`). Remaining: write the two endpoints, point the frontend at them, remove `test_data` from the repo/build.
 
 ## Cost model (why this is cheap)
