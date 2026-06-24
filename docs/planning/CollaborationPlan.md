@@ -89,9 +89,9 @@ Neither track is "the boring one." If at any point one feels boring, swap indivi
 - Related Problems API + UI on problem pages (1.11)
 - Problem page layout restructure (editorial-first, hints above code) (1.10)
 - Multi-language solution tabs UI (backend table he sets up, frontend tabs he wires) (1.6)
-- 3-layer caching: CF Cache API + Upstash, with invalidation strategy
+- 3-layer caching: CF Cache API + Workers KV, with invalidation strategy
 - Turnstile integration on writes (3.1)
-- Per-user rate limiting with Upstash sliding window (3.2)
+- Per-user rate limiting via the native Workers Rate Limiting binding (3.2)
 - Cloudflare WAF / IP rate limit dashboard config (3.3)
 - Zod validation helper and shared schemas (3.4) — pattern, [Collaborator] uses it
 - Server-side Markdown/HTML sanitize layer (3.5) — central util, used by everyone
@@ -188,7 +188,7 @@ Comments, votes, reputation. The site stops feeling like a static editorial wiki
 **William ships:**
 - Turnstile middleware on all writes (3.1)
 - Per-user rate limit middleware (3.2)
-- CF Cache API + Upstash caching layer turned on for problem/editorial reads
+- CF Cache API + Workers KV caching layer turned on for problem/editorial reads
 - IP-level rate limit dashboard config in Cloudflare
 - Soft-hide rendering coordination (he writes the spec, [Collaborator] applies it on comments)
 
