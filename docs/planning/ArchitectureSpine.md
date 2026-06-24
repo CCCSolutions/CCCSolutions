@@ -235,14 +235,13 @@ Reads skip Turnstile and Zod-body validation (no body), but still pass through r
 
 ## Environment & Secrets
 
-**Local dev:** `backend/.dev.vars` (gitignored). Same keys as production but pointed at staging Supabase/Upstash. Wrangler loads it automatically.
+**Local dev:** `backend/.dev.vars` (gitignored). Same keys as production but pointed at staging Supabase. Wrangler loads it automatically. (KV and the rate-limit binding are Wrangler bindings, not secrets — no REST URL/token to set.)
 
 **Production:** `wrangler secret put NAME` for sensitive values. Non-sensitive config goes in `wrangler.jsonc` under `vars`.
 
 **Naming.**
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY` — safe to expose, used in user-context queries.
 - `SUPABASE_SERVICE_ROLE_KEY` — never sent to frontend, never logged, used only in backend scripts.
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`.
 - `TURNSTILE_SECRET_KEY` (backend), `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (frontend, embedded in HTML).
 - `OPENAI_MODERATION_KEY`, `DISCORD_WEBHOOK_URL`.
 
