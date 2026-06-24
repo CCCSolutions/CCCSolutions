@@ -155,7 +155,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 │                                     │
 │  ┌─────────┐  ┌──────────────────┐  │
 │  │Turnstile│  │ Cloudflare Cache │  │
-│  │Validate │  │ API + Upstash    │  │
+│  │Validate │  │ API + Workers KV │  │
 │  └─────────┘  └──────────────────┘  │
 │                                     │
 │  ┌─────────┐  ┌──────────────────┐  │
@@ -292,7 +292,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
   src/routes/profiles.ts    - user profiles, DMOJ sync
   src/routes/search.ts      - full-text and semantic search
   src/middleware/auth.ts     - JWT verification
-  src/middleware/rateLimit.ts - Upstash rate limiting
+  src/middleware/rateLimit.ts - Workers Rate Limiting binding (per-user)
   ```
 - Configure CORS locked to the exact Cloudflare Pages domain only (no wildcards)
 - Set up Wrangler for local development
@@ -744,7 +744,7 @@ Request
   ├─► Cloudflare Turnstile (bot check on POST routes)
   │     └─► Fail → 403 Forbidden
   │
-  ├─► Upstash Redis Rate Limit (per-user)
+  ├─► Workers Rate Limiting binding (per-user, in-colo)
   │     └─► Exceeded → 429 Too Many Requests
   │
   ├─► Zod Payload Validation
@@ -769,7 +769,7 @@ Moderation needs to be low-maintenance. There is no separate admin dashboard. Mo
 
 ### Automated
 
-- **OpenAI Moderation API:** Free, classification-based (not generative, cannot be prompt-injected). Every new comment/post is checked before saving. If flagged as serious, content is saved with `is_hidden = true` and a Discord webhook fires. The user sees their post; nobody else does.
+- **OpenAI Moderation API:** Free, classification-based (not generative, cannot be prompt-injected). The comment saves immediately, then moderation runs **asynchronously** (`ctx.waitUntil`, off the write path) so a slow or down OpenAI never blocks posting. If flagged as serious, the row flips to `is_hidden = true` and a Discord webhook fires. If the moderation call itself fails, a Discord webhook alerts a maintainer to review manually. The post is briefly visible before an async hide — acceptable for our threat model given the soft-hide infra (3.6).
 - **Vote-based auto-hide:** Comments with score <= -5 are soft-hidden (collapsed, expandable, same as DMOJ's hidden comments). Not deleted, just folded.
 - **Weighted reports:** Reports from users with 500+ reputation auto-hide the reported content pending review.
 
