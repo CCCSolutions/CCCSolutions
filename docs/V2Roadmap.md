@@ -132,7 +132,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 | **Backend API** | Cloudflare Workers + Hono | Edge-first API, decoupled from frontend. Native integration with R2 and Turnstile. |
 | **Database** | Supabase (PostgreSQL + pgvector) | Managed Postgres with built-in auth, Row Level Security, and vector search. |
 | **Object Storage** | Cloudflare R2 | Test cases are too large for Postgres and currently bloat the git repo. R2 has 10GB free tier, zero egress fees. |
-| **Caching** | Cloudflare Cache API + Upstash Redis | Three-layer cache (Cloudflare edge, Redis, Supabase). Cloudflare Cache API handles edge caching natively in Workers. Redis serves as warm fallback and handles per-user rate limiting. |
+| **Caching** | Cloudflare Cache API + Workers KV | Cloudflare-native three layers: Cache API (per-colo edge responses), Workers KV (globally-replicated warm data), Supabase on full miss. All on-platform — no cross-internet Redis hop from the edge. |
 | **Bot Protection** | Cloudflare Turnstile | Invisible CAPTCHA, no traffic-light clicking. Cryptographic challenge runs in background. |
 | **Auth** | Supabase Auth (GitHub + Google OAuth) | One-click sign-in. Eliminates registration friction for a community that already has GitHub accounts. |
 | **Error Tracking** | Sentry (free tier) | Catches unhandled exceptions in prod with full stack traces. 5K errors/month on the free plan. |
@@ -155,7 +155,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 │                                     │
 │  ┌─────────┐  ┌──────────────────┐  │
 │  │Turnstile│  │ Cloudflare Cache │  │
-│  │Validate │  │ API + Upstash    │  │
+│  │Validate │  │ API + Workers KV │  │
 │  └─────────┘  └──────────────────┘  │
 │                                     │
 │  ┌─────────┐  ┌──────────────────┐  │
@@ -223,20 +223,22 @@ Massive, read-heavy blobs that don't need relational queries.
 
 ### The R2 serving strategy
 
-Test cases range from 2-3 lines for easy problems to thousands of lines for hard graph theory problems. We don't dump raw test case text into the browser.
+The bucket stays private. The Hono API is the only way in (no public custom domain). Test cases range from a few lines to thousands of lines, so we never dump raw test data into the browser.
 
-- **Preview endpoint:** Hono reads the first 50 lines from R2 and returns them. The frontend renders this as a preview.
-- **Download endpoint:** Hono generates a temporary signed R2 URL. Users download massive test cases locally.
+- **Preview endpoint:** Hono does a Range read of the first ~8 KB from R2 via the bucket binding (not a full GET) and returns the first 50 lines. A 69 MB file never streams through the Worker.
+- **Download endpoint:** Hono mints a short-lived (~60s) presigned S3 URL with `aws4fetch`. The browser fetches the bytes straight from R2.
+- **Keys** are normalized under `contests/`: `tests/{n}.in|out` (renumbered, code stripped), `tests/sample/{n}.in|out`, `solutions/{n}.{cpp,py,java,t,txt}` (language detected once). See `docs/R2Migration.md`.
+- **Cost and abuse:** R2 egress is free, so the bill risk is operation and request COUNT, not bandwidth. The primary defense is a Cloudflare WAF rate-limit rule, which runs before the Worker so blocked requests are never billed. Full design and threat model in `docs/planning/R2ServingAndAbuseDefense.md`.
 
 ### Caching Strategy
 
 Solutions and problem data rarely change. We use a three-layer cache to serve the vast majority of reads without hitting the database.
 
-1. **Cloudflare Cache API** - built into Workers, free. Cache full API responses at the edge with a ~24hr TTL. Handles most read traffic with zero external calls.
-2. **Upstash Redis** - warm fallback if the edge cache misses (cold location or expired TTL). Also handles per-user rate limit counters and solution/test case availability flags.
+1. **Cloudflare Cache API** - built into Workers, free, per-colo. Cache full API responses at the edge with a long TTL. Handles most read traffic with zero external calls.
+2. **Workers KV** - globally-replicated warm layer for the data behind a response. Fast edge reads, ideal for read-heavy rarely-written content (problems, solutions). Replaces the old Upstash Redis layer — same job, on-platform, no edge→region round-trip. (Per-user rate-limit counters move OUT of here to the native Workers Rate Limiting binding / Durable Objects.)
 3. **Supabase (Postgres)** - only hit on a full cache miss. Both caches are populated on the way back out.
 
-**Invalidation:** On any POST/PUT to a solution or editorial, the Hono handler purges that problem's cache key from both the Cloudflare Cache API and Redis. Edits are infrequent enough (a few times per week across the whole site) that nearly all traffic is served from cache.
+**Invalidation:** On any POST/PUT to a solution or editorial, the Hono handler purges that problem's cache key from both the Cloudflare Cache API and KV. Edits are infrequent enough (a few times per week across the whole site) that nearly all traffic is served from cache. Immutable content (R2 test cases) needs no invalidation — cache it indefinitely.
 
 ---
 
@@ -290,7 +292,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
   src/routes/profiles.ts    - user profiles, DMOJ sync
   src/routes/search.ts      - full-text and semantic search
   src/middleware/auth.ts     - JWT verification
-  src/middleware/rateLimit.ts - Upstash rate limiting
+  src/middleware/rateLimit.ts - Workers Rate Limiting binding (per-user)
   ```
 - Configure CORS locked to the exact Cloudflare Pages domain only (no wildcards)
 - Set up Wrangler for local development
@@ -300,7 +302,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
 **1.3 - Authentication**
 - Supabase Auth with GitHub and Google OAuth
 - One-click sign-in, no registration forms. A student stuck on a problem at 11 PM shouldn't have to fill out a 5-field form to ask a question.
-- Hono middleware verifies Supabase JWTs on all protected routes
+- Hono middleware verifies Supabase JWTs on all protected routes. **Recommended:** `@supabase/server` (first-party, Hono adapter, Workers support) does JWT verification + builds an RLS-scoped client in one import, so we don't hand-write this middleware. Requires `nodejs_compat`.
 - Short JWT expiry (~15 minutes) with refresh tokens to limit token reuse after logout or ban
 - Role column on users table: `user`, `moderator`, `admin`
 - Frontend: login flow, session persistence, role-aware UI (moderators see mod buttons)
@@ -602,7 +604,7 @@ History: within 15 minutes of the original v1 launch, a user exploited PocketBas
 
 **3.2 - Rate Limiting**
 - **IP-level:** Cloudflare's built-in rate limiting rules handle basic IP-level protection at the edge, configured in the Cloudflare dashboard, no custom code needed
-- **Per-user:** Upstash Redis sliding window rate limiter in Hono middleware for authenticated user limits (e.g., ~5 comments per minute per user). Cloudflare can't do this because it doesn't know who's logged in, it only sees the IP.
+- **Per-user:** the native **Workers Rate Limiting binding** (`env.RL.limit({ key })`) in Hono middleware, keyed on user id (or IP when anon). Runs in-colo at the edge, no external Redis. For strict *global* counts, a **Durable Object** counter per key. (Cloudflare's IP rules can't see who's logged in; the binding/DO can, because the Worker holds the verified JWT.)
 - Returns `429 Too Many Requests` when exceeded
 
 **3.3 - IP Blocking**
@@ -742,7 +744,7 @@ Request
   ├─► Cloudflare Turnstile (bot check on POST routes)
   │     └─► Fail → 403 Forbidden
   │
-  ├─► Upstash Redis Rate Limit (per-user)
+  ├─► Workers Rate Limiting binding (per-user, in-colo)
   │     └─► Exceeded → 429 Too Many Requests
   │
   ├─► Zod Payload Validation
@@ -767,7 +769,7 @@ Moderation needs to be low-maintenance. There is no separate admin dashboard. Mo
 
 ### Automated
 
-- **OpenAI Moderation API:** Free, classification-based (not generative, cannot be prompt-injected). Every new comment/post is checked before saving. If flagged as serious, content is saved with `is_hidden = true` and a Discord webhook fires. The user sees their post; nobody else does.
+- **OpenAI Moderation API:** Free, classification-based (not generative, cannot be prompt-injected). The comment saves immediately, then moderation runs **asynchronously** (`ctx.waitUntil`, off the write path) so a slow or down OpenAI never blocks posting. If flagged as serious, the row flips to `is_hidden = true` and a Discord webhook fires. If the moderation call itself fails, a Discord webhook alerts a maintainer to review manually. The post is briefly visible before an async hide — acceptable for our threat model given the soft-hide infra (3.6).
 - **Vote-based auto-hide:** Comments with score <= -5 are soft-hidden (collapsed, expandable, same as DMOJ's hidden comments). Not deleted, just folded.
 - **Weighted reports:** Reports from users with 500+ reputation auto-hide the reported content pending review.
 
