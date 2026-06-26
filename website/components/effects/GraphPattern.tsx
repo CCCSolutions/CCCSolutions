@@ -117,6 +117,27 @@ function build() {
   for (let k = 0; k < path.length - 1; k++) {
     hiKeys.add(`${Math.min(path[k], path[k + 1])}-${Math.max(path[k], path[k + 1])}`);
   }
+  // Bold the existing edge that carries the path off-screen past the top-right
+  // endpoint, so the highlighted route reads as running beyond the frame
+  // (mirrors the source side at the bottom-left).
+  const prevIdx = path[path.length - 2];
+  const inDx = nodes[target].x - nodes[prevIdx].x;
+  const inDy = nodes[target].y - nodes[prevIdx].y;
+  let tail = -1;
+  let bestDot = -Infinity;
+  for (const v of adj[target]) {
+    const n = nodes[v];
+    if (n.x >= 0 && n.x <= VIEW_W && n.y >= 0 && n.y <= VIEW_H) continue; // must leave the frame
+    const dx = n.x - nodes[target].x;
+    const dy = n.y - nodes[target].y;
+    const dot = (inDx * dx + inDy * dy) / (Math.hypot(dx, dy) || 1);
+    if (dot > bestDot) {
+      bestDot = dot;
+      tail = v;
+    }
+  }
+  if (tail !== -1) hiKeys.add(`${Math.min(target, tail)}-${Math.max(target, tail)}`);
+
   for (const e of edges) e.hi = hiKeys.has(`${e.a}-${e.b}`);
 
   return { nodes, edges };

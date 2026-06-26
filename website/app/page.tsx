@@ -155,15 +155,15 @@ const Home = async () => {
               <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
                   <div>
                       <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.activeUsers}</p>
-                      <p className="mt-1 text-base text-foreground-light">Active Users</p>
+                      <p className="mt-2 text-base text-foreground-light">Active Users</p>
                   </div>
                   <div>
                       <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.numSolutions}</p>
-                      <p className="mt-1 text-base text-foreground-light">CCC solutions</p>
+                      <p className="mt-2 text-base text-foreground-light">CCC solutions</p>
                   </div>
                   <div>
                       <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.history}</p>
-                      <p className="mt-1 text-base text-foreground-light">Providing Answers</p>
+                      <p className="mt-2 text-base text-foreground-light">Providing Answers</p>
                   </div>
               </CardContent>
           </Card>

@@ -163,7 +163,7 @@
 }
 
 @theme {
-  --font-sans: 'Lato', 'Roboto', 'Arial', sans-serif;
+  --font-sans: 'DM Sans', 'Lato', 'Roboto', 'Arial', sans-serif;
 
   --color-pastel-green: #c1e1c1;
   --color-pastel-blue: #c6e4ee;
@@ -239,7 +239,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Lato', sans-serif;
+    font-family: 'DM Sans', 'Lato', sans-serif;
     line-height: 1.6;
 }
 
