@@ -50,7 +50,7 @@ const Navbar = () => {
                   key={item.name}
                   href={item.path}
                   className={`
-                    px-3 py-2 rounded-md text-lg font-medium
+                    px-3 py-2 rounded-md text-lg font-normal
                     relative
                     ${
                       pathname === item.path
@@ -98,7 +98,7 @@ const Navbar = () => {
                 key={item.name}
                 href={item.path}
                 className={`
-                  block px-3 py-2 rounded-md text-base font-medium
+                  block px-3 py-2 rounded-md text-base font-normal
                   relative overflow-hidden
                   ${
                     pathname === item.path
