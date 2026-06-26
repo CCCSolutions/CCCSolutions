@@ -82,25 +82,24 @@ export default function ForumPage() {
 
   return (
     <div className="bg-background text-foreground">
-      {/* Header — always dark themed (white text on dark blue) regardless of global mode.
-          data-theme="dark" propagates to nested elements (e.g. SearchBar tokens),
-          but title/subtitle use explicit light colors so they're guaranteed white. */}
-      <div data-theme="dark" className="relative bg-blue-950 overflow-hidden border-b border-border-default">
+      {/* Header — home-hero treatment (theme-aware background + flickering grid), with the
+          grid dots in a clear blue (Tailwind blue-500). */}
+      <div className="relative bg-background overflow-hidden border-b border-border-default">
         <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
           <FlickeringGrid
             className="size-full"
             squareSize={4}
             gridGap={6}
-            color="hsl(239, 84%, 67%)"
-            maxOpacity={0.12}
+            color="#3b82f6"
+            maxOpacity={0.15}
             flickerChance={0.03}
           />
         </div>
         <SectionContainer size="large" className="relative z-10 pt-16 pb-12">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
             Forum
           </h1>
-          <p className="mt-4 text-base md:text-lg text-white/75 max-w-2xl">
+          <p className="mt-4 text-base md:text-lg text-foreground-light max-w-2xl">
             Ask, search, or answer any question related to the CCC.
           </p>
         </SectionContainer>
