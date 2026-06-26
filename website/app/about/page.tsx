@@ -133,7 +133,7 @@ export default function About() {
           </div>
 
           <div className="lg:border-l lg:border-border-default lg:pl-14">
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">A special thanks</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">A special thanks</h2>
             <p className="text-base text-foreground-light mb-10">
               The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
             </p>
