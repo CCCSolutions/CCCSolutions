@@ -2,6 +2,10 @@
 
 Cloudflare Workers + Hono API. Package manager: **bun**. R2 bucket `cccsolutions` is **private**; access it via the binding `c.env.TESTCASES_SOLUTIONS_BUCKET`, never S3 creds (those are for external scripts only).
 
+## Code style
+
+- **Semicolons required.** Terminate statements with `;` (maintainer preference, C/C++ background). Match across all backend code; eslint/prettier should enforce `semi: true`.
+
 ## REQUIRED: Cloudflare Access JWT validation (central middleware)
 
 The worker is reachable on two kinds of hostname:

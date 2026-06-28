@@ -4,6 +4,10 @@ Cloudflare Workers + Hono API. Package manager: **bun**. R2 bucket `cccsolutions
 
 Full agent instructions: @AGENTS.md
 
+## Code style
+
+Use **semicolons** to terminate statements (maintainer reads C/C++ and wants them for readability). All backend TS uses explicit semicolons; keep eslint/prettier on `semi: true`.
+
 ## Non-negotiable: Cloudflare Access JWT middleware (GLOBAL — every endpoint)
 
 Register a single global `app.use('*', …)` validator before all routes — never opt in per-route. It:
