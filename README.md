@@ -12,7 +12,7 @@ Forum, solutions, and contribution guides all in one place.
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a solution, set up the project, and open a PR. New here? Look for issues tagged [`good first issue`](https://github.com/CCCSolutions/CCCSolutions/labels/good%20first%20issue).
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to help, set up the project, and open a PR. New here? Look for issues tagged [`good first issue`](https://github.com/CCCSolutions/CCCSolutions/labels/good%20first%20issue).
 
 ## Test Data 
 
