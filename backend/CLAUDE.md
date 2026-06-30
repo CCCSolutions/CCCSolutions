@@ -8,10 +8,6 @@ Full agent instructions: @AGENTS.md
 
 Use **semicolons** to terminate statements (maintainer reads C/C++ and wants them for readability). All backend TS uses explicit semicolons; keep eslint/prettier on `semi: true`.
 
-## Non-negotiable: Cloudflare Access JWT middleware (GLOBAL — every endpoint)
+## Abuse defense — no in-Worker Access check
 
-Register a single global `app.use('*', …)` validator before all routes — never opt in per-route. It:
-- **Validates** the Cloudflare Access JWT when the request hostname ends in `.workers.dev` (the Access-gated preview URLs) → `403` on missing/invalid.
-- **Skips** validation for the public custom domain `api.cccsolutions.ca` → the frontend reaches it normally.
-
-Purpose: stop abuse (e.g. DMOJ trolls) from burning the `workers.dev` quota via the discoverable preview URL, while keeping the prod API public. Access config (`aud`, JWKS URL, issuer) + reference code are in @AGENTS.md.
+Don't add an in-Worker Cloudflare Access validator. A Worker has no origin IP, so the check guarded a bypass vector that doesn't exist; it was redundant and broke local/CI testing, so it's gone. Preview / `*.workers.dev` URLs are gated by edge Cloudflare Access; the public domains are protected by WAF rate-limiting. Real auth (admin upload, user accounts) uses an admin secret or Supabase RLS. See @AGENTS.md.

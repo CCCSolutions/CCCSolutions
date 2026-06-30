@@ -37,7 +37,7 @@ Key fact: the Cloudflare request order is `DDoS > WAF custom rules > rate limiti
 4. **Cache immutable responses** (Cache API, long TTL). Cuts R2 ops + CPU on repeat hits. Note: with a Worker on the route, a cache hit still invokes the Worker, so this bounds R2/CPU, not Worker-request count (the rate-limit rule bounds that).
 5. **In-Worker rate limit** (Workers Rate Limiting binding, keyed on IP for anon / user id for authed). Durable Object counter if strict global counts are ever needed.
 6. **Zod key validation.** Allowlist regex, reject anything not matching `contests/<year>/<code>/...` before any R2 call.
-7. **Access-JWT middleware** on `*.workers.dev` preview URLs (defense-in-depth; prod `api.cccsolutions.ca` is intentionally public). Billing alerts. Under Attack Mode as break-glass only.
+7. **Edge Cloudflare Access** on `*.workers.dev` and preview URLs (dashboard toggle). Unauthenticated requests are blocked at the edge before the Worker runs, so they aren't billed; prod `api.cccsolutions.ca` is intentionally public. No in-Worker Access check — a Worker has no origin IP, so there's nothing for it to guard, and it broke local/CI testing. Billing alerts. Under Attack Mode as break-glass only.
 
 ## Code vs config
 
@@ -48,7 +48,6 @@ Most of the protection is dashboard config (the WAF rate-limit rule), not Worker
 - Define WAF rate-limiting + custom rules in the Cloudflare dashboard.
 - Set billing alerts (no hard spend cap exists on Workers/R2).
 - Decide cache TTL and cache key for preview responses.
-- Write the Access-JWT middleware before the R2 endpoints go live.
 - Remove `website/public/past_contests/**/test_data` from the build once the endpoints work (git-history shrink is a separate, optional step).
 
 ## Sources
