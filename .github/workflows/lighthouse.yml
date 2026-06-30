@@ -1,0 +1,42 @@
+name: Lighthouse
+
+# Informational only — never blocks merges (continue-on-error).
+# The site is built with `bun run build` and served with `next start` on :3000.
+# Maintainer note: if a production build needs env vars or a backend, add them
+# as repo secrets and wire them into the build/start steps below.
+
+on:
+  pull_request:
+    paths:
+      - "website/**"
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: website
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Start server
+        run: |
+          bun run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: http://localhost:3000
+          uploadArtifacts: true
+          temporaryPublicStorage: true
