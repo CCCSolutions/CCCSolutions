@@ -6,10 +6,6 @@ export type Bindings = {
   // R2 binding (no credentials; reads/writes go through this)
   TESTCASES_SOLUTIONS_BUCKET: R2Bucket;
 
-  // Cloudflare Access — gates the *.workers.dev preview URLs
-  ACCESS_TEAM_DOMAIN: string;
-  ACCESS_AUD: string;
-
   // R2 S3 API — only used to presign download URLs
   R2_ACCOUNT_ID: string;
   R2_BUCKET: string;

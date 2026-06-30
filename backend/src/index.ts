@@ -1,31 +1,8 @@
 import { Hono } from 'hono';
-import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { z } from 'zod';
 import type { Bindings } from './types';
 
-let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
-
 const app = new Hono<{ Bindings: Bindings }>();
-
-// Gate only the discoverable *.workers.dev preview URLs; prod stays public.
-app.use('*', async (c, next) => {
-  const { hostname } = new URL(c.req.url);
-  if (hostname.endsWith('.workers.dev')) {
-    const token = c.req.header('Cf-Access-Jwt-Assertion');
-    if (!token) return c.text('Forbidden', 403);
-
-    jwks ??= createRemoteJWKSet(new URL(`${c.env.ACCESS_TEAM_DOMAIN}/cdn-cgi/access/certs`));
-    try {
-      await jwtVerify(token, jwks, {
-        issuer: c.env.ACCESS_TEAM_DOMAIN,
-        audience: c.env.ACCESS_AUD,
-      });
-    } catch {
-      return c.text('Forbidden', 403);
-    }
-  }
-  return next();
-});
 
 // Allowlist for R2 keys (mirrors scripts/stage-r2.js). Matches:
 //   contests/<year>/<code>/tests/<n>.in|out        (samples under tests/sample/)
