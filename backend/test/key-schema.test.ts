@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { keySchema } from '../src/index';
+import { keySchema } from '../src/schemas';
 
 // The R2 key allowlist (mirrors scripts/stage-r2.js). Only the normalized
 // `contests/<year>/<code>/...` scheme is accepted; everything else is rejected
