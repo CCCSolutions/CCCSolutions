@@ -1,0 +1,2 @@
+# Cloudflare's community forum 403s all bots/crawlers, so valid links there fail the check.
+community.cloudflare.com

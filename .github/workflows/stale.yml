@@ -1,0 +1,36 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 60
+          days-before-close: 14
+          exempt-issue-labels: pinned,security,good first issue
+          exempt-pr-labels: pinned,security,good first issue
+          stale-issue-label: stale
+          stale-pr-label: stale
+          stale-issue-message: >-
+            Hi! This issue has been quiet for a while, so we've marked it stale.
+            No rush — just comment if it's still relevant and we'll keep it open.
+            Otherwise it'll close in 14 days.
+          stale-pr-message: >-
+            Hi! This PR has been quiet for a while, so we've marked it stale.
+            Push a commit or leave a comment when you're ready and we'll pick it
+            back up. Otherwise it'll close in 14 days.
+          close-issue-message: >-
+            Closing this for now since it's been inactive. Feel free to reopen
+            anytime — no hard feelings!
+          close-pr-message: >-
+            Closing this for now since it's been inactive. Reopen whenever you'd
+            like to continue. Thanks for contributing!
