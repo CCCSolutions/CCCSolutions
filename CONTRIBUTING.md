@@ -18,6 +18,7 @@ You'll need [bun](https://bun.sh).
 ## Style
 
 - Match the style of the code around you. Run `bun run lint` and the tests before pushing.
+- Adding or changing backend feature code (`backend/src/`)? Add matching vitest tests in `backend/test/`.
 
 ## Opening a PR
 
