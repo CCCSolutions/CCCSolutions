@@ -1,6 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /backend
     schedule:
       interval: weekly
@@ -10,7 +10,7 @@ updates:
           - minor
           - patch
 
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /website
     schedule:
       interval: weekly
