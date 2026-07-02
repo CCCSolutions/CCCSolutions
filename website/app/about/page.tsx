@@ -6,6 +6,27 @@ import { GraphPattern } from '../../components/effects/GraphPattern';
 import { NoiseTexture } from '../../components/effects/NoiseTexture';
 import { contributors } from '../../constants';
 
+// Dulled, pastel-ish palette (same shape as the difficulty tags) so contributor
+// avatars aren't all one monotone brand color, without going full-saturation.
+const avatarPalette = [
+  'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+  'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+  'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+  'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
+  'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
+  'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+  'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
+  'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
+];
+
+function avatarColor(seed: string) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  }
+  return avatarPalette[Math.abs(hash) % avatarPalette.length];
+}
+
 const timeline = [
   {
     year: 2001,
@@ -45,35 +66,30 @@ const teachers = [
 export default function About() {
   return (
     <div className="bg-background text-foreground">
-      {/* Hero band — deep indigo brand background with a soft light from above,
-          film grain, and the graph structure on top. Forced dark so text/cards
-          stay legible. The band's border-b doubles as the section separator. */}
+      {/* Hero band — the actual brand purple (same hue/lightness as text-brand)
+          as a solid background, with film grain and the graph structure on top.
+          Forced dark so text/cards stay legible. The band's border-b doubles as
+          the section separator. */}
       <div
         data-theme="dark"
         className="relative overflow-hidden border-b border-border-default text-white"
-        style={{ backgroundColor: 'hsl(244 47% 24%)' }}
+        style={{ backgroundColor: 'hsl(239 58% 45%)' }}
       >
-        {/* Soft light from above — static, long gradual falloff (source off-screen
-            above the top edge so no hard core/ring shows). */}
+        {/* Soft light from above — subtle, same hue as the base so it doesn't
+            look like a mismatched glow. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(150% 140% at 50% -45%, hsl(244 82% 82% / 0.32), hsl(244 74% 68% / 0.10) 50%, transparent 96%)',
+              'radial-gradient(150% 140% at 50% -45%, hsl(239 70% 70% / 0.25), transparent 90%)',
           }}
         />
         {/* Film grain — cinematic texture. */}
-        <NoiseTexture opacity={0.16} />
-        {/* Graph asset: anchored right, faded toward the content so the left stays clean. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/4 lg:w-3/5"
-          style={{
-            maskImage: 'linear-gradient(to right, transparent 4%, black 46%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 4%, black 46%)',
-          }}
-        >
+        <NoiseTexture opacity={0.26} />
+        {/* Graph asset: anchored right. The left side thins out structurally
+            (pruned edges in GraphPattern itself), not via an opacity/mask fade. */}
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/4 lg:w-3/5">
           <GraphPattern className="h-full w-full text-white opacity-80" />
         </div>
 
@@ -112,59 +128,66 @@ export default function About() {
 
       {/* Our journey + A special thanks side by side — the journey entries are short
           one-liners, so the thanks block fits in the freed horizontal space. */}
-      <SectionContainer size="large" className="pt-16 pb-16">
-        <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-0">
-          <div className="lg:pr-14">
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">Our journey</h2>
-            <div className="relative border-l border-border-muted ml-2 pl-8">
-              {timeline.map((t, i) => (
-                <section key={t.year} className={i === timeline.length - 1 ? '' : 'pb-6'}>
-                  <div className="mb-2 flex items-center gap-2 text-foreground-light">
-                    <div className="ml-[-42px] bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
-                      <GitCommit size={14} strokeWidth={1.5} />
+      <SectionContainer size="large">
+        <div className="relative pt-16 pb-16">
+          <div
+            aria-hidden
+            className="hidden lg:block absolute inset-y-0 left-[61.54%] w-px bg-border-default"
+          />
+          <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-0">
+            <div className="lg:pr-14">
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">Our journey</h2>
+              <div className="relative border-l border-border-muted ml-2 pl-8">
+                {timeline.map((t, i) => (
+                  <section key={t.year} className={i === timeline.length - 1 ? '' : 'pb-6'}>
+                    <div className="mb-2 flex items-center gap-2 text-foreground-light">
+                      <div className="ml-[-42px] bg-surface-200 border border-border-muted flex size-5 shrink-0 items-center justify-center rounded-sm">
+                        <GitCommit size={14} strokeWidth={1.5} />
+                      </div>
+                      <span className="text-sm leading-none">{t.year}</span>
                     </div>
-                    <span className="text-sm leading-none">{t.year}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">{t.title}</h3>
-                  <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
-                </section>
-              ))}
+                    <h3 className="text-lg font-semibold text-foreground mb-1">{t.title}</h3>
+                    <p className="text-base text-foreground-light leading-relaxed">{t.body}</p>
+                  </section>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="lg:border-l lg:border-border-default lg:pl-14">
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">A special thanks</h2>
-            <p className="text-base text-foreground-light mb-10">
-              The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
-            </p>
-            <div className="grid gap-6">
-              {teachers.map((t) => (
-                <Card key={t.name}>
-                <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
-                    <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
-                      <Image
-                        src={t.image}
-                        alt={t.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                        unoptimized={t.image.startsWith('http')}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-foreground">{t.name}</h3>
-                      <p className="text-sm text-foreground-light">{t.role}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="lg:pl-14">
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">A special thanks</h2>
+              <p className="text-base text-foreground-light mb-10">
+                The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
+              </p>
+              <div className="grid gap-6">
+                {teachers.map((t) => (
+                  <Card key={t.name}>
+                  <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
+                      <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
+                        <Image
+                          src={t.image}
+                          alt={t.name}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                          unoptimized={t.image.startsWith('http')}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-base font-semibold text-foreground">{t.name}</h3>
+                        <p className="text-sm text-foreground-light">{t.role}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </SectionContainer>
 
       {/* Contributors */}
-      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-16">
+      <div className="border-t border-border-default">
+      <SectionContainer size="large" className="pt-16 pb-16">
         <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">Contributors</h2>
         <p className="text-base text-foreground-light max-w-2xl mb-8">
           Thank you to those who have helped contribute solutions to this website!
@@ -175,7 +198,7 @@ export default function About() {
             return (
               <Card key={c.initials}>
                 <CardContent className="flex items-start gap-3 p-4 border-none">
-                  <div className="size-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-semibold text-xs shrink-0">
+                  <div className={`size-10 rounded-full flex items-center justify-center font-semibold text-xs shrink-0 ${avatarColor(c.name)}`}>
                     {c.initials}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -205,9 +228,11 @@ export default function About() {
           </Card>
         </div>
       </SectionContainer>
+      </div>
 
       {/* School origin — keeps the connection without leading with the school name */}
-      <SectionContainer size="large" className="border-t border-border-default pt-16 pb-20">
+      <div className="border-t border-border-default">
+      <SectionContainer size="large" className="pt-16 pb-20">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-center max-w-5xl">
           <div>
             <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
@@ -231,6 +256,7 @@ export default function About() {
           </div>
         </div>
       </SectionContainer>
+      </div>
 
     </div>
   );
