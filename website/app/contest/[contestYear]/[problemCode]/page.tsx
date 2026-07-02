@@ -226,7 +226,7 @@ const Problem = () => {
       case 'insane':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
       default:
         return 'bg-surface-200 text-foreground-light';
     }

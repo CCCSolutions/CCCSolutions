@@ -41,7 +41,7 @@ const ProblemsTable = () => {
       case 'insane':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
       default:
         return 'bg-surface-200 text-foreground-light';
     }
@@ -49,12 +49,12 @@ const ProblemsTable = () => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[640px] text-sm table-fixed">
         <thead>
           <tr className="bg-surface-300 border-b border-border-default text-foreground">
-            <th className="pl-6 py-3 text-left font-medium">Solution</th>
-            <th className="pl-6 py-3 text-left font-medium">Problem Name</th>
-            <th className="pr-6 py-3 text-left font-medium">
+            <th className="w-[8%] pl-6 py-3 text-left font-medium">Solution</th>
+            <th className="w-[40%] pl-4 md:pl-6 py-3 text-left font-medium">Problem Name</th>
+            <th className="w-[22%] pr-6 py-3 text-left font-medium">
               <div className="flex items-center gap-2 relative">
                 <span>Difficulty</span>
                 <div className="relative group">
@@ -83,7 +83,7 @@ const ProblemsTable = () => {
                 </div>
               </div>
             </th>
-            <th className="pl-6 py-3 text-left font-medium">Tags</th>
+            <th className="w-[30%] pl-4 md:pl-6 py-3 text-left font-medium">Tags</th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +92,7 @@ const ProblemsTable = () => {
               key={problem.name}
               className="border-b border-border-default hover:bg-surface-200/50 transition-colors"
             >
-              <td className="py-3 whitespace-nowrap">
+              <td className="py-5 whitespace-nowrap">
                 {problem.hasSolution ? (
                   <div className="px-10 text-green-600 dark:text-green-400">
                     <ReaderIcon width="20" height="20" />
@@ -103,16 +103,15 @@ const ProblemsTable = () => {
                   </div>
                 )}
               </td>
-              <td className="pl-4 md:px-6 py-3 whitespace-nowrap">
+              <td className="pl-4 md:px-6 py-5 overflow-hidden">
                 <Link
                   href={problem.link}
-                  className="truncate text-brand font-medium hover:underline inline-block"
-                  style={{ maxWidth: '20rem' }}
+                  className="block truncate text-brand font-medium hover:underline"
                 >
                   {problem.name}
                 </Link>
               </td>
-              <td className="py-3 whitespace-nowrap pr-4 md:pr-6">
+              <td className="py-5 whitespace-nowrap pr-4 md:pr-6">
                 <span
                   className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-xs ${getDifficultyClass(
                     problem.difficulty
@@ -121,7 +120,7 @@ const ProblemsTable = () => {
                   {problem.difficulty}
                 </span>
               </td>
-              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-foreground-light">
+              <td className="pl-4 md:pl-6 py-5 truncate text-foreground-light">
                 {problem.tags.join(', ')}
               </td>
             </tr>

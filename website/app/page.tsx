@@ -135,10 +135,12 @@ const Home = async () => {
       </div>
 
       {/* Feature cards — bare icons (no tinted square wrapper) */}
-      <SectionContainer size="large" className="py-14">
+      <div className="border-t border-border-default">
+      <SectionContainer size="large" className="py-20">
         <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-3xl">
           <span className="text-foreground">Everything you need to prepare: </span>
-          <span className="text-foreground-light">Forum, archive, and tools in one place.</span>
+          <br />
+          <span className="text-foreground-light">Forums, archives, and tools, all in one place.</span>
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map(({ icon, title, body }) => (
@@ -168,9 +170,11 @@ const Home = async () => {
               </CardContent>
           </Card>
       </SectionContainer>
+      </div>
 
       {/* Get started */}
-      <SectionContainer size="large" className="py-14">
+      <div className="border-t border-border-default">
+      <SectionContainer size="large" className="py-20">
         <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12 max-w-3xl mx-auto">
           <span className="text-foreground">Three ways to get started:</span>
         </h2>
@@ -219,11 +223,13 @@ const Home = async () => {
           </Card>
         </div>
       </SectionContainer>
+      </div>
 
       {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
-      <SectionContainer size="large" className="py-14">
+      <div className="border-t border-border-default">
+      <SectionContainer size="large" className="py-20">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-foreground">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
             Free and open source.
           </h2>
           <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">
@@ -250,6 +256,7 @@ const Home = async () => {
           </div>
         </div>
       </SectionContainer>
+      </div>
 
     </div>
   );
