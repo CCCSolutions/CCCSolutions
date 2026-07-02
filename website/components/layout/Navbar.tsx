@@ -98,7 +98,7 @@ const Navbar = () => {
                 key={item.name}
                 href={item.path}
                 className={`
-                  block px-3 py-2 rounded-md text-base font-normal
+                  block w-fit px-3 py-2 rounded-md text-base font-normal
                   relative overflow-hidden
                   ${
                     pathname === item.path
