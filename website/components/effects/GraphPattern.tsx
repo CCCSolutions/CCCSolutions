@@ -106,10 +106,14 @@ function build() {
     return best;
   };
 
-  const source = nearest(40, 302);
+  const source = nearest(119, 208);
   const target = nearest(418, 80);
   nodes[source].endpoint = true;
   nodes[target].endpoint = true;
+
+  // Two dim nodes down-left of the source formed a dangling diagonal stub;
+  // drop them (and all their edges) outright.
+  const dropped = new Set([nearest(62, 248), nearest(26, 274)]);
 
   const path = dijkstra(nodes, adj, source, target);
   const hiKeys = new Set<string>();
@@ -118,8 +122,7 @@ function build() {
     hiKeys.add(`${Math.min(path[k], path[k + 1])}-${Math.max(path[k], path[k + 1])}`);
   }
   // Bold the existing edge that carries the path off-screen past the top-right
-  // endpoint, so the highlighted route reads as running beyond the frame
-  // (mirrors the source side at the bottom-left).
+  // endpoint, so the highlighted route reads as running beyond the frame.
   const prevIdx = path[path.length - 2];
   const inDx = nodes[target].x - nodes[prevIdx].x;
   const inDy = nodes[target].y - nodes[prevIdx].y;
@@ -138,12 +141,80 @@ function build() {
   }
   if (tail !== -1) hiKeys.add(`${Math.min(target, tail)}-${Math.max(target, tail)}`);
 
+  // Same idea on the source side: walk downward along existing edges from the
+  // source, bolding as it goes, until the chain exits the bottom of the frame.
+  let cur = source;
+  while (nodes[cur].y <= VIEW_H) {
+    let next = -1;
+    let bestDown = 0;
+    for (const v of adj[cur]) {
+      if (nodes[v].path || dropped.has(v)) continue;
+      const dx = nodes[v].x - nodes[cur].x;
+      const dy = nodes[v].y - nodes[cur].y;
+      const down = dy / (Math.hypot(dx, dy) || 1);
+      if (down > bestDown) {
+        bestDown = down;
+        next = v;
+      }
+    }
+    if (next === -1) break;
+    hiKeys.add(`${Math.min(cur, next)}-${Math.max(cur, next)}`);
+    nodes[next].path = true;
+    cur = next;
+  }
+
   for (const e of edges) e.hi = hiKeys.has(`${e.a}-${e.b}`);
 
-  return { nodes, edges };
+  // Instead of fading the whole pattern out toward the left with an opacity/mask
+  // trick, just drop edges that sit entirely in the deep-left zone (both endpoints
+  // left of the cutoff) — the graph thins out there structurally. Edges that reach
+  // out of that zone (toward the visible body of the graph) still get drawn, and
+  // the highlighted path is never pruned since it deliberately runs to the edge.
+  const LEFT_FADE_X = 100;
+  let visibleEdges = edges.filter(
+    (e) =>
+      !dropped.has(e.a) &&
+      !dropped.has(e.b) &&
+      (e.hi || Math.max(nodes[e.a].x, nodes[e.b].x) >= LEFT_FADE_X)
+  );
+
+  // The region filter above can leave a node with only one remaining edge — a
+  // stub poking out on its own with nothing else attached, which reads as a
+  // stray branch rather than part of the mesh. Strip those leaf edges too
+  // (repeatedly, since removing one can expose another), leaving the path/
+  // endpoint nodes untouched.
+  let pruning = true;
+  while (pruning) {
+    pruning = false;
+    const degree = new Array(nodes.length).fill(0);
+    for (const e of visibleEdges) {
+      degree[e.a]++;
+      degree[e.b]++;
+    }
+    visibleEdges = visibleEdges.filter((e) => {
+      if (e.hi) return true;
+      const aLeaf = degree[e.a] === 1 && !nodes[e.a].endpoint;
+      const bLeaf = degree[e.b] === 1 && !nodes[e.b].endpoint;
+      if (aLeaf || bLeaf) {
+        pruning = true;
+        return false;
+      }
+      return true;
+    });
+  }
+
+  // Edge pruning can leave nodes with no edges at all; hide those dots too so
+  // nothing floats disconnected from the mesh.
+  const connected = new Array<boolean>(nodes.length).fill(false);
+  for (const e of visibleEdges) {
+    connected[e.a] = true;
+    connected[e.b] = true;
+  }
+
+  return { nodes, edges: visibleEdges, connected };
 }
 
-const { nodes, edges } = build();
+const { nodes, edges, connected } = build();
 const radius = (n: Node) => (n.endpoint ? 5 : n.path ? 4.5 : 3.8);
 
 export function GraphPattern({ className, ...props }: GraphPatternProps) {
@@ -181,19 +252,10 @@ export function GraphPattern({ className, ...props }: GraphPatternProps) {
         })}
       </g>
       {nodes.map((n, i) =>
-        n.path ? (
+        !connected[i] ? null : n.path ? (
           <circle key={i} cx={n.x} cy={n.y} r={radius(n)} fill="currentColor" />
         ) : (
-          <circle
-            key={i}
-            cx={n.x}
-            cy={n.y}
-            r={radius(n)}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.3}
-            strokeOpacity={0.5}
-          />
+          <circle key={i} cx={n.x} cy={n.y} r={radius(n)} fill="currentColor" fillOpacity={0.35} />
         )
       )}
     </svg>
