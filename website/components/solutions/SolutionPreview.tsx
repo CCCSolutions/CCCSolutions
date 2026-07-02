@@ -187,37 +187,37 @@ export function SolutionPreview() {
   return (
     <div className="relative mx-auto w-full max-w-[620px] min-w-0">
       <Card className="relative w-full min-w-0 overflow-hidden flex flex-col h-[520px] sm:h-[580px] lg:h-auto lg:aspect-[620/580] lg:max-h-[calc(100svh-180px)]">
-        {/* Header bar — title + difficulty (matches ProblemTable.tsx Insane styling) */}
-        <div className="flex-none items-center justify-between px-5 py-4 border-b border-border-default bg-surface-200/50 flex">
+        {/* Header — title, difficulty, tag, and language tabs merged into one block */}
+        <div className="flex-none px-5 py-2.5 border-b border-border-default bg-background">
           <div className="min-w-0">
             <p className="text-[11px] uppercase tracking-wider text-foreground-lighter">
-              CCC 2025 · Senior
+              CCC 2025
             </p>
-            <h3 className="text-base font-semibold text-foreground truncate">S4: Floor is Lava</h3>
+            <div className="mt-0.5 flex items-center justify-between">
+              <h3 className="text-base leading-none font-semibold text-foreground truncate">S4: Floor is Lava</h3>
+              <span className="inline-flex items-center leading-none shrink-0 ml-3 px-2.5 py-1 text-xs font-semibold rounded-xs bg-red-100 text-red-800">
+                Insane
+              </span>
+            </div>
           </div>
-          <span className="inline-flex items-center shrink-0 px-3 py-1 text-xs font-semibold rounded-xs bg-red-100 text-red-800">
-            Insane
-          </span>
-        </div>
-
-        {/* Tags + language tabs */}
-        <div className="flex-none flex items-center justify-between px-5 py-2.5 border-b border-border-default text-xs">
-          <span className="inline-flex items-center px-2 py-0.5 rounded bg-surface-300 text-foreground-light">
-            graph theory
-          </span>
-          <div className="flex gap-1">
-            {solutions.map((s, i) => (
-              <Button
-                key={s.language}
-                onClick={() => setActive(i)}
-                type={i === active ? 'primary' : 'default'}
-                size="tiny"
-                className="text-[11px]"
-                aria-pressed={i === active}
-              >
-                {s.language}
-              </Button>
-            ))}
+          <div className="mt-1.5 flex items-center justify-between text-xs">
+            <span className="inline-flex items-center px-2 py-0.5 rounded bg-surface-300 text-foreground-light">
+              graph theory
+            </span>
+            <div className="flex gap-1">
+              {solutions.map((s, i) => (
+                <Button
+                  key={s.language}
+                  onClick={() => setActive(i)}
+                  type={i === active ? 'primary' : 'default'}
+                  size="tiny"
+                  className="text-[11px]"
+                  aria-pressed={i === active}
+                >
+                  {s.language}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -249,12 +249,6 @@ export function SolutionPreview() {
               {current.code}
             </SyntaxHighlighter>
           </div>
-        </div>
-
-        {/* Footer — attribution updates with active tab */}
-        <div className="flex-none flex items-center justify-between px-5 py-3 border-t border-border-default bg-surface-200/40 text-xs text-foreground-light">
-          <span>Solution by {current.author}</span>
-          <span className="text-foreground-lighter">{current.school}</span>
         </div>
       </Card>
     </div>
