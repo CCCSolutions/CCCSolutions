@@ -98,7 +98,7 @@ export default function About() {
 
         <SectionContainer size="large" className="relative z-10 pt-16 pb-10">
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">About</h1>
-          <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl">
+          <p className="mt-4 text-base md:text-lg text-white/85 max-w-2xl">
             Learn more about our journey in becoming the most comprehensive platform for Canadian
             Computing Competition solutions since 1996.
           </p>

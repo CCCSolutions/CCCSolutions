@@ -102,7 +102,7 @@ const Home = async () => {
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-20 items-center">
               {/* Left: hero copy — centered on mobile, left-aligned on desktop */}
               <div className="text-center lg:text-left">
-                <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
+                <h1 className="text-5xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
                   <span className="block text-foreground">The most comprehensive</span>
                   <span className="block text-brand">CCC solution repository</span>
                 </h1>
