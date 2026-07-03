@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: backend (typecheck + lint + format + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-backend-${{ hashFiles('backend/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-backend-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # worker-configuration.d.ts is gitignored; regenerate it before tsc.
+      - name: Generate Worker types
+        run: bun run cf-typegen
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint (eslint)
+        run: bun run lint
+
+      - name: Format check (prettier)
+        run: bun run format:check
+
+      - name: Test (vitest, coverage threshold enforced in vitest.config.ts)
+        run: bun run test
+
+  website:
+    name: website (typecheck + lint + format)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-website-${{ hashFiles('website/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-website-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format check (prettier)
+        run: bun run format:check
