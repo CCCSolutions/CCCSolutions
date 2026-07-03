@@ -26,7 +26,7 @@ const NotFound = () => {
           404: <span className="text-foreground">Page not found</span>
         </h1>
         <p className="mt-4 text-base text-foreground-light max-w-md mx-auto">
-          The page you're looking for doesn't exist or may have moved.
+          The page you&apos;re looking for doesn&apos;t exist or may have moved.
         </p>
         <div className="mt-8">
           <Button type="primary" size="medium" asChild>
