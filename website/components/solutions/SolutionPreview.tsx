@@ -7,10 +7,13 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import dynamic from 'next/dynamic';
 
-const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
-  ssr: false,
-  loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>
-});
+const SyntaxHighlighter = dynamic(
+  () => import('react-syntax-highlighter').then((mod) => mod.Prism),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>,
+  }
+);
 
 // Real solutions for CCC 2025 S4 (Floor is Lava) — Insane / graph theory.
 // Pulled verbatim from public/past_contests/2025/s4/
@@ -190,11 +193,11 @@ export function SolutionPreview() {
         {/* Header — title, difficulty, tag, and language tabs merged into one block */}
         <div className="flex-none px-5 py-2.5 border-b border-border-default bg-background">
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wider text-foreground-lighter">
-              CCC 2025
-            </p>
+            <p className="text-[11px] uppercase tracking-wider text-foreground-lighter">CCC 2025</p>
             <div className="mt-0.5 flex items-center justify-between">
-              <h3 className="text-base leading-none font-semibold text-foreground truncate">S4: Floor is Lava</h3>
+              <h3 className="text-base leading-none font-semibold text-foreground truncate">
+                S4: Floor is Lava
+              </h3>
               <span className="inline-flex items-center leading-none shrink-0 ml-3 px-2.5 py-1 text-xs font-semibold rounded-xs bg-red-100 text-red-800">
                 Insane
               </span>

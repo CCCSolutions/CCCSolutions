@@ -13,12 +13,7 @@ import {
 } from '@radix-ui/react-icons';
 import { FlickeringGrid } from '../components/effects/FlickeringGrid';
 import { Button } from '../components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle } from '../components/ui/card';
 import { SectionContainer } from '../components/ui/section-container';
 
 import { stats } from '../constants';
@@ -92,175 +87,172 @@ const Home = async () => {
 
         {/* Hero */}
         <div className="relative bg-background overflow-hidden flex-1 flex flex-col justify-center">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <FlickeringGrid
-            className="size-full"
-            squareSize={4}
-            gridGap={6}
-            color="hsl(239, 84%, 67%)"
-            maxOpacity={0.15}
-            flickerChance={0.03}
-          />
-        </div>
-
-        <SectionContainer
-          size="large"
-          className="relative z-10 py-12 max-w-[1440px]"
-        >
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-20 items-center">
-            {/* Left: hero copy — centered on mobile, left-aligned on desktop */}
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
-                <span className="block text-foreground">The most comprehensive</span>
-                <span className="block text-brand">CCC solution repository</span>
-              </h1>
-              <p className="mt-6 text-base lg:text-lg text-foreground-light max-w-xl mx-auto lg:mx-0 text-pretty">
-                  Detailed Canadian Computing Competition solutions, all in one place.
-              </p>
-              <div className="mt-10 flex justify-center lg:justify-start gap-3">
-                <Button asChild type="primary" size="large">
-                  <Link href="/solutions">Explore solutions</Link>
-                </Button>
-                <Button asChild type="default" size="large">
-                  <Link href="/forum">Visit forum</Link>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right: solution-page mockup */}
-            <SolutionPreview />
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <FlickeringGrid
+              className="size-full"
+              squareSize={4}
+              gridGap={6}
+              color="hsl(239, 84%, 67%)"
+              maxOpacity={0.15}
+              flickerChance={0.03}
+            />
           </div>
-        </SectionContainer>
+
+          <SectionContainer size="large" className="relative z-10 py-12 max-w-[1440px]">
+            <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-20 items-center">
+              {/* Left: hero copy — centered on mobile, left-aligned on desktop */}
+              <div className="text-center lg:text-left">
+                <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl tracking-tight font-semibold text-balance max-w-2xl mx-auto lg:mx-0">
+                  <span className="block text-foreground">The most comprehensive</span>
+                  <span className="block text-brand">CCC solution repository</span>
+                </h1>
+                <p className="mt-6 text-base lg:text-lg text-foreground-light max-w-xl mx-auto lg:mx-0 text-pretty">
+                  Detailed Canadian Computing Competition solutions, all in one place.
+                </p>
+                <div className="mt-10 flex justify-center lg:justify-start gap-3">
+                  <Button asChild type="primary" size="large">
+                    <Link href="/solutions">Explore solutions</Link>
+                  </Button>
+                  <Button asChild type="default" size="large">
+                    <Link href="/forum">Visit forum</Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right: solution-page mockup */}
+              <SolutionPreview />
+            </div>
+          </SectionContainer>
         </div>
       </div>
 
       {/* Feature cards — bare icons (no tinted square wrapper) */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="py-20">
-        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-3xl">
-          <span className="text-foreground">Everything you need to prepare: </span>
-          <br />
-          <span className="text-foreground-light">Forums, archives, and tools, all in one place.</span>
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon, title, body }) => (
-            <Card key={title}>
-              <CardContent className="flex flex-col gap-4 py-8 px-6 border-none">
-                {icon}
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{body}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <SectionContainer size="large" className="py-20">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-12 max-w-3xl">
+            <span className="text-foreground">Everything you need to prepare: </span>
+            <br />
+            <span className="text-foreground-light">
+              Forums, archives, and tools, all in one place.
+            </span>
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map(({ icon, title, body }) => (
+              <Card key={title}>
+                <CardContent className="flex flex-col gap-4 py-8 px-6 border-none">
+                  {icon}
+                  <CardTitle>{title}</CardTitle>
+                  <CardDescription>{body}</CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
           <Card className="mt-4">
-              <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
-                  <div>
-                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.activeUsers}</p>
-                      <p className="mt-2 text-base text-foreground-light">Active Users</p>
-                  </div>
-                  <div>
-                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.numSolutions}</p>
-                      <p className="mt-2 text-base text-foreground-light">CCC solutions</p>
-                  </div>
-                  <div>
-                      <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.history}</p>
-                      <p className="mt-2 text-base text-foreground-light">Providing Answers</p>
-                  </div>
-              </CardContent>
+            <CardContent className="grid md:grid-cols-3 gap-8 py-12 px-8 border-none text-center">
+              <div>
+                <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.activeUsers}</p>
+                <p className="mt-2 text-base text-foreground-light">Active Users</p>
+              </div>
+              <div>
+                <p className="text-4xl md:text-5xl font-semibold text-brand">
+                  {stats.numSolutions}
+                </p>
+                <p className="mt-2 text-base text-foreground-light">CCC solutions</p>
+              </div>
+              <div>
+                <p className="text-4xl md:text-5xl font-semibold text-brand">{stats.history}</p>
+                <p className="mt-2 text-base text-foreground-light">Providing Answers</p>
+              </div>
+            </CardContent>
           </Card>
-      </SectionContainer>
+        </SectionContainer>
       </div>
 
       {/* Get started */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="py-20">
-        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12 max-w-3xl mx-auto">
-          <span className="text-foreground">Three ways to get started:</span>
-        </h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          <Card className="flex flex-col">
-            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
-              <ChatBubbleIcon width="28" height="28" className="text-brand" />
-              <CardTitle>Start a forum post</CardTitle>
-              <CardDescription>
-                Stuck on a problem or have a better approach to share?
-              </CardDescription>
-              <div className="mt-auto pt-2">
-                <Button asChild type="primary" size="small">
-                  <Link href="/create-post">Write post</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="flex flex-col">
-            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
-              <ReaderIcon width="28" height="28" className="text-brand" />
-              <CardTitle>Browse the archive</CardTitle>
-              <CardDescription>
-                Every CCC problem + test data from 1996 to 2026.
-              </CardDescription>
-              <div className="mt-auto pt-2">
-                <Button asChild type="primary" size="small">
-                  <Link href="/solutions">View archive</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="flex flex-col">
-            <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
-              <ExternalLinkIcon width="28" height="28" className="text-brand" />
-              <CardTitle>Resources</CardTitle>
-              <CardDescription>
-                Helpful links to other CP sites, editorials, and references.
-              </CardDescription>
-              <div className="mt-auto pt-2">
-                <Button asChild type="primary" size="small">
-                  <Link href="/resources">See links</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </SectionContainer>
+        <SectionContainer size="large" className="py-20">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center mb-12 max-w-3xl mx-auto">
+            <span className="text-foreground">Three ways to get started:</span>
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card className="flex flex-col">
+              <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+                <ChatBubbleIcon width="28" height="28" className="text-brand" />
+                <CardTitle>Start a forum post</CardTitle>
+                <CardDescription>
+                  Stuck on a problem or have a better approach to share?
+                </CardDescription>
+                <div className="mt-auto pt-2">
+                  <Button asChild type="primary" size="small">
+                    <Link href="/create-post">Write post</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="flex flex-col">
+              <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+                <ReaderIcon width="28" height="28" className="text-brand" />
+                <CardTitle>Browse the archive</CardTitle>
+                <CardDescription>Every CCC problem + test data from 1996 to 2026.</CardDescription>
+                <div className="mt-auto pt-2">
+                  <Button asChild type="primary" size="small">
+                    <Link href="/solutions">View archive</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="flex flex-col">
+              <CardContent className="flex flex-col gap-4 py-8 px-6 border-none flex-1">
+                <ExternalLinkIcon width="28" height="28" className="text-brand" />
+                <CardTitle>Resources</CardTitle>
+                <CardDescription>
+                  Helpful links to other CP sites, editorials, and references.
+                </CardDescription>
+                <div className="mt-auto pt-2">
+                  <Button asChild type="primary" size="small">
+                    <Link href="/resources">See links</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </SectionContainer>
       </div>
 
       {/* Open source — centered Supabase-style section with longer subtext + repo handle in CTA */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="py-20">
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-            Free and open source.
-          </h2>
-          <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">
-            CCCSolutions is maintained through GitHub. Read the code, create an issue, or open a pull
-            request. Every contribution helps!
-          </p>
-          <div className="mt-10 flex justify-center">
-            <Button asChild type="default" size="medium">
-              <a
-                href="https://github.com/CCCSolutions/CCCSolutions"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitHubLogoIcon width="18" height="18" />
-                <span>cccsolutions</span>
-                {githubStars !== null && (
-                  <>
-                    <span className="text-foreground-muted px-1">|</span>
-                    <span>{kFormatter(githubStars)}</span>
-                  </>
-                )}
-              </a>
-            </Button>
+        <SectionContainer size="large" className="py-20">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              Free and open source.
+            </h2>
+            <p className="mt-6 text-base md:text-lg text-foreground-light leading-relaxed">
+              CCCSolutions is maintained through GitHub. Read the code, create an issue, or open a
+              pull request. Every contribution helps!
+            </p>
+            <div className="mt-10 flex justify-center">
+              <Button asChild type="default" size="medium">
+                <a
+                  href="https://github.com/CCCSolutions/CCCSolutions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <GitHubLogoIcon width="18" height="18" />
+                  <span>cccsolutions</span>
+                  {githubStars !== null && (
+                    <>
+                      <span className="text-foreground-muted px-1">|</span>
+                      <span>{kFormatter(githubStars)}</span>
+                    </>
+                  )}
+                </a>
+              </Button>
+            </div>
           </div>
-        </div>
-      </SectionContainer>
+        </SectionContainer>
       </div>
-
     </div>
   );
 };
 
 export default Home;
-

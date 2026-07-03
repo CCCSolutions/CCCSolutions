@@ -89,16 +89,18 @@ export default function About() {
         <NoiseTexture opacity={0.26} />
         {/* Graph asset: anchored right. The left side thins out structurally
             (pruned edges in GraphPattern itself), not via an opacity/mask fade. */}
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/4 lg:w-3/5">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-3/4 lg:w-3/5"
+        >
           <GraphPattern className="h-full w-full text-white opacity-80" />
         </div>
 
         <SectionContainer size="large" className="relative z-10 pt-16 pb-10">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
-            About
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">About</h1>
           <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl">
-            Learn more about our journey in becoming the most comprehensive platform for Canadian Computing Competition solutions since 1996.
+            Learn more about our journey in becoming the most comprehensive platform for Canadian
+            Computing Competition solutions since 1996.
           </p>
         </SectionContainer>
 
@@ -136,7 +138,9 @@ export default function About() {
           />
           <div className="grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-0">
             <div className="lg:pr-14">
-              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">Our journey</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                Our journey
+              </h2>
               <div className="relative border-l border-border-muted ml-2 pl-8">
                 {timeline.map((t, i) => (
                   <section key={t.year} className={i === timeline.length - 1 ? '' : 'pb-6'}>
@@ -154,14 +158,17 @@ export default function About() {
             </div>
 
             <div className="lg:pl-14">
-              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">A special thanks</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
+                A special thanks
+              </h2>
               <p className="text-base text-foreground-light mb-10">
-                The original solutions came from two Milliken Mills H.S. teachers who have been key in creating and maintaining this website. Enjoy your retirement!
+                The original solutions came from two Milliken Mills H.S. teachers who have been key
+                in creating and maintaining this website. Enjoy your retirement!
               </p>
               <div className="grid gap-6">
                 {teachers.map((t) => (
                   <Card key={t.name}>
-                  <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
+                    <CardContent className="flex items-center gap-4 py-6 px-5 border-none">
                       <div className="relative size-16 rounded-full overflow-hidden bg-surface-200 shrink-0">
                         <Image
                           src={t.image}
@@ -187,77 +194,80 @@ export default function About() {
 
       {/* Contributors */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="pt-16 pb-16">
-        <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">Contributors</h2>
-        <p className="text-base text-foreground-light max-w-2xl mb-8">
-          Thank you to those who have helped contribute solutions to this website!
-        </p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {contributors.map((c) => {
-            const school = c.school || c.schools;
-            return (
-              <Card key={c.initials}>
-                <CardContent className="flex items-start gap-3 p-4 border-none">
-                  <div className={`size-10 rounded-full flex items-center justify-center font-semibold text-xs shrink-0 ${avatarColor(c.name)}`}>
-                    {c.initials}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold text-foreground truncate">{c.name}</h3>
-                    {school && (
-                      <p className="text-xs text-foreground-lighter truncate">{school}</p>
-                    )}
-                    <p className="text-xs text-foreground-lighter mt-1 line-clamp-2">
-                      {c.contributions}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-          {/* Placeholder for the rest of our 50+ contributors until the new backend tracks them directly. */}
-          <Card>
-            <CardContent className="flex items-center gap-3 p-4 border-none">
-              <div className="size-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-semibold text-xs shrink-0">
-                …
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-semibold text-foreground">and more…</h3>
-                <p className="text-xs text-foreground-lighter mt-1">Countless others over the years.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </SectionContainer>
+        <SectionContainer size="large" className="pt-16 pb-16">
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">Contributors</h2>
+          <p className="text-base text-foreground-light max-w-2xl mb-8">
+            Thank you to those who have helped contribute solutions to this website!
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {contributors.map((c) => {
+              const school = c.school || c.schools;
+              return (
+                <Card key={c.initials}>
+                  <CardContent className="flex items-start gap-3 p-4 border-none">
+                    <div
+                      className={`size-10 rounded-full flex items-center justify-center font-semibold text-xs shrink-0 ${avatarColor(c.name)}`}
+                    >
+                      {c.initials}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-foreground truncate">{c.name}</h3>
+                      {school && (
+                        <p className="text-xs text-foreground-lighter truncate">{school}</p>
+                      )}
+                      <p className="text-xs text-foreground-lighter mt-1 line-clamp-2">
+                        {c.contributions}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+            {/* Placeholder for the rest of our 50+ contributors until the new backend tracks them directly. */}
+            <Card>
+              <CardContent className="flex items-center gap-3 p-4 border-none">
+                <div className="size-10 rounded-full bg-brand/15 text-brand flex items-center justify-center font-semibold text-xs shrink-0">
+                  …
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-semibold text-foreground">and more…</h3>
+                  <p className="text-xs text-foreground-lighter mt-1">
+                    Countless others over the years.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </SectionContainer>
       </div>
 
       {/* School origin — keeps the connection without leading with the school name */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="pt-16 pb-20">
-        <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-center max-w-5xl">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
-              Where it started
-            </h2>
-            <p className="text-base text-foreground-light leading-relaxed">
-              Milliken Mills High School is a public school offering the IB Diploma Programme in
-              Markham, Ontario, Canada. The CCCSolutions archive began as a CS class resource and
-              has been rebuilt and maintained with help from the MMHS Computer Science club and
-              contributors from many other schools.
-            </p>
+        <SectionContainer size="large" className="pt-16 pb-20">
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-10 items-center max-w-5xl">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
+                Where it started
+              </h2>
+              <p className="text-base text-foreground-light leading-relaxed">
+                Milliken Mills High School is a public school offering the IB Diploma Programme in
+                Markham, Ontario, Canada. The CCCSolutions archive began as a CS class resource and
+                has been rebuilt and maintained with help from the MMHS Computer Science club and
+                contributors from many other schools.
+              </p>
+            </div>
+            <div className="relative aspect-video rounded-lg overflow-hidden bg-surface-200">
+              <Image
+                src="/images/mmhs_4.jpg"
+                alt="Milliken Mills High School"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
           </div>
-          <div className="relative aspect-video rounded-lg overflow-hidden bg-surface-200">
-            <Image
-              src="/images/mmhs_4.jpg"
-              alt="Milliken Mills High School"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </SectionContainer>
+        </SectionContainer>
       </div>
-
     </div>
   );
 }

@@ -1,9 +1,4 @@
-import {
-  ReaderIcon,
-  GlobeIcon,
-  ExternalLinkIcon,
-  GitHubLogoIcon,
-} from '@radix-ui/react-icons';
+import { ReaderIcon, GlobeIcon, ExternalLinkIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
@@ -39,7 +34,7 @@ const websites: Resource[] = [
     title: 'CSES Problem Set',
     link: 'https://cses.fi/problemset/',
     description:
-      '200+ classical problems covering sorting, graphs, DP, and more. Pairs perfectly with the Competitive Programmer\'s Handbook.',
+      "200+ classical problems covering sorting, graphs, DP, and more. Pairs perfectly with the Competitive Programmer's Handbook.",
     meta: 'by Antti Laaksonen',
   },
   {
@@ -149,43 +144,45 @@ export default function ResourcesPage() {
 
       {/* Books */}
       <div className="border-t border-border-default">
-      <SectionContainer id="books" size="large" className="scroll-mt-24 pt-16 pb-16">
-        <div className="flex items-center gap-2 mb-6">
-          <ReaderIcon width="18" height="18" className="text-brand" />
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">Books</h2>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((r) => (
-            <ResourceCard key={r.title} r={r} />
-          ))}
-        </div>
-      </SectionContainer>
+        <SectionContainer id="books" size="large" className="scroll-mt-24 pt-16 pb-16">
+          <div className="flex items-center gap-2 mb-6">
+            <ReaderIcon width="18" height="18" className="text-brand" />
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              Books
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {books.map((r) => (
+              <ResourceCard key={r.title} r={r} />
+            ))}
+          </div>
+        </SectionContainer>
       </div>
 
       {/* Contribute callout */}
       <div className="border-t border-border-default">
-      <SectionContainer size="large" className="pt-16 pb-20">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-            Have a resource we should add?
-          </h2>
-          <p className="mt-3 text-base text-foreground-light">
-            Open a pull request on GitHub or suggest one in the forum.
-          </p>
-          <div className="mt-6 flex justify-center">
-            <Button asChild type="default" size="medium">
-              <a
-                href="https://github.com/CCCSolutions/CCCSolutions"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitHubLogoIcon width="18" height="18" />
-                <span>GitHub</span>
-              </a>
-            </Button>
+        <SectionContainer size="large" className="pt-16 pb-20">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              Have a resource we should add?
+            </h2>
+            <p className="mt-3 text-base text-foreground-light">
+              Open a pull request on GitHub or suggest one in the forum.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <Button asChild type="default" size="medium">
+                <a
+                  href="https://github.com/CCCSolutions/CCCSolutions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <GitHubLogoIcon width="18" height="18" />
+                  <span>GitHub</span>
+                </a>
+              </Button>
+            </div>
           </div>
-        </div>
-      </SectionContainer>
+        </SectionContainer>
       </div>
     </div>
   );

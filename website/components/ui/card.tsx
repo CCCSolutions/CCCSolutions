@@ -15,7 +15,10 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('flex flex-col space-y-1.5 py-4 px-4 border-b border-border-default', className)}
+      className={cn(
+        'flex flex-col space-y-1.5 py-4 px-4 border-b border-border-default',
+        className
+      )}
       {...props}
     />
   );
@@ -35,10 +38,7 @@ export function CardDescription({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p
-      className={cn('text-base text-foreground-light leading-relaxed', className)}
-      {...props}
-    />
+    <p className={cn('text-base text-foreground-light leading-relaxed', className)} {...props} />
   );
 }
 
