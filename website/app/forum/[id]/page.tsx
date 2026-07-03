@@ -197,10 +197,7 @@ export default function PostPage() {
 
         {/* Add comment */}
         <form onSubmit={handleAddComment} className="space-y-3">
-          <label
-            htmlFor="newComment"
-            className="block text-sm font-medium text-foreground-light"
-          >
+          <label htmlFor="newComment" className="block text-sm font-medium text-foreground-light">
             Add a comment
           </label>
           <textarea
