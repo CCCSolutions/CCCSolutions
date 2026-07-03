@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  MagnifyingGlassIcon,
-  ChatBubbleIcon,
-  ArrowUpIcon,
-} from '@radix-ui/react-icons';
+import { MagnifyingGlassIcon, ChatBubbleIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import { Button } from '../../../../components/ui/button';
 import { Card } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
@@ -51,9 +47,13 @@ export default function ForumPreviewLoggedIn() {
             {/* Filter row */}
             <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
               <div className="flex gap-1.5">
-                <Button type="primary" size="tiny">Recent</Button>
+                <Button type="primary" size="tiny">
+                  Recent
+                </Button>
               </div>
-              <Button type="primary" size="small">+ New thread</Button>
+              <Button type="primary" size="small">
+                + New thread
+              </Button>
             </div>
 
             {/* Single placeholder thread */}

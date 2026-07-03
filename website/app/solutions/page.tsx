@@ -12,7 +12,11 @@ function SolutionsContent() {
     <div className="bg-background text-foreground">
       {/* Header — always dark themed (white text on dark blue) regardless of global mode.
           Title/subtitle use explicit light colors; data-theme="dark" propagates to SearchBar. */}
-      <div data-theme="dark" className="relative overflow-hidden border-b border-border-default" style={{ backgroundColor: 'hsl(228 50% 27%)' }}>
+      <div
+        data-theme="dark"
+        className="relative overflow-hidden border-b border-border-default"
+        style={{ backgroundColor: 'hsl(228 50% 27%)' }}
+      >
         <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
           <FlickeringGrid
             className="size-full"

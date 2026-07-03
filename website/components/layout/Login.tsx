@@ -125,9 +125,7 @@ export default function AuthForm() {
             </div>
 
             {error && (
-              <div className="mt-4 text-center text-sm text-red-600 dark:text-red-400">
-                {error}
-              </div>
+              <div className="mt-4 text-center text-sm text-red-600 dark:text-red-400">{error}</div>
             )}
 
             {success && (

@@ -5,21 +5,19 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import {
-  InfoCircledIcon,
-  CodeIcon,
-  FileTextIcon,
-  ArrowLeftIcon,
-} from '@radix-ui/react-icons';
+import { InfoCircledIcon, CodeIcon, FileTextIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
 import { Problem as ProblemType, problems } from '../../../../constants';
 import dynamic from 'next/dynamic';
 
-const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
-  ssr: false,
-  loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>
-});
+const SyntaxHighlighter = dynamic(
+  () => import('react-syntax-highlighter').then((mod) => mod.Prism),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>,
+  }
+);
 
 interface TestCaseData {
   input: string | null;
@@ -484,16 +482,12 @@ const Problem = () => {
                             <p className="mt-2 text-foreground-light">
                               Loading large test case ({sizeDisplay})…
                             </p>
-                            <p className="mt-1 text-sm text-warning">
-                              ⚠️ This may take a moment
-                            </p>
+                            <p className="mt-1 text-sm text-warning">⚠️ This may take a moment</p>
                           </div>
                         );
                       }
                     }
-                    return (
-                      <p className="mt-2 text-foreground-light">Loading test case…</p>
-                    );
+                    return <p className="mt-2 text-foreground-light">Loading test case…</p>;
                   })()}
                 </div>
               ) : testCaseState === 'error' ? (

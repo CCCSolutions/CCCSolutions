@@ -1,4 +1,4 @@
-@import "tailwindcss" source(none);
+@import 'tailwindcss' source(none);
 
 @source "../app";
 @source "../components";
@@ -12,14 +12,14 @@
   --colors-black: 0deg 0% 0%;
   --colors-white: 0deg 0% 100%;
 
-    --brand-default: 239deg 84% 67%;
-    --brand-link: 244deg 76% 58%;
-    --brand-600: 244deg 58% 51%;
-    --brand-500: 239deg 84% 67%;
-    --brand-400: 234deg 89% 74%;
-    --brand-300: 226deg 100% 94%;
-    --brand-200: 226deg 100% 97%;
-    --brand-highlight: hsl(235, 80%, 62%);
+  --brand-default: 239deg 84% 67%;
+  --brand-link: 244deg 76% 58%;
+  --brand-600: 244deg 58% 51%;
+  --brand-500: 239deg 84% 67%;
+  --brand-400: 234deg 89% 74%;
+  --brand-300: 226deg 100% 94%;
+  --brand-200: 226deg 100% 97%;
+  --brand-highlight: hsl(235, 80%, 62%);
 
   --colors-gray-dark-100: 0deg 0% 8.6%;
   --colors-gray-dark-200: 0deg 0% 11%;
@@ -60,7 +60,7 @@
   --brand-300: 244deg 60% 24%;
   --brand-200: 244deg 50% 14%;
   /* Lighter than the button bg so the ring reads as a highlight, not an outline */
-    --brand-highlight: hsl(235, 80%, 62%);
+  --brand-highlight: hsl(235, 80%, 62%);
 
   --warning-default: 38.9deg 100% 42.9%;
   --warning-600: 38.9deg 100% 42.9%;
@@ -231,16 +231,18 @@
 }
 
 @layer base {
-  *, ::after, ::before {
+  *,
+  ::after,
+  ::before {
     border-color: var(--color-gray-200);
   }
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'DM Sans', 'Lato', sans-serif;
-    line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  font-family: 'DM Sans', 'Lato', sans-serif;
+  line-height: 1.6;
 }
 
 /* Highlighted graph-traversal nodes breathe slowly. Honors reduced-motion. */
@@ -251,11 +253,17 @@ body {
 }
 
 @keyframes graph-node-pulse {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .graph-node-pulse { animation: none; }
+  .graph-node-pulse {
+    animation: none;
+  }
 }
-
