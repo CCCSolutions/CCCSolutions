@@ -6,6 +6,7 @@ import { ArrowLeftIcon, ChevronDownIcon, ChevronRightIcon } from '@radix-ui/reac
 import { Button } from '../../../../components/ui/button';
 import { Card } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
+import { MarkdownEditor } from '../../../../components/forum/MarkdownEditor';
 
 // FIXME: visual mockup, not real feature code — no backend wired up, form
 // doesn't submit anywhere. Inspo for the real "new thread" build.
@@ -82,7 +83,9 @@ const guideByType: Record<
 export default function NewThreadPreview() {
   const [type, setType] = useState<ThreadType>('question');
   const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(
+    "I think the editorial's complexity is off. A segment tree walk here is $O(N \\log N)$ overall, not $O(\\log^2 N)$ per query — right?\n\n$$\\sum_{i=1}^{N} \\log i = O(N \\log N)$$\n\nHere's what I tried:\n\n```cpp\nfor (int i = 0; i < n; i++) {\n    ans += query(seg, i, i + k);\n}\n```"
+  );
   const [tags, setTags] = useState('');
 
   const canSubmit = title.trim().length >= 15 && body.trim().length >= 30;
@@ -148,12 +151,11 @@ export default function NewThreadPreview() {
                 label="Body"
                 hint="Include all the information someone would need. Min 30 characters."
               >
-                <textarea
+                <MarkdownEditor
                   value={body}
-                  onChange={(e) => setBody(e.target.value)}
+                  onChange={setBody}
                   placeholder={placeholderByType[type]}
                   rows={12}
-                  className="w-full p-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight"
                 />
               </Field>
 

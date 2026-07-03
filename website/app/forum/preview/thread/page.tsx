@@ -14,6 +14,8 @@ import {
 import { Button } from '../../../../components/ui/button';
 import { Card } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
+import { MarkdownPreview } from '../../../../components/forum/MarkdownPreview';
+import { MarkdownEditor } from '../../../../components/forum/MarkdownEditor';
 
 // FIXME: visual mockup, not real feature code — no backend wired up, votes/
 // replies below don't persist. Inspo for the real thread-view build.
@@ -28,18 +30,22 @@ const thread = {
   views: 287,
   asked: '6 hours ago',
   lastActivity: '12 minutes ago',
-  body: `The editorial claims **O(N log N)** but the suggested approach uses a segment tree per node which would naively be O(N log² N).
+  body: `The editorial claims $O(N \\log N)$ but the suggested approach uses a segment tree per node which would naively be $O(N \\log^2 N)$.
 
 Specifically, the editorial walks through:
 
 1. Build a segment tree over the array
 2. For each query, perform a binary search inside the segment tree
 
-If both the outer iteration and the inner segment tree are log N, that should multiply, not add. Am I missing something? Is there an implicit fractional cascading / parallel binary search trick the editorial assumes?
+If both the outer iteration and the inner segment tree are $\\log N$, that should multiply, not add:
+
+$$\\sum_{i=1}^{N} \\log N = O(N \\log N) \\quad\\text{vs.}\\quad \\sum_{i=1}^{N} \\log^2 N = O(N \\log^2 N)$$
+
+Am I missing something? Is there an implicit fractional cascading / parallel binary search trick the editorial assumes?
 
 I tried both implementations on the official test data:
-- O(N log² N) implementation: 1.8s on TC 10
-- O(N log N) implementation (using fractional cascading): 0.4s on TC 10
+- $O(N \\log^2 N)$ implementation: 1.8s on TC 10
+- $O(N \\log N)$ implementation (using fractional cascading): 0.4s on TC 10
 
 The TLE limit is 2s, so technically both pass, but the editorial is misleading.`,
   tags: ['algorithms', 'segment-tree', 'complexity', '2024'],
@@ -69,9 +75,9 @@ const answers: Answer[] = [
     id: 'a1',
     votes: 12,
     accepted: false,
-    body: `You're right that the *naive* implementation is O(N log² N). The editorial is being loose with notation.
+    body: `You're right that the *naive* implementation is $O(N \\log^2 N)$. The editorial is being loose with notation.
 
-The trick is that the inner binary search shares structure with the outer iteration. If you precompute prefix/suffix arrays, you can amortize the inner search to O(1) per outer step, bringing the total to O(N log N).
+The trick is that the inner binary search shares structure with the outer iteration. If you precompute prefix/suffix arrays, you can amortize the inner search to $O(1)$ per outer step, bringing the total to $O(N \\log N)$.
 
 Look at the reference C++ solution at lines 47–63 — there's a \`pre[]\` and \`suf[]\` array being built before the main loop. That's the optimization the editorial doesn't explain.`,
     author: { name: 'kshrestha', rep: 3120 },
@@ -232,20 +238,15 @@ function ReplyComposer({
   }
 
   return (
-    <div className="rounded-md border border-border-strong bg-surface-100 focus-within:border-brand-highlight transition-colors overflow-hidden">
-      <textarea
-        autoFocus={autoFocus || forceOpen}
+    <div className="flex flex-col gap-2">
+      <MarkdownEditor
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={setText}
         placeholder={placeholder}
-        rows={compact ? 4 : 5}
-        className="w-full px-3 pt-3 bg-transparent text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none resize-y"
+        autoFocus={autoFocus || forceOpen}
+        compact={compact}
       />
-      <div
-        className={`flex items-center justify-end gap-2 ${
-          compact ? 'px-3 pb-2.5 pt-1' : 'px-3 pb-3 pt-1.5'
-        }`}
-      >
+      <div className="flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={() => {
@@ -334,11 +335,7 @@ export default function ForumThreadPreview() {
                 <VoteColumn initial={thread.votes} />
                 <div className="flex-1 min-w-0">
                   <div className="text-foreground-light">
-                    {thread.body.split('\n\n').map((para, i) => (
-                      <p key={i} className="mb-3 leading-relaxed whitespace-pre-wrap">
-                        {para}
-                      </p>
-                    ))}
+                    <MarkdownPreview content={thread.body} />
                   </div>
                   <div className="mt-4 flex items-center gap-1.5 flex-wrap">
                     {thread.tags.map((tag) => (
@@ -409,8 +406,8 @@ export default function ForumThreadPreview() {
                 <div className="flex gap-5 px-5 py-5">
                   <VoteColumn initial={a.votes} accepted={a.accepted} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-foreground-light leading-relaxed whitespace-pre-wrap">
-                      {a.body}
+                    <div className="text-foreground-light leading-relaxed">
+                      <MarkdownPreview content={a.body} />
                     </div>
                     <div className="mt-4 pt-3 border-t border-border-default flex items-center justify-between flex-wrap gap-3">
                       <div className="flex gap-3 text-xs items-center">
@@ -536,9 +533,9 @@ export default function ForumThreadPreview() {
 function SubReplyView({ reply }: { reply: SubReply }) {
   return (
     <div>
-      <p className="text-sm text-foreground-light leading-relaxed whitespace-pre-wrap">
-        {reply.body}
-      </p>
+      <div className="text-sm text-foreground-light">
+        <MarkdownPreview content={reply.body} />
+      </div>
       <div className="mt-2 flex items-center gap-3 text-[11px] flex-wrap">
         <InlineVote initial={reply.votes} />
         <span className="text-foreground-lighter">
