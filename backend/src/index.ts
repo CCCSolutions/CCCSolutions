@@ -1,8 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { AwsClient } from 'aws4fetch';
 import type { Bindings } from './types';
-import { keySchema } from './schemas';
+import r2 from './r2/routes';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -23,50 +22,16 @@ function isAllowedOrigin(origin: string): boolean {
 
 app.use('*', cors({ origin: (origin) => (origin && isAllowedOrigin(origin) ? origin : undefined) }));
 
-app.get('/', (c) => c.text('Hello Hono!'));
-
-// R2 preview endpoint for test case files
-app.get('/preview', async (c) => {
-  const parsed = keySchema.safeParse(c.req.query('key'));
-  if (!parsed.success) return c.text('Bad key: ensure you are requesting a valid solution or testcase', 400);
-  const key = parsed.data;
-  const isSolution = key.includes('/solutions/');
-
-  const obj = isSolution
-    ? await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key)
-    : await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key, { range: { offset: 0, length: 8192 } });
-
-  if (!obj) return c.text('File not found. Does the solution exist?', 404);
-
-  const text = await obj.text();
-  const res = isSolution ? text : text.split('\n').slice(0, 50).join('\n');
-
-  return c.text(res);
+app.get('/', (c) => {
+  return c.json('Not implemented', 501);
+  // TODO: welcome message and API version + other information
 });
 
-// R2 download endpoint: hand back a short-lived presigned URL so the browser
-// fetches the file straight from R2 (egress is free; the Worker never streams it).
-app.get('/download', async (c) => {
-  const parsed = keySchema.safeParse(c.req.query('key'));
-  if (!parsed.success) return c.text('Bad key: ensure you are requesting a valid solution or test case', 400);
-  const key = parsed.data;
-
-  const client = new AwsClient({
-    accessKeyId: c.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: c.env.R2_SECRET_ACCESS_KEY,
-    service: 's3',
-    region: 'auto',
-  });
-
-  const endpoint = new URL(`https://${c.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${c.env.R2_BUCKET}/${key}`);
-  endpoint.searchParams.set('X-Amz-Expires', '300'); // presigned URL valid 5 minutes
-
-  const signed = await client.sign(endpoint.toString(), {
-    method: 'GET',
-    aws: { signQuery: true }, // signature in the query string = presigned URL
-  });
-
-  return c.redirect(signed.url, 302);
+app.get('/health', (c) => {
+  return c.json('Not implemented', 501);
+  // TODO: need to implement checking database, cloudflare (all services used), etc.
 });
+
+app.route('/contests', r2);
 
 export default app;
