@@ -128,7 +128,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 | Layer | Technology | Rationale |
 |---|---|---|
 | **Frontend** | Next.js + TypeScript + Tailwind CSS v4 + Radix UI | Industry standard React meta-framework. SSR/SSG for preserving search rankings. Radix for accessible, composable UI primitives. |
-| **Frontend Hosting** | Cloudflare Pages | Pairs with the rest of the Cloudflare stack (Workers, R2, Turnstile). Global edge deployment. |
+| **Frontend Hosting** | Cloudflare Workers (via `@opennextjs/cloudflare`) | Deploys Next.js to Workers with full SSR/SSG/**ISR** support — required for server-rendered per-problem SEO, runtime-edited wiki editorials, and dynamic OG cards (none possible on a pure static export). OpenNext-on-Workers is Cloudflare's current recommended path for Next.js, superseding `@cloudflare/next-on-pages`. Pairs natively with R2, Turnstile, and Workers KV; global edge deployment. |
 | **Backend API** | Cloudflare Workers + Hono | Edge-first API, decoupled from frontend. Native integration with R2 and Turnstile. |
 | **Database** | Supabase (PostgreSQL + pgvector) | Managed Postgres with built-in auth, Row Level Security, and vector search. |
 | **Object Storage** | Cloudflare R2 | Test cases are too large for Postgres and currently bloat the git repo. R2 has 10GB free tier, zero egress fees. |
@@ -145,7 +145,7 @@ Moderators (MMHS CS Club maintainers + users who reach 1,000 rep) see:
 ```
 ┌─────────────────────────────────────┐
 │         Next.js Frontend            │
-│       (Cloudflare Pages)            │
+│  (Cloudflare Workers · OpenNext)    │
 └──────────────┬──────────────────────┘
                │ HTTPS (JWT in headers)
                ▼
@@ -294,7 +294,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
   src/middleware/auth.ts     - JWT verification
   src/middleware/rateLimit.ts - Workers Rate Limiting binding (per-user)
   ```
-- Configure CORS locked to the exact Cloudflare Pages domain only (no wildcards)
+- Configure CORS locked to the exact frontend origin only — `v2.cccsolutions.ca` (and its `*.workers.dev` preview), no wildcards
 - Set up Wrangler for local development
 - Environment variables via `.dev.vars` for local, Wrangler secrets for production
 - `SUPABASE_SERVICE_ROLE_KEY` and all secrets never appear in frontend code (only `NEXT_PUBLIC_` prefixed vars are exposed to the browser)
@@ -650,7 +650,7 @@ History: within 15 minutes of the original v1 launch, a user exploited PocketBas
 - Pagination is cursor-based across all list endpoints
 - UUIDs used everywhere public-facing, no sequential IDs
 - Short JWT expiry with refresh tokens
-- CORS locked to exact Cloudflare Pages domain
+- CORS locked to exact frontend origin (`v2.cccsolutions.ca` + `*.workers.dev` preview)
 - Service role keys never exposed to frontend
 
 ---
@@ -803,7 +803,7 @@ That's it. No E2E tests, no Playwright, no heavy test infrastructure. Just enoug
 
 ### CD Pipeline
 
-- **Frontend:** Cloudflare Pages auto-deploys on push to main and generates preview URLs for every PR branch. Zero config needed.
+- **Frontend:** `opennextjs-cloudflare build && wrangler deploy` via GitHub Actions on push to main; Wrangler versioned uploads provide per-PR preview URLs. Runs the OpenNext adapter, then deploys the Worker.
 - **Backend:** `wrangler deploy` via GitHub Actions on push to main. Cloudflare Workers deploy in seconds.
 
 ### Error Tracking
@@ -819,10 +819,10 @@ That's it. No E2E tests, no Playwright, no heavy test infrastructure. Just enoug
 We do not do a big-bang cutover. The v1 site stays live throughout development.
 
 - **v1 stays live on Netlify** at `cccsolutions.ca` throughout the entire development process. Prod does not get touched until v2 is ready.
-- **v2 develops at `v2.cccsolutions.ca`** on Cloudflare Pages. This is the live preview for the entire development cycle.
+- **v2 develops at `v2.cccsolutions.ca`** on Cloudflare Workers (OpenNext). This is the live preview for the entire development cycle.
 - **Data is migrated (copied, not moved)** from PocketBase and the git repo into Supabase and R2. The old data stays intact. If v2 has a catastrophic bug, v1 is still running and unaffected.
 - **PocketBase forum migration:** Write a migration script that pulls existing forum posts from PocketBase, transforms them into the new Supabase schema, and preserves authorship. Existing contributors should see their content already there when they first log into v2.
-- **DNS cutover only when ready.** When v2 is stable and tested, point `cccsolutions.ca` DNS to Cloudflare Pages instead of Netlify. This takes ~5 minutes to do and ~5 minutes to revert.
+- **DNS cutover only when ready.** When v2 is stable and tested, point `cccsolutions.ca` to the Cloudflare Workers deployment instead of Netlify. This takes ~5 minutes to do and ~5 minutes to revert.
 - **Keep Netlify deployment alive** as a fallback for at least one month post-cutover.
 - **301 redirects for every old URL.** If any existing URL changes format in v2, redirects are mandatory. Google has indexed all current pages, broken links mean lost search rankings.
 
@@ -859,7 +859,7 @@ These features are not part of the v2 rebuild.
 
 ```
 CCCSolutions/
-├── website/                 # Next.js frontend (Cloudflare Pages)
+├── website/                 # Next.js frontend (Cloudflare Workers · OpenNext)
 ├── backend/                 # Cloudflare Workers + Hono API
 ├── docs/
 │   └── V2Roadmap.md         # This file
