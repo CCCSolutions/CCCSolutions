@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
@@ -11,6 +11,18 @@ const ProblemsTable = () => {
   const searchParams = useSearchParams();
   const initialPage = parseInt(searchParams.get('page') || '1') || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [showDifficultyInfo, setShowDifficultyInfo] = useState(false);
+  const difficultyInfoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (difficultyInfoRef.current && !difficultyInfoRef.current.contains(e.target as Node)) {
+        setShowDifficultyInfo(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const problemsPerPage = 20;
 
@@ -41,7 +53,7 @@ const ProblemsTable = () => {
       case 'insane':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
       default:
         return 'bg-surface-200 text-foreground-light';
     }
@@ -49,41 +61,53 @@ const ProblemsTable = () => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[640px] text-sm table-fixed">
         <thead>
           <tr className="bg-surface-300 border-b border-border-default text-foreground">
-            <th className="pl-6 py-3 text-left font-medium">Solution</th>
-            <th className="pl-6 py-3 text-left font-medium">Problem Name</th>
-            <th className="pr-6 py-3 text-left font-medium">
+            <th className="w-28 pl-6 py-3 text-left font-medium">Solution</th>
+            <th className="w-[45%] pl-4 md:pl-6 py-3 text-left font-medium">Problem Name</th>
+            <th className="w-32 pr-6 py-3 text-left font-medium">
               <div className="flex items-center gap-2 relative">
-                <span>Difficulty</span>
-                <div className="relative group">
-                  <InfoCircledIcon
-                    width="16"
-                    height="16"
-                    className="text-foreground-lighter cursor-pointer"
-                  />
-                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 hidden group-hover:block p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-nowrap">
+                <span className="leading-none">Difficulty</span>
+                <div className="relative group leading-none" ref={difficultyInfoRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowDifficultyInfo((v) => !v)}
+                    className="inline-flex items-center leading-none p-0 border-0 bg-transparent text-foreground-lighter cursor-pointer"
+                    aria-label="Difficulty legend"
+                  >
+                    <InfoCircledIcon width="16" height="16" />
+                  </button>
+                  <div
+                    className={`absolute left-1/2 transform -translate-x-1/2 top-full mt-2 ${
+                      showDifficultyInfo ? 'block' : 'hidden'
+                    } md:group-hover:block w-64 p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-normal`}
+                  >
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Easy</strong>: an average grade 11 student should get this
+                      <strong className="text-foreground font-medium">Easy</strong>: an average
+                      grade 11 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Normal</strong>: an average grade 12 student should get this
+                      <strong className="text-foreground font-medium">Normal</strong>: an average
+                      grade 12 student should get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Hard</strong>: a good grade 12 student MIGHT get this
+                      <strong className="text-foreground font-medium">Hard</strong>: a good grade 12
+                      student MIGHT get this
                     </div>
                     <div className="mb-1">
-                      <strong className="text-foreground font-medium">Insane</strong>: the best grade 12 student MIGHT get this, given enough time
+                      <strong className="text-foreground font-medium">Insane</strong>: the best
+                      grade 12 student MIGHT get this, given enough time
                     </div>
                     <div>
-                      <strong className="text-foreground font-medium">Wicked</strong>: the teacher will get this after many days, or maybe never :-)
+                      <strong className="text-foreground font-medium">Wicked</strong>: the teacher
+                      will get this after many days, or maybe never :-)
                     </div>
                   </div>
                 </div>
               </div>
             </th>
-            <th className="pl-6 py-3 text-left font-medium">Tags</th>
+            <th className="pl-4 md:pl-6 py-3 text-left font-medium">Tags</th>
           </tr>
         </thead>
         <tbody>
@@ -103,11 +127,10 @@ const ProblemsTable = () => {
                   </div>
                 )}
               </td>
-              <td className="pl-4 md:px-6 py-3 whitespace-nowrap">
+              <td className="pl-4 md:px-6 py-3 overflow-hidden">
                 <Link
                   href={problem.link}
-                  className="truncate text-brand font-medium hover:underline inline-block"
-                  style={{ maxWidth: '20rem' }}
+                  className="block truncate text-brand font-medium hover:underline"
                 >
                   {problem.name}
                 </Link>
@@ -121,7 +144,7 @@ const ProblemsTable = () => {
                   {problem.difficulty}
                 </span>
               </td>
-              <td className="pl-4 md:pl-6 py-3 whitespace-nowrap text-foreground-light">
+              <td className="pl-4 md:pl-6 py-3 truncate text-foreground-light">
                 {problem.tags.join(', ')}
               </td>
             </tr>

@@ -12,10 +12,6 @@ const widths: Record<NonNullable<SectionContainerProps['size']>, string> = {
   full: 'w-full',
 };
 
-export function SectionContainer({
-  size = 'default',
-  className,
-  ...props
-}: SectionContainerProps) {
+export function SectionContainer({ size = 'default', className, ...props }: SectionContainerProps) {
   return <section className={cn(widths[size], 'mx-auto px-8', className)} {...props} />;
 }

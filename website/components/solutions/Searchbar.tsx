@@ -78,10 +78,7 @@ const SearchBar = ({ problems }: SearchBarProps) => {
                   key={problem.name}
                   className="p-4 border-b border-border-default last:border-none hover:bg-surface-200/60 transition-colors"
                 >
-                  <Link
-                    href={problem.link}
-                    className="text-brand font-medium hover:underline"
-                  >
+                  <Link href={problem.link} className="text-brand font-medium hover:underline">
                     {problem.name}
                   </Link>
                   <p className="text-sm text-foreground-light mt-1">

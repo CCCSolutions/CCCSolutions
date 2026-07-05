@@ -62,9 +62,7 @@ export default function ForumPage() {
       const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
       await pb.collection('posts').update(postId, { upvotes: updatedVotes });
       setPosts((prev) => {
-        const next = prev.map((p) =>
-          p.id === postId ? { ...p, upvotes: updatedVotes } : p
-        );
+        const next = prev.map((p) => (p.id === postId ? { ...p, upvotes: updatedVotes } : p));
         if (sortBy === 'top') {
           next.sort((a, b) => b.upvotes - a.upvotes);
         }
@@ -82,24 +80,25 @@ export default function ForumPage() {
 
   return (
     <div className="bg-background text-foreground">
-      {/* Header — always dark themed (white text on dark blue) regardless of global mode.
-          data-theme="dark" propagates to nested elements (e.g. SearchBar tokens),
-          but title/subtitle use explicit light colors so they're guaranteed white. */}
-      <div data-theme="dark" className="relative bg-blue-950 overflow-hidden border-b border-border-default">
+      {/* Header — same colors as the primary Button in dark mode: brand-500 fill,
+          brand-highlight for the flickering grid (its border color). */}
+      <div
+        data-theme="dark"
+        className="relative overflow-hidden border-b border-border-default"
+        style={{ backgroundColor: 'hsl(244, 66%, 34%)' }}
+      >
         <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
           <FlickeringGrid
             className="size-full"
             squareSize={4}
             gridGap={6}
-            color="hsl(239, 84%, 67%)"
-            maxOpacity={0.12}
+            color="hsl(235, 90%, 78%)"
+            maxOpacity={0.15}
             flickerChance={0.03}
           />
         </div>
         <SectionContainer size="large" className="relative z-10 pt-16 pb-12">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
-            Forum
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">Forum</h1>
           <p className="mt-4 text-base md:text-lg text-white/75 max-w-2xl">
             Ask, search, or answer any question related to the CCC.
           </p>
@@ -111,8 +110,7 @@ export default function ForumPage() {
         <div className="flex justify-end text-sm text-foreground-light">
           {user ? (
             <span>
-              Logged in as{' '}
-              <span className="font-semibold text-foreground">{user.username}</span>
+              Logged in as <span className="font-semibold text-foreground">{user.username}</span>
               {' · '}
               <button
                 className="cursor-pointer underline hover:text-foreground"
@@ -203,7 +201,9 @@ export default function ForumPage() {
                       <Link href={`/forum/${post.id}`}>{post.title}</Link>
                     </h2>
                     <ReactQuill
-                      value={post.body.length > 200 ? post.body.substring(0, 200) + '...' : post.body}
+                      value={
+                        post.body.length > 200 ? post.body.substring(0, 200) + '...' : post.body
+                      }
                       readOnly
                       theme="bubble"
                       className="text-foreground-light max-h-24 overflow-hidden"

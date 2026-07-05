@@ -9,7 +9,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"vitest.config.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"vitest.config.ts\"",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "db:pull": "drizzle-kit pull",
@@ -18,26 +18,27 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1045.0",
-    "@aws-sdk/lib-storage": "^3.1045.0",
+    "@aws-sdk/client-s3": "^3.1077.0",
+    "@aws-sdk/lib-storage": "^3.1077.0",
     "@hono/zod-validator": "^0.8.0",
     "aws4fetch": "^1.0.20",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.8",
+    "hono": "^4.12.27",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.6.2",
+    "@types/node": "^26.0.1",
+    "@vitest/coverage-v8": "^4.1.9",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^10.4.1",
-    "globals": "^17.6.0",
-    "prettier": "^3.9.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.1",
+    "typescript-eslint": "^8.62.1",
     "vitest": "^4.1.9",
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.106.0"
   }
 }

@@ -18,21 +18,20 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      # Cache Bun's global module cache, keyed on the lockfile.
       - name: Cache Bun dependencies
         uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('backend/bun.lock') }}
+          key: ${{ runner.os }}-bun-backend-${{ hashFiles('backend/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-bun-backend-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -42,7 +41,7 @@ jobs:
         run: bun run cf-typegen
 
       - name: Typecheck
-        run: bunx tsc --noEmit
+        run: bun run typecheck
 
       - name: Lint (eslint)
         run: bun run lint
@@ -50,28 +49,39 @@ jobs:
       - name: Format check (prettier)
         run: bun run format:check
 
-      - name: Test (vitest)
-        run: bunx vitest run
+      - name: Test (vitest, coverage threshold enforced in vitest.config.ts)
+        run: bun run test
 
-  guard-test-data:
-    name: guard against committing test_data
+  website:
+    name: website (typecheck + lint + format)
     runs-on: ubuntu-latest
-    # PR-only: needs the base ref to diff against.
-    if: github.event_name == 'pull_request'
+    defaults:
+      run:
+        working-directory: website
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v7
 
-      - name: Fail if the PR adds website/public/past_contests test_data
-        run: |
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-          offenders=$(git diff --name-only --diff-filter=A "$base" "$head" \
-            | grep -E '^website/public/past_contests/.*/test_data(/|$)' || true)
-          if [ -n "$offenders" ]; then
-            echo "::error::This PR adds test_data paths under website/public/past_contests (these 3.7GB files must not be committed):"
-            echo "$offenders"
-            exit 1
-          fi
-          echo "OK: no website/public/past_contests test_data paths added."
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-website-${{ hashFiles('website/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-website-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format check (prettier)
+        run: bun run format:check

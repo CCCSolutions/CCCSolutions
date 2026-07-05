@@ -1,12 +1,12 @@
 # Contributing to CCCSolutions
 
-Thanks for helping out! This is a community project, so don't stress about getting everything perfect. 
+Thanks for helping out! This is a community project, so don't stress about getting everything perfect.
 
 ## Ways to contribute
 
 - **Help build a new planned feature** — please check the issue board, there are also many issues tagged `good first issue`!
 - **Fix the site** — bugs, UI, performance.
-- **Report a bug or suggest something**  open a new issue.
+- **Report a bug or suggest something** — open a new issue.
 
 ## Dev setup
 
