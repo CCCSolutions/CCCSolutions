@@ -5,21 +5,19 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import {
-  InfoCircledIcon,
-  CodeIcon,
-  FileTextIcon,
-  ArrowLeftIcon,
-} from '@radix-ui/react-icons';
+import { InfoCircledIcon, CodeIcon, FileTextIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
 import { Problem as ProblemType, problems } from '../../../../constants';
 import dynamic from 'next/dynamic';
 
-const SyntaxHighlighter = dynamic(() => import('react-syntax-highlighter').then(mod => mod.Prism), {
-  ssr: false,
-  loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>
-});
+const SyntaxHighlighter = dynamic(
+  () => import('react-syntax-highlighter').then((mod) => mod.Prism),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>,
+  }
+);
 
 interface TestCaseData {
   input: string | null;
@@ -226,7 +224,7 @@ const Problem = () => {
       case 'insane':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'wicked':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 evil-purple-glow';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
       default:
         return 'bg-surface-200 text-foreground-light';
     }
@@ -338,10 +336,10 @@ const Problem = () => {
             description: `Solution to ${
               problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`
             } from the Canadian Computing Competition`,
-            author: { '@type': 'Organization', name: 'CCC Solutions Community' },
+            author: { '@type': 'Organization', name: 'CCCSolutions Community' },
             publisher: {
               '@type': 'Organization',
-              name: 'CCC Solutions',
+              name: 'CCCSolutions',
               logo: { '@type': 'ImageObject', url: 'https://cccsolutions.ca/icon.png' },
             },
             datePublished: `${contestYear}-02-01`,
@@ -484,16 +482,12 @@ const Problem = () => {
                             <p className="mt-2 text-foreground-light">
                               Loading large test case ({sizeDisplay})…
                             </p>
-                            <p className="mt-1 text-sm text-warning">
-                              ⚠️ This may take a moment
-                            </p>
+                            <p className="mt-1 text-sm text-warning">⚠️ This may take a moment</p>
                           </div>
                         );
                       }
                     }
-                    return (
-                      <p className="mt-2 text-foreground-light">Loading test case…</p>
-                    );
+                    return <p className="mt-2 text-foreground-light">Loading test case…</p>;
                   })()}
                 </div>
               ) : testCaseState === 'error' ? (

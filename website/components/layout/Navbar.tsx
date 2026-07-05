@@ -38,8 +38,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-3">
-            <Link href="/website/public" className="flex items-center">
-              <Image src="/images/mmhs_logo_transparent.png" alt="MMHS Logo" width={40} height={40} className="h-10 w-auto" />
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/images/mmhs_logo_transparent.png"
+                alt="MMHS Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+              />
             </Link>
             <ThemeToggle />
           </div>
@@ -50,7 +56,7 @@ const Navbar = () => {
                   key={item.name}
                   href={item.path}
                   className={`
-                    px-3 py-2 rounded-md text-lg font-medium
+                    px-3 py-2 rounded-md text-lg font-normal
                     relative
                     ${
                       pathname === item.path
@@ -98,7 +104,7 @@ const Navbar = () => {
                 key={item.name}
                 href={item.path}
                 className={`
-                  block px-3 py-2 rounded-md text-base font-medium
+                  block w-fit px-3 py-2 rounded-md text-base font-normal
                   relative overflow-hidden
                   ${
                     pathname === item.path

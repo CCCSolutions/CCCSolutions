@@ -20,7 +20,11 @@ export default function ThemeToggle() {
       className="inline-flex size-9 items-center justify-center text-foreground-light hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
     >
       {mounted ? (
-        isDark ? <SunIcon width="18" height="18" /> : <Moon size={18} strokeWidth={1.75} />
+        isDark ? (
+          <SunIcon width="18" height="18" />
+        ) : (
+          <Moon size={18} strokeWidth={1.75} />
+        )
       ) : (
         <span className="block h-[18px] w-[18px]" />
       )}

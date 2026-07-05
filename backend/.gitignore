@@ -1,6 +1,9 @@
 # prod
 dist/
 
+# test
+coverage/
+
 # dev
 .yarn/
 !.yarn/releases

@@ -1,6 +1,6 @@
 # CCCSolutions v2 Blueprint
 
-> **Maintainers:** William Yang ([@tankman61](https://github.com/tankman61))
+> **Maintainers:** William Yang ([@tankman61](https://github.com/tankman61)), Daniel Zhang ([@danielyx-z](https://github.com/danielyx-z))
 
 ---
 
