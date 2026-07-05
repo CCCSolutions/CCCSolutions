@@ -1,0 +1,11 @@
+# Local env for `wrangler dev` (the Worker) AND drizzle-kit (loaded via drizzle.config.ts).
+# Copy to .dev.vars and fill in real values. .dev.vars is gitignored — never commit it.
+
+# R2 S3 API — used by /download to presign URLs (Object Read & Write token, bucket-scoped)
+R2_ACCOUNT_ID=your-cloudflare-account-id
+R2_BUCKET=cccsolutions
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
+
+# Postgres / Supabase — used by drizzle-kit (db:* scripts)
+DATABASE_URL=postgres://user:pass@host:5432/dbname
