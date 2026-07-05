@@ -23,13 +23,13 @@ function isAllowedOrigin(origin: string): boolean {
 app.use('*', cors({ origin: (origin) => (origin && isAllowedOrigin(origin) ? origin : undefined) }));
 
 app.get('/', (c) => {
-  return c.json('Not implemented', 501);
-  // TODO: welcome message and API version + other information
+  return c.json({ name: 'cccsolutions-api', version: 'v1' });
+  // TODO: expand with available endpoints / links / more API info
 });
 
 app.get('/health', (c) => {
-  return c.json('Not implemented', 501);
-  // TODO: need to implement checking database, cloudflare (all services used), etc.
+  return c.json({ status: 'ok' });
+  // TODO: deeper checks — R2, DB, downstream services (not just liveness)
 });
 
 app.route('/contests', r2);
