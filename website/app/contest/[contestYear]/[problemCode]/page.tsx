@@ -129,7 +129,10 @@ const Problem = () => {
         const data: ListResponse = await res.json();
         if (cancelled) return;
 
-        const listTests = data.tests ?? [];
+        // Show sample cases first, then graded — each group by ascending n.
+        const listTests = [...(data.tests ?? [])].sort(
+          (a, b) => Number(b.sample) - Number(a.sample) || a.n - b.n
+        );
         setTests(listTests);
         if (listTests.length === 0) setTestCaseState('error');
 
@@ -463,7 +466,7 @@ const Problem = () => {
             <div className="flex items-center p-3 border-b border-border-default overflow-x-auto">
               {tests.map((test, idx) => (
                 <button
-                  key={idx}
+                  key={`${test.sample ? 'sample' : 'case'}-${test.n}`}
                   onClick={() => handleTabClick(idx)}
                   className={`px-3 py-1 mr-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                     activeTab === idx
@@ -471,7 +474,7 @@ const Problem = () => {
                       : 'bg-surface-200 text-foreground-light hover:bg-surface-300 hover:text-foreground'
                   }`}
                 >
-                  Case {idx + 1}
+                  {test.sample ? `Sample ${test.n}` : `Case ${test.n}`}
                 </button>
               ))}
             </div>
