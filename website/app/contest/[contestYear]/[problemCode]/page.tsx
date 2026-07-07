@@ -129,7 +129,10 @@ const Problem = () => {
         const data: ListResponse = await res.json();
         if (cancelled) return;
 
-        const listTests = data.tests ?? [];
+        // Show sample cases first, then graded — each group by ascending n.
+        const listTests = [...(data.tests ?? [])].sort(
+          (a, b) => Number(b.sample) - Number(a.sample) || a.n - b.n
+        );
         setTests(listTests);
         if (listTests.length === 0) setTestCaseState('error');
 
