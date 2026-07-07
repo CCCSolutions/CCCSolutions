@@ -11,6 +11,9 @@ import { SectionContainer } from '../../../../components/ui/section-container';
 import { Problem as ProblemType, problems } from '../../../../constants';
 import dynamic from 'next/dynamic';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
+const LARGE_FILE_BYTES = 50 * 1024;
+
 const SyntaxHighlighter = dynamic(
   () => import('react-syntax-highlighter').then((mod) => mod.Prism),
   {
@@ -24,24 +27,49 @@ interface TestCaseData {
   output: string | null;
 }
 
-interface TestCaseSize {
-  inputKB: number;
-  outputKB: number;
+interface TestMeta {
+  n: number;
+  sample: boolean;
+  inputBytes: number;
+  outputBytes: number;
 }
+
+interface SolutionMeta {
+  n: number;
+  ext: string;
+  bytes: number;
+}
+
+interface SolutionEntry {
+  code: string;
+  language: string;
+}
+
+interface ListResponse {
+  tests: TestMeta[];
+  solutions: SolutionMeta[];
+}
+
+const SOLUTION_MISSING_MESSAGE =
+  'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!';
+
+const formatSize = (bytes: number) =>
+  bytes > 1024 * 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+    : `${(bytes / 1024).toFixed(1)}KB`;
 
 const Problem = () => {
   const { contestYear, problemCode } = useParams<{
     contestYear: string;
     problemCode: string;
   }>();
-  const [solutions, setSolutions] = useState<string[]>([]);
+  const [solutions, setSolutions] = useState<SolutionEntry[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: '', output: '' });
   const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
   );
-  const [availableTestCases, setAvailableTestCases] = useState(10);
-  const [testCaseSizes, setTestCaseSizes] = useState<Record<number, TestCaseSize>>({});
+  const [tests, setTests] = useState<TestMeta[]>([]);
   const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -73,38 +101,76 @@ const Problem = () => {
   }, [contestYear, problemCode]);
 
   useEffect(() => {
-    const fetchSolutions = async () => {
-      setLoading(true);
-      const solutionsArray: string[] = [];
-      const basePath = `/past_contests/${contestYear}/${problemCode}`;
+    let cancelled = false;
 
-      for (let i = 1; i <= 3; i++) {
-        try {
-          const fetchUrl = `${basePath}/solution${i === 1 ? '' : i}.txt`;
-          const response = await fetch(fetchUrl);
-
-          if (!response.ok) continue;
-          const text = await response.text();
-
-          if (!text.toLowerCase().includes('<!doctype html>')) {
-            solutionsArray.push(text);
-          }
-        } catch (error) {
-          console.error(`Error fetching solution${i}:`, error);
-        }
+    const extToLanguage = (ext: string, code: string) => {
+      switch (ext) {
+        case 'py':
+          return 'python';
+        case 'cpp':
+          return 'cpp';
+        case 'java':
+          return 'java';
+        case 't':
+          return 'turing';
+        default:
+          return getLanguageFromCode(code);
       }
-
-      if (solutionsArray.length > 0) {
-        setSolutions(solutionsArray);
-      } else {
-        setSolutions([
-          'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!',
-        ]);
-      }
-      setLoading(false);
     };
 
-    fetchSolutions();
+    const loadContest = async () => {
+      setLoading(true);
+      setActiveTab(null);
+      setTestCaseState('idle');
+
+      try {
+        const res = await fetch(`${API_BASE}/contests/${contestYear}/${problemCode}/list`);
+        if (!res.ok) throw new Error(`list ${res.status}`);
+        const data: ListResponse = await res.json();
+        if (cancelled) return;
+
+        const listTests = data.tests ?? [];
+        setTests(listTests);
+        if (listTests.length === 0) setTestCaseState('error');
+
+        const solutionEntries = await Promise.all(
+          (data.solutions ?? []).map(async (s) => {
+            try {
+              const sres = await fetch(
+                `${API_BASE}/contests/${contestYear}/${problemCode}/preview?file=solutions/${s.n}.${s.ext}`
+              );
+              if (!sres.ok) return null;
+              const code = await sres.text();
+              return { code, language: extToLanguage(s.ext, code) };
+            } catch (error) {
+              console.error(`Error fetching solution ${s.n}:`, error);
+              return null;
+            }
+          })
+        );
+        if (cancelled) return;
+
+        const validSolutions = solutionEntries.filter((e): e is SolutionEntry => e !== null);
+        setSolutions(
+          validSolutions.length > 0
+            ? validSolutions
+            : [{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]
+        );
+      } catch (error) {
+        console.error('Error loading contest data:', error);
+        if (cancelled) return;
+        setTests([]);
+        setTestCaseState('error');
+        setSolutions([{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadContest();
+    return () => {
+      cancelled = true;
+    };
   }, [contestYear, problemCode]);
 
   useEffect(() => {
@@ -116,41 +182,39 @@ const Problem = () => {
     }
   }, [problemInfo]);
 
+  const testFilePath = (test: TestMeta, kind: 'in' | 'out') =>
+    `${test.sample ? 'tests/sample' : 'tests'}/${test.n}.${kind}`;
+
+  const downloadUrl = (relpath: string) =>
+    `${API_BASE}/contests/${contestYear}/${problemCode}/download?file=${relpath}`;
+
   const fetchTestCase = async (idx: number) => {
+    const test = tests[idx];
+    if (!test) return;
     setTestCaseState('loading');
     setTestCaseData({ input: '', output: '' });
-    const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
-    const caseNum = idx + 1;
+
+    const base = `${API_BASE}/contests/${contestYear}/${problemCode}/preview`;
 
     try {
-      const inputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.in`);
-      const outputResponse = await fetch(`${basePath}/${problemCode}.${caseNum}.out`);
+      const [inputResponse, outputResponse] = await Promise.all([
+        fetch(`${base}?file=${testFilePath(test, 'in')}`),
+        fetch(`${base}?file=${testFilePath(test, 'out')}`),
+      ]);
 
-      if (!inputResponse.ok || !outputResponse.ok) {
-        setTestCaseState('error');
-        setTestCaseData({
-          input: inputResponse.ok ? await inputResponse.text() : null,
-          output: outputResponse.ok ? await outputResponse.text() : null,
-        });
-        return;
-      }
-
-      const inputText = await inputResponse.text();
-      const outputText = await outputResponse.text();
-
-      if (
-        inputText.toLowerCase().includes('<!doctype html>') ||
-        outputText.toLowerCase().includes('<!doctype html>')
-      ) {
+      if (!inputResponse.ok && !outputResponse.ok) {
         setTestCaseState('error');
         setTestCaseData({ input: null, output: null });
         return;
       }
 
-      setTestCaseData({ input: inputText, output: outputText });
+      setTestCaseData({
+        input: inputResponse.ok ? await inputResponse.text() : null,
+        output: outputResponse.ok ? await outputResponse.text() : null,
+      });
       setTestCaseState('success');
     } catch (error) {
-      console.error(`Error fetching test case ${caseNum}:`, error);
+      console.error(`Error fetching test case ${test.n}:`, error);
       setTestCaseState('error');
       setTestCaseData({ input: null, output: null });
     }
@@ -161,57 +225,8 @@ const Problem = () => {
     fetchTestCase(idx);
   };
 
-  useEffect(() => {
-    const checkTestCases = async () => {
-      const basePath = `/past_contests/${contestYear}/${problemCode}/test_data`;
-      let count = 0;
-      const sizes: Record<number, TestCaseSize> = {};
-
-      for (let i = 1; i <= 20; i++) {
-        try {
-          const inputResponse = await fetch(`${basePath}/${problemCode}.${i}.in`);
-          if (inputResponse.ok) {
-            const inputText = await inputResponse.text();
-            if (!inputText.toLowerCase().includes('<!doctype html>')) {
-              count = i;
-              const inputKB = (inputText.length / 1024).toFixed(1);
-
-              try {
-                const outputResponse = await fetch(`${basePath}/${problemCode}.${i}.out`);
-                if (outputResponse.ok) {
-                  const outputText = await outputResponse.text();
-                  const outputKB = (outputText.length / 1024).toFixed(1);
-                  sizes[i] = {
-                    inputKB: parseFloat(inputKB),
-                    outputKB: parseFloat(outputKB),
-                  };
-                }
-              } catch {
-                sizes[i] = { inputKB: parseFloat(inputKB), outputKB: 0 };
-              }
-            } else {
-              break;
-            }
-          } else {
-            break;
-          }
-        } catch {
-          break;
-        }
-      }
-
-      setAvailableTestCases(count > 0 ? count : 10);
-      setTestCaseSizes(sizes);
-    };
-
-    checkTestCases();
-  }, [contestYear, problemCode]);
-
-  const getFileSizeWarning = (text: string | null) => {
-    if (!text) return null;
-    const sizeKB = parseFloat((text.length / 1024).toFixed(1));
-    return sizeKB > 50 ? `Large file (${sizeKB}KB)` : null;
-  };
+  const getFileSizeWarning = (bytes: number | undefined) =>
+    bytes && bytes > LARGE_FILE_BYTES ? `Large file (${formatSize(bytes)})` : null;
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty?.toLowerCase()) {
@@ -292,6 +307,8 @@ const Problem = () => {
 
     return 'cpp';
   };
+
+  const activeTest = activeTab !== null ? (tests[activeTab] ?? null) : null;
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -410,11 +427,11 @@ const Problem = () => {
                       Solution {idx + 1}
                     </h3>
                     <span className="text-xs font-medium text-foreground-lighter uppercase">
-                      {getLanguageFromCode(solution)}
+                      {solution.language}
                     </span>
                   </div>
                   <SyntaxHighlighter
-                    language={getLanguageFromCode(solution)}
+                    language={solution.language}
                     style={codeStyle}
                     showLineNumbers
                     customStyle={{
@@ -426,7 +443,7 @@ const Problem = () => {
                     codeTagProps={{ style: { background: 'transparent' } }}
                     lineProps={{ style: { background: 'transparent' } }}
                   >
-                    {solution}
+                    {solution.code}
                   </SyntaxHighlighter>
                 </Card>
               ))}
@@ -444,7 +461,7 @@ const Problem = () => {
           <Card>
             {/* Tab strip */}
             <div className="flex items-center p-3 border-b border-border-default overflow-x-auto">
-              {Array.from({ length: availableTestCases }, (_, idx) => (
+              {tests.map((test, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleTabClick(idx)}
@@ -460,7 +477,7 @@ const Problem = () => {
             </div>
 
             <div className="p-4">
-              {activeTab === null ? (
+              {activeTab === null && tests.length > 0 ? (
                 <div className="text-center py-8 text-foreground-lighter text-sm">
                   Select a test case to view input and output
                 </div>
@@ -468,19 +485,13 @@ const Problem = () => {
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full size-8 border-b-2 border-brand" />
                   {(() => {
-                    const caseNum = activeTab + 1;
-                    const sizes = testCaseSizes[caseNum];
-                    if (sizes) {
-                      const maxSize = Math.max(sizes.inputKB, sizes.outputKB);
-                      if (maxSize > 50) {
-                        const sizeDisplay =
-                          maxSize > 1024
-                            ? `${(maxSize / 1024).toFixed(1)}MB`
-                            : `${maxSize.toFixed(1)}KB`;
+                    if (activeTest) {
+                      const maxBytes = Math.max(activeTest.inputBytes, activeTest.outputBytes);
+                      if (maxBytes > LARGE_FILE_BYTES) {
                         return (
                           <div>
                             <p className="mt-2 text-foreground-light">
-                              Loading large test case ({sizeDisplay})…
+                              Loading large test case ({formatSize(maxBytes)})…
                             </p>
                             <p className="mt-1 text-sm text-warning">⚠️ This may take a moment</p>
                           </div>
@@ -497,16 +508,16 @@ const Problem = () => {
                     Test case not available. See GitHub repo for test data.
                   </p>
                 </div>
-              ) : testCaseState === 'success' ? (
+              ) : testCaseState === 'success' && activeTest ? (
                 <div>
-                  {(getFileSizeWarning(testCaseData.input) ||
-                    getFileSizeWarning(testCaseData.output)) && (
+                  {(getFileSizeWarning(activeTest.inputBytes) ||
+                    getFileSizeWarning(activeTest.outputBytes)) && (
                     <div className="mb-4 p-3 bg-warning-200 border border-warning-400 rounded-md">
                       <p className="text-sm text-warning-600">
                         ⚠️{' '}
-                        {getFileSizeWarning(testCaseData.input) ||
-                          getFileSizeWarning(testCaseData.output)}{' '}
-                        , may load slowly
+                        {getFileSizeWarning(activeTest.inputBytes) ||
+                          getFileSizeWarning(activeTest.outputBytes)}{' '}
+                        — preview is truncated, use the download link for the full file
                       </p>
                     </div>
                   )}
@@ -514,32 +525,40 @@ const Problem = () => {
                     <div>
                       <h3 className="font-medium text-foreground-light mb-2 text-sm">
                         Input
-                        {getFileSizeWarning(testCaseData.input) && (
-                          <span className="text-xs text-foreground-lighter ml-2">
-                            ({(testCaseData.input!.length / 1024).toFixed(1)}KB)
-                          </span>
-                        )}
+                        <span className="text-xs text-foreground-lighter ml-2">
+                          ({formatSize(activeTest.inputBytes)})
+                        </span>
                       </h3>
                       <textarea
                         className="w-full h-48 p-3 bg-surface-100 text-foreground border border-border-strong rounded-md resize-y font-mono text-sm focus:outline-none focus:border-brand-highlight"
                         readOnly
                         value={testCaseData.input || ''}
                       />
+                      <a
+                        href={downloadUrl(testFilePath(activeTest, 'in'))}
+                        className="inline-block mt-2 text-xs text-brand hover:underline"
+                      >
+                        Download full input
+                      </a>
                     </div>
                     <div>
                       <h3 className="font-medium text-foreground-light mb-2 text-sm">
                         Output
-                        {getFileSizeWarning(testCaseData.output) && (
-                          <span className="text-xs text-foreground-lighter ml-2">
-                            ({(testCaseData.output!.length / 1024).toFixed(1)}KB)
-                          </span>
-                        )}
+                        <span className="text-xs text-foreground-lighter ml-2">
+                          ({formatSize(activeTest.outputBytes)})
+                        </span>
                       </h3>
                       <textarea
                         className="w-full h-48 p-3 bg-surface-100 text-foreground border border-border-strong rounded-md resize-y font-mono text-sm focus:outline-none focus:border-brand-highlight"
                         readOnly
                         value={testCaseData.output || ''}
                       />
+                      <a
+                        href={downloadUrl(testFilePath(activeTest, 'out'))}
+                        className="inline-block mt-2 text-xs text-brand hover:underline"
+                      >
+                        Download full output
+                      </a>
                     </div>
                   </div>
                 </div>
