@@ -5,9 +5,16 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { InfoCircledIcon, CodeIcon, FileTextIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
+import {
+  InfoCircledIcon,
+  CodeIcon,
+  FileTextIcon,
+  ArrowLeftIcon,
+  DownloadIcon,
+} from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
+import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
 import { Problem as ProblemType, problems } from '../../../../constants';
 import dynamic from 'next/dynamic';
 
@@ -43,6 +50,10 @@ interface SolutionMeta {
 interface SolutionEntry {
   code: string;
   language: string;
+  // Present for real solutions (enables the per-card download); absent for the
+  // "no solution yet" placeholder entry.
+  n?: number;
+  ext?: string;
 }
 
 interface ListResponse {
@@ -70,6 +81,8 @@ const Problem = () => {
     'idle'
   );
   const [tests, setTests] = useState<TestMeta[]>([]);
+  const [solutionsMeta, setSolutionsMeta] = useState<SolutionMeta[]>([]);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -134,6 +147,7 @@ const Problem = () => {
           (a, b) => Number(b.sample) - Number(a.sample) || a.n - b.n
         );
         setTests(listTests);
+        setSolutionsMeta([...(data.solutions ?? [])].sort((a, b) => a.n - b.n));
         if (listTests.length === 0) setTestCaseState('error');
 
         const solutionEntries = await Promise.all(
@@ -144,7 +158,7 @@ const Problem = () => {
               );
               if (!sres.ok) return null;
               const code = await sres.text();
-              return { code, language: extToLanguage(s.ext, code) };
+              return { code, language: extToLanguage(s.ext, code), n: s.n, ext: s.ext };
             } catch (error) {
               console.error(`Error fetching solution ${s.n}:`, error);
               return null;
@@ -153,7 +167,9 @@ const Problem = () => {
         );
         if (cancelled) return;
 
-        const validSolutions = solutionEntries.filter((e): e is SolutionEntry => e !== null);
+        const validSolutions = solutionEntries.filter(
+          (e): e is NonNullable<typeof e> => e !== null
+        );
         setSolutions(
           validSolutions.length > 0
             ? validSolutions
@@ -163,6 +179,7 @@ const Problem = () => {
         console.error('Error loading contest data:', error);
         if (cancelled) return;
         setTests([]);
+        setSolutionsMeta([]);
         setTestCaseState('error');
         setSolutions([{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]);
       } finally {
@@ -429,9 +446,21 @@ const Problem = () => {
                     <h3 className="font-medium text-foreground-light text-sm">
                       Solution {idx + 1}
                     </h3>
-                    <span className="text-xs font-medium text-foreground-lighter uppercase">
-                      {solution.language}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium text-foreground-lighter uppercase">
+                        {solution.language}
+                      </span>
+                      {solution.n !== undefined && solution.ext && (
+                        <a
+                          href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
+                          className="text-foreground-lighter hover:text-brand transition-colors"
+                          aria-label={`Download solution ${idx + 1}`}
+                          title="Download solution"
+                        >
+                          <DownloadIcon width="15" height="15" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <SyntaxHighlighter
                     language={solution.language}
@@ -456,9 +485,21 @@ const Problem = () => {
 
         {/* Test cases section */}
         <section>
-          <div className="flex items-center gap-2 mb-4">
-            <FileTextIcon width="18" height="18" className="text-brand" />
-            <h2 className="text-xl font-semibold text-foreground">Test cases</h2>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <FileTextIcon width="18" height="18" className="text-brand" />
+              <h2 className="text-xl font-semibold text-foreground">Test cases</h2>
+            </div>
+            {(tests.length > 0 || solutionsMeta.length > 0) && (
+              <button
+                onClick={() => setDownloadOpen(true)}
+                className="inline-flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground transition-colors"
+                aria-label="Download test cases and solutions"
+              >
+                <DownloadIcon width="15" height="15" />
+                Download
+              </button>
+            )}
           </div>
 
           <Card>
@@ -520,7 +561,7 @@ const Problem = () => {
                         ⚠️{' '}
                         {getFileSizeWarning(activeTest.inputBytes) ||
                           getFileSizeWarning(activeTest.outputBytes)}{' '}
-                        — preview is truncated, use the download link for the full file
+                        — preview is truncated, use the Download button for the full file
                       </p>
                     </div>
                   )}
@@ -537,12 +578,6 @@ const Problem = () => {
                         readOnly
                         value={testCaseData.input || ''}
                       />
-                      <a
-                        href={downloadUrl(testFilePath(activeTest, 'in'))}
-                        className="inline-block mt-2 text-xs text-brand hover:underline"
-                      >
-                        Download full input
-                      </a>
                     </div>
                     <div>
                       <h3 className="font-medium text-foreground-light mb-2 text-sm">
@@ -556,12 +591,6 @@ const Problem = () => {
                         readOnly
                         value={testCaseData.output || ''}
                       />
-                      <a
-                        href={downloadUrl(testFilePath(activeTest, 'out'))}
-                        className="inline-block mt-2 text-xs text-brand hover:underline"
-                      >
-                        Download full output
-                      </a>
                     </div>
                   </div>
                 </div>
@@ -570,6 +599,16 @@ const Problem = () => {
           </Card>
         </section>
       </SectionContainer>
+
+      <DownloadDialog
+        open={downloadOpen}
+        onClose={() => setDownloadOpen(false)}
+        apiBase={API_BASE}
+        year={contestYear}
+        code={problemCode}
+        tests={tests}
+        solutions={solutionsMeta}
+      />
     </div>
   );
 };
