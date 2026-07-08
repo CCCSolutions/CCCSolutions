@@ -61,6 +61,17 @@ r2.get('/:year/:code/preview', async (c) => {
   return c.text(isSolution ? text : text.split('\n').slice(0, 50).join('\n'));
 });
 
+// Friendly download filename: samples read clearly, solutions carry year+code.
+function downloadName(file: string, year: string, code: string): string {
+  const sample = file.match(/^tests\/sample\/(\d+)\.(in|out)$/);
+  if (sample) return `sample${sample[1]}.${sample[2]}`;
+  const test = file.match(/^tests\/(\d+)\.(in|out)$/);
+  if (test) return `${test[1]}.${test[2]}`;
+  const sol = file.match(/^solutions\/(\d+)\.(\w+)$/);
+  if (sol) return `${year}_${code}_solution${sol[1]}.${sol[2]}`;
+  return file.split('/').pop()!;
+}
+
 // R2 download endpoint: hand back a short-lived presigned URL so the browser
 // fetches the file straight from R2 (egress is free; the Worker never streams it).
 r2.get('/:year/:code/download', async (c) => {
@@ -79,6 +90,10 @@ r2.get('/:year/:code/download', async (c) => {
 
   const endpoint = new URL(`https://${c.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${c.env.R2_BUCKET}/${key}`);
   endpoint.searchParams.set('X-Amz-Expires', '300'); // presigned URL valid 5 minutes
+  endpoint.searchParams.set(
+    'response-content-disposition',
+    `attachment; filename="${downloadName(file.data, params.data.year, params.data.code)}"`,
+  );
 
   const signed = await client.sign(endpoint.toString(), {
     method: 'GET',

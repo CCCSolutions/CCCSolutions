@@ -92,6 +92,17 @@ describe('GET /contests/:year/:code/download', () => {
     expect(loc).toContain('X-Amz-Signature=');
   });
 
+  it('names the download via response-content-disposition', async () => {
+    const env = { TESTCASES_SOLUTIONS_BUCKET: bucketReturning(null), ...R2_ENV };
+    const cd = async (file: string) => {
+      const res = await app.request(`/contests/2024/s1/download?file=${file}`, {}, env);
+      return decodeURIComponent(res.headers.get('location') ?? '');
+    };
+    expect(await cd('tests/sample/3.in')).toContain('filename="sample3.in"');
+    expect(await cd('tests/5.out')).toContain('filename="5.out"');
+    expect(await cd('solutions/1.py')).toContain('filename="2024_s1_solution1.py"');
+  });
+
   it('returns 400 for a bad file', async () => {
     const res = await app.request(
       '/contests/2024/s1/download?file=nope',
