@@ -119,8 +119,7 @@ export function DownloadDialog({
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  const downloadUrl = (file: string) =>
-    `${apiBase}/contests/${year}/${code}/download?file=${file}`;
+  const downloadUrl = (file: string) => `${apiBase}/contests/${year}/${code}/download?file=${file}`;
 
   const toggle = (file: string) =>
     setSelected((prev) => {
@@ -131,8 +130,7 @@ export function DownloadDialog({
     });
 
   const allSelected = items.length > 0 && selected.size === items.length;
-  const toggleAll = () =>
-    setSelected(allSelected ? new Set() : new Set(items.map((i) => i.file)));
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(items.map((i) => i.file)));
 
   const selectedItems = items.filter((i) => selected.has(i.file));
   const selectedBytes = selectedItems.reduce((sum, i) => sum + i.bytes, 0);
