@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import JSZip from 'jszip';
-import { Cross2Icon, DownloadIcon } from '@radix-ui/react-icons';
+import { Cross2Icon, DownloadIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { Button } from '../ui/button';
 
 interface TestMeta {
@@ -28,10 +28,10 @@ interface DownloadItem {
   entryName: string;
 }
 
-// JSZip buffers every file in memory, so cap the total selected size to keep the
-// browser tab from OOM-ing. Egress is free; this is a memory guard, not a cost one.
-// Individual (direct) downloads are unbounded — they never touch this path.
-const ZIP_MAX_BYTES = 300 * 1024 * 1024;
+// JSZip buffers every file in memory, so a big selection can lag or crash the
+// tab. This isn't a hard limit (egress is free, and the zip still builds) — past
+// it we just warn. Individual (direct) downloads never touch this path.
+const ZIP_WARN_BYTES = 300 * 1024 * 1024;
 
 const formatSize = (bytes: number) =>
   bytes > 1024 * 1024
@@ -121,23 +121,52 @@ export function DownloadDialog({
 
   const downloadUrl = (file: string) => `${apiBase}/contests/${year}/${code}/download?file=${file}`;
 
-  const toggle = (file: string) =>
+  // Click-and-drag selection: mousedown on a row picks a mode (select vs deselect
+  // based on that row's current state) and applies it; dragging over more rows
+  // paints them the same. A plain click toggles a single row. Desktop only —
+  // touchscreens fall back to per-row taps. dragMode lives in a ref so the
+  // window mouseup listener and mouseenter handlers read it without re-rendering.
+  const dragMode = useRef<boolean | null>(null);
+
+  const applyDrag = (file: string, select: boolean) =>
     setSelected((prev) => {
+      if (prev.has(file) === select) return prev;
       const next = new Set(prev);
-      if (next.has(file)) next.delete(file);
-      else next.add(file);
+      if (select) next.add(file);
+      else next.delete(file);
       return next;
     });
+
+  const onRowMouseDown = (e: React.MouseEvent, file: string) => {
+    // Left button only, and never hijack the per-row download link.
+    if (e.button !== 0 || (e.target as HTMLElement).closest('a')) return;
+    e.preventDefault(); // don't start a text selection while dragging
+    const select = !selected.has(file);
+    dragMode.current = select;
+    applyDrag(file, select);
+  };
+
+  const onRowMouseEnter = (file: string) => {
+    if (dragMode.current !== null) applyDrag(file, dragMode.current);
+  };
+
+  useEffect(() => {
+    const end = () => {
+      dragMode.current = null;
+    };
+    window.addEventListener('mouseup', end);
+    return () => window.removeEventListener('mouseup', end);
+  }, []);
 
   const allSelected = items.length > 0 && selected.size === items.length;
   const toggleAll = () => setSelected(allSelected ? new Set() : new Set(items.map((i) => i.file)));
 
   const selectedItems = items.filter((i) => selected.has(i.file));
   const selectedBytes = selectedItems.reduce((sum, i) => sum + i.bytes, 0);
-  const overLimit = selectedBytes > ZIP_MAX_BYTES;
+  const largeSelection = selectedBytes > ZIP_WARN_BYTES;
 
   const downloadZip = async () => {
-    if (selectedItems.length === 0 || overLimit || zipping) return;
+    if (selectedItems.length === 0 || zipping) return;
     setZipping(true);
     setError(null);
     try {
@@ -220,7 +249,7 @@ export function DownloadDialog({
           </span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 py-2">
+        <div className="flex-1 overflow-y-auto px-2 py-2 select-none">
           {items.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-foreground-lighter">
               Nothing available to download.
@@ -229,13 +258,16 @@ export function DownloadDialog({
             items.map((item) => (
               <div
                 key={item.file}
-                className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-surface-200"
+                onMouseDown={(e) => onRowMouseDown(e, item.file)}
+                onMouseEnter={() => onRowMouseEnter(item.file)}
+                className="flex items-center gap-3 px-3 py-1.5 rounded-md cursor-pointer hover:bg-surface-200"
               >
                 <input
                   type="checkbox"
                   checked={selected.has(item.file)}
-                  onChange={() => toggle(item.file)}
-                  className="accent-brand-500"
+                  readOnly
+                  tabIndex={-1}
+                  className="accent-brand-500 pointer-events-none"
                   aria-label={item.label}
                 />
                 <span className="flex-1 text-sm text-foreground-light truncate">{item.label}</span>
@@ -255,10 +287,13 @@ export function DownloadDialog({
         </div>
 
         <div className="px-5 py-3 border-t border-border-default">
-          {overLimit && (
-            <p className="mb-2 text-xs text-warning-600">
-              ⚠️ Selection is {formatSize(selectedBytes)} — over the {formatSize(ZIP_MAX_BYTES)} zip
-              limit. Deselect some files, or download them individually.
+          {largeSelection && (
+            <p className="mb-2 flex items-start gap-1.5 text-xs text-warning-600">
+              <ExclamationTriangleIcon width="14" height="14" className="mt-0.5 shrink-0" />
+              <span>
+                Large selection ({formatSize(selectedBytes)}) — the zip is built in your browser and
+                may lag or freeze the tab.
+              </span>
             </p>
           )}
           {error && <p className="mb-2 text-xs text-destructive">{error}</p>}
@@ -267,7 +302,7 @@ export function DownloadDialog({
             size="small"
             block
             onClick={downloadZip}
-            disabled={selectedItems.length === 0 || overLimit || zipping}
+            disabled={selectedItems.length === 0 || zipping}
             iconLeft={<DownloadIcon width="15" height="15" />}
           >
             {zipping ? 'Building zip…' : 'Download selected (.zip)'}

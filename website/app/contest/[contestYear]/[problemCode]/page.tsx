@@ -11,6 +11,7 @@ import {
   FileTextIcon,
   ArrowLeftIcon,
   DownloadIcon,
+  ExclamationTriangleIcon,
 } from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
@@ -537,7 +538,10 @@ const Problem = () => {
                             <p className="mt-2 text-foreground-light">
                               Loading large test case ({formatSize(maxBytes)})…
                             </p>
-                            <p className="mt-1 text-sm text-warning">⚠️ This may take a moment</p>
+                            <p className="mt-1 flex items-center justify-center gap-1.5 text-sm text-warning">
+                              <ExclamationTriangleIcon width="13" height="13" />
+                              This may take a moment
+                            </p>
                           </div>
                         );
                       }
@@ -557,11 +561,17 @@ const Problem = () => {
                   {(getFileSizeWarning(activeTest.inputBytes) ||
                     getFileSizeWarning(activeTest.outputBytes)) && (
                     <div className="mb-4 p-3 bg-warning-200 border border-warning-400 rounded-md">
-                      <p className="text-sm text-warning-600">
-                        ⚠️{' '}
-                        {getFileSizeWarning(activeTest.inputBytes) ||
-                          getFileSizeWarning(activeTest.outputBytes)}{' '}
-                        — preview is truncated, use the Download button for the full file
+                      <p className="flex items-start gap-1.5 text-sm text-warning-600">
+                        <ExclamationTriangleIcon
+                          width="14"
+                          height="14"
+                          className="mt-0.5 shrink-0"
+                        />
+                        <span>
+                          {getFileSizeWarning(activeTest.inputBytes) ||
+                            getFileSizeWarning(activeTest.outputBytes)}{' '}
+                          — preview is truncated, use the Download button for the full file
+                        </span>
                       </p>
                     </div>
                   )}
