@@ -1833,7 +1833,14 @@ const problems: Problem[] = [
     hasSolution: true,
   },
 
-  // 2002 Senifalse	{ name: '2002 S2 - Fraction Action', difficulty: 'Easy', tags: ['GCD algorithm'], link: '/contest/2002/s2', hasSolution: true },
+  // 2002 Senior
+  {
+    name: '2002 S2 - Fraction Action',
+    difficulty: 'Easy',
+    tags: ['GCD algorithm'],
+    link: '/contest/2002/s2',
+    hasSolution: true,
+  },
   {
     name: '2002 S3 - Blindfold',
     difficulty: 'Normal',
