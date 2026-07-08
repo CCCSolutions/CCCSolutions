@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { AwsClient } from 'aws4fetch';
+import { z } from 'zod';
 import type { Bindings } from '../types';
 import { problemParamsSchema, fileSchema } from '../schemas';
 
@@ -72,6 +73,31 @@ function downloadName(file: string, year: string, code: string): string {
   return file.split('/').pop()!;
 }
 
+// Presign a short-lived R2 URL for one file, naming the download via
+// response-content-disposition. Shared by the single (GET) and batch (POST)
+// download endpoints so both stay on the same signing + filename logic.
+async function presignDownload(env: Bindings, year: string, code: string, file: string): Promise<string> {
+  const key = `contests/${year}/${code}/${file}`;
+
+  const client = new AwsClient({
+    accessKeyId: env.R2_ACCESS_KEY_ID,
+    secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+    service: 's3',
+    region: 'auto',
+  });
+
+  const endpoint = new URL(`https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${env.R2_BUCKET}/${key}`);
+  endpoint.searchParams.set('X-Amz-Expires', '300'); // presigned URL valid 5 minutes
+  endpoint.searchParams.set('response-content-disposition', `attachment; filename="${downloadName(file, year, code)}"`);
+
+  const signed = await client.sign(endpoint.toString(), {
+    method: 'GET',
+    aws: { signQuery: true }, // signature in the query string = presigned URL
+  });
+
+  return signed.url;
+}
+
 // R2 download endpoint: hand back a short-lived presigned URL so the browser
 // fetches the file straight from R2 (egress is free; the Worker never streams it).
 r2.get('/:year/:code/download', async (c) => {
@@ -79,28 +105,32 @@ r2.get('/:year/:code/download', async (c) => {
   const file = fileSchema.safeParse(c.req.query('file'));
   if (!params.success || !file.success)
     return c.text('Bad request: /contests/<year>/<code>/download?file=solutions/1.cpp', 400);
-  const key = `contests/${params.data.year}/${params.data.code}/${file.data}`;
 
-  const client = new AwsClient({
-    accessKeyId: c.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: c.env.R2_SECRET_ACCESS_KEY,
-    service: 's3',
-    region: 'auto',
-  });
+  const url = await presignDownload(c.env, params.data.year, params.data.code, file.data);
+  return c.redirect(url, 302);
+});
 
-  const endpoint = new URL(`https://${c.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${c.env.R2_BUCKET}/${key}`);
-  endpoint.searchParams.set('X-Amz-Expires', '300'); // presigned URL valid 5 minutes
-  endpoint.searchParams.set(
-    'response-content-disposition',
-    `attachment; filename="${downloadName(file.data, params.data.year, params.data.code)}"`,
+// Batch download: one call → N presigned URLs, so a frontend zip doesn't fire
+// N separate (rate-limited) /download requests. Returns URLs, not bytes — the
+// browser fetches each straight from R2.
+const MAX_BATCH_FILES = 200;
+
+r2.post('/:year/:code/download', async (c) => {
+  const params = problemParamsSchema.safeParse({ year: c.req.param('year'), code: c.req.param('code') });
+  if (!params.success) return c.text('Bad request: POST /contests/<year>/<code>/download', 400);
+
+  const body = await c.req.json().catch(() => null);
+  const parsed = z.object({ files: z.array(fileSchema).min(1).max(MAX_BATCH_FILES) }).safeParse(body);
+  if (!parsed.success) return c.text('Bad request: body must be { files: string[] } of valid file paths', 400);
+
+  const urls = await Promise.all(
+    parsed.data.files.map(async (file) => ({
+      file,
+      url: await presignDownload(c.env, params.data.year, params.data.code, file),
+    })),
   );
 
-  const signed = await client.sign(endpoint.toString(), {
-    method: 'GET',
-    aws: { signQuery: true }, // signature in the query string = presigned URL
-  });
-
-  return c.redirect(signed.url, 302);
+  return c.json({ urls });
 });
 
 export default r2;
