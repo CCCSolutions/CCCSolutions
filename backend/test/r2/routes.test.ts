@@ -135,3 +135,47 @@ describe('GET /contests/:year/:code/list', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('Workers Cache headers', () => {
+  const CACHE_CONTROL = 'public, max-age=86400, stale-while-revalidate=604800';
+
+  it('/list is cacheable and tagged by contest', async () => {
+    const bucket = bucketListing([['contests/2024/s1/tests/1.in', 100]]);
+    const res = await app.request('/contests/2024/s1/list', {}, { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV });
+    expect(res.headers.get('cache-control')).toBe(CACHE_CONTROL);
+    expect(res.headers.get('cache-tag')).toBe('contest:2024:s1');
+  });
+
+  it('/preview is cacheable and tagged by contest', async () => {
+    const bucket = bucketReturning('print(1)\n');
+    const res = await app.request(
+      '/contests/2024/s1/preview?file=solutions/1.py',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.headers.get('cache-control')).toBe(CACHE_CONTROL);
+    expect(res.headers.get('cache-tag')).toBe('contest:2024:s1');
+  });
+
+  it('/preview miss (404) is not cached', async () => {
+    const bucket = bucketReturning(null);
+    const res = await app.request(
+      '/contests/2024/s1/preview?file=solutions/1.py',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(404);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(res.headers.get('cache-tag')).toBeNull();
+  });
+
+  it('/download is never cached', async () => {
+    const res = await app.request(
+      '/contests/2024/s1/download?file=solutions/1.py',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucketReturning(null), ...R2_ENV },
+    );
+    expect(res.status).toBe(302);
+    expect(res.headers.get('cache-control')).toBe('no-store');
+  });
+});
