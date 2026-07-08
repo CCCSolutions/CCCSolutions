@@ -125,8 +125,11 @@ export function DownloadDialog({
   // based on that row's current state) and applies it; dragging over more rows
   // paints them the same. A plain click toggles a single row. Desktop only —
   // touchscreens fall back to per-row taps. dragMode lives in a ref so the
-  // window mouseup listener and mouseenter handlers read it without re-rendering.
+  // window listeners and the rAF loop read it without re-rendering.
   const dragMode = useRef<boolean | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const pointer = useRef({ x: 0, y: 0 });
+  const rafId = useRef<number | null>(null);
 
   const applyDrag = (file: string, select: boolean) =>
     setSelected((prev) => {
@@ -141,6 +144,7 @@ export function DownloadDialog({
     // Left button only, and never hijack the per-row download link.
     if (e.button !== 0 || (e.target as HTMLElement).closest('a')) return;
     e.preventDefault(); // don't start a text selection while dragging
+    pointer.current = { x: e.clientX, y: e.clientY };
     const select = !selected.has(file);
     dragMode.current = select;
     applyDrag(file, select);
@@ -150,12 +154,64 @@ export function DownloadDialog({
     if (dragMode.current !== null) applyDrag(file, dragMode.current);
   };
 
+  // Auto-scroll the list when a drag reaches its top/bottom edge, so off-screen
+  // rows scroll into view (and get painted) instead of being stuck out of reach.
   useEffect(() => {
+    const EDGE = 40; // px from an edge that triggers scrolling
+    const MAX_STEP = 16; // px per frame at the very edge (ramps with proximity)
+
+    const stopScroll = () => {
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+        rafId.current = null;
+      }
+    };
+
+    const step = () => {
+      const el = listRef.current;
+      if (!el || dragMode.current === null) {
+        rafId.current = null;
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const { x, y } = pointer.current;
+      let delta = 0;
+      if (y < rect.top + EDGE) {
+        const p = Math.min(1, (rect.top + EDGE - y) / EDGE);
+        delta = -Math.ceil(p * MAX_STEP);
+      } else if (y > rect.bottom - EDGE) {
+        const p = Math.min(1, (y - (rect.bottom - EDGE)) / EDGE);
+        delta = Math.ceil(p * MAX_STEP);
+      }
+      if (delta === 0) {
+        rafId.current = null; // cursor left the edge zone — idle until it returns
+        return;
+      }
+      el.scrollTop += delta;
+      // Scrolling under a still cursor doesn't reliably fire mouseenter, so paint
+      // whichever row now sits under the pointer.
+      const row = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-file]');
+      if (row?.dataset.file) applyDrag(row.dataset.file, dragMode.current);
+      rafId.current = requestAnimationFrame(step);
+    };
+
+    const onMove = (e: MouseEvent) => {
+      if (dragMode.current === null) return;
+      pointer.current = { x: e.clientX, y: e.clientY };
+      if (rafId.current === null) rafId.current = requestAnimationFrame(step);
+    };
     const end = () => {
       dragMode.current = null;
+      stopScroll();
     };
+
+    window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', end);
-    return () => window.removeEventListener('mouseup', end);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', end);
+      stopScroll();
+    };
   }, []);
 
   const allSelected = items.length > 0 && selected.size === items.length;
@@ -249,7 +305,7 @@ export function DownloadDialog({
           </span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 py-2 select-none">
+        <div ref={listRef} className="flex-1 overflow-y-auto px-2 py-2 select-none">
           {items.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-foreground-lighter">
               Nothing available to download.
@@ -258,6 +314,7 @@ export function DownloadDialog({
             items.map((item) => (
               <div
                 key={item.file}
+                data-file={item.file}
                 onMouseDown={(e) => onRowMouseDown(e, item.file)}
                 onMouseEnter={() => onRowMouseEnter(item.file)}
                 className="flex items-center gap-3 px-3 py-1.5 rounded-md cursor-pointer hover:bg-surface-200"
