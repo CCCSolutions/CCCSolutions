@@ -219,10 +219,27 @@ export function DownloadDialog({
 
   const selectedItems = items.filter((i) => selected.has(i.file));
   const selectedBytes = selectedItems.reduce((sum, i) => sum + i.bytes, 0);
-  const largeSelection = selectedBytes > ZIP_WARN_BYTES;
+  // Only a 2+ selection builds a zip, so the browser-memory caution is scoped to that.
+  const largeSelection = selectedItems.length >= 2 && selectedBytes > ZIP_WARN_BYTES;
 
-  const downloadZip = async () => {
+  // Trigger a direct browser download of one file via the GET /download endpoint,
+  // which 302s to R2 with Content-Disposition. Same mechanism as the per-row link
+  // (no fetch/JSZip/CORS needed) — a single selection shouldn't become a 1-file zip.
+  const downloadSingle = (file: string) => {
+    const a = document.createElement('a');
+    a.href = downloadUrl(file);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    onClose();
+  };
+
+  const downloadSelected = async () => {
     if (selectedItems.length === 0 || zipping) return;
+    if (selectedItems.length === 1) {
+      downloadSingle(selectedItems[0].file);
+      return;
+    }
     setZipping(true);
     setError(null);
     try {
@@ -358,11 +375,15 @@ export function DownloadDialog({
             type="primary"
             size="small"
             block
-            onClick={downloadZip}
+            onClick={downloadSelected}
             disabled={selectedItems.length === 0 || zipping}
             iconLeft={<DownloadIcon width="15" height="15" />}
           >
-            {zipping ? 'Building zip…' : 'Download selected (.zip)'}
+            {zipping
+              ? 'Building zip…'
+              : selectedItems.length === 1
+                ? 'Download file'
+                : 'Download selected (.zip)'}
           </Button>
         </div>
       </div>
