@@ -92,11 +92,79 @@ describe('GET /contests/:year/:code/download', () => {
     expect(loc).toContain('X-Amz-Signature=');
   });
 
+  it('names the download via response-content-disposition', async () => {
+    const env = { TESTCASES_SOLUTIONS_BUCKET: bucketReturning(null), ...R2_ENV };
+    const cd = async (file: string) => {
+      const res = await app.request(`/contests/2024/s1/download?file=${file}`, {}, env);
+      return decodeURIComponent(res.headers.get('location') ?? '');
+    };
+    expect(await cd('tests/sample/3.in')).toContain('filename="sample3.in"');
+    expect(await cd('tests/5.out')).toContain('filename="5.out"');
+    expect(await cd('solutions/1.py')).toContain('filename="2024_s1_solution1.py"');
+  });
+
   it('returns 400 for a bad file', async () => {
     const res = await app.request(
       '/contests/2024/s1/download?file=nope',
       {},
       { TESTCASES_SOLUTIONS_BUCKET: bucketReturning(null), ...R2_ENV },
+    );
+    expect(res.status).toBe(400);
+  });
+});
+
+describe('POST /contests/:year/:code/download (batch)', () => {
+  const env = { TESTCASES_SOLUTIONS_BUCKET: bucketReturning(null), ...R2_ENV };
+  const postFiles = (files: unknown) =>
+    app.request(
+      '/contests/2024/s1/download',
+      { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ files }) },
+      env,
+    );
+
+  it('returns a presigned URL per file, each named via response-content-disposition', async () => {
+    const res = await postFiles(['tests/sample/3.in', 'tests/5.out', 'solutions/1.py']);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { urls: { file: string; url: string }[] };
+    expect(body.urls.map((u) => u.file)).toEqual(['tests/sample/3.in', 'tests/5.out', 'solutions/1.py']);
+    const named = body.urls.map((u) => decodeURIComponent(u.url));
+    expect(named[0]).toContain('filename="sample3.in"');
+    expect(named[1]).toContain('filename="5.out"');
+    expect(named[2]).toContain('filename="2024_s1_solution1.py"');
+    for (const { url } of body.urls) {
+      expect(url).toContain('acct123.r2.cloudflarestorage.com');
+      expect(url).toContain('X-Amz-Signature=');
+    }
+  });
+
+  it('returns 400 when any file entry is invalid', async () => {
+    const res = await postFiles(['tests/1.in', '../../etc/passwd']);
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 for an empty or oversized files array', async () => {
+    expect((await postFiles([])).status).toBe(400);
+    expect((await postFiles(Array.from({ length: 201 }, () => 'tests/1.in'))).status).toBe(400);
+  });
+
+  it('returns 400 for a malformed body', async () => {
+    const res = await app.request(
+      '/contests/2024/s1/download',
+      { method: 'POST', headers: { 'content-type': 'application/json' }, body: 'not json' },
+      env,
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 for a bad problem code', async () => {
+    const res = await app.request(
+      '/contests/2024/x9/download',
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ files: ['tests/1.in'] }),
+      },
+      env,
     );
     expect(res.status).toBe(400);
   });
