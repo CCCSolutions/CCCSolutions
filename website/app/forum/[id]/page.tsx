@@ -23,18 +23,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Post Not Found | CCC Forum' };
   }
 
+  const authorName = post.expand?.author?.username || 'Unknown';
   const plainBody = (post.body || '').replace(/<[^>]*>/g, '').trim();
   const description =
-    plainBody.length > 155 ? plainBody.slice(0, 155) + '…' : plainBody || 'Discussion on the CCC Solutions forum.';
+    plainBody.length > 155 ? plainBody.slice(0, 100) + '…' : plainBody || 'Discussion on the CCC Solutions forum.';
+
+  const title = `${post.title} by ${authorName} | CCC Forum`;
 
   return {
-    title: `${post.title} | CCC Forum`,
+    title,
     description,
     alternates: {
       canonical: `https://cccsolutions.ca/forum/${id}`,
     },
     openGraph: {
-      title: post.title,
+      title: `${post.title} by ${authorName}`,
       description,
       url: `https://cccsolutions.ca/forum/${id}`,
       type: 'article',
@@ -43,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
+      title: `${post.title} by ${authorName}`,
       description,
     },
   };
