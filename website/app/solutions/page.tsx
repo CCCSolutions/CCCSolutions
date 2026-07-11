@@ -14,10 +14,12 @@ function SolutionsContent() {
           Title/subtitle use explicit light colors; data-theme="dark" propagates to SearchBar. */}
       <div
         data-theme="dark"
-        className="relative overflow-hidden border-b border-border-default"
+        className="relative border-b border-border-default"
         style={{ backgroundColor: 'hsl(228 50% 27%)' }}
       >
-        <div aria-hidden className="absolute inset-0 z-0 pointer-events-none">
+        {/* overflow-hidden lives on this grid wrapper (not the band) so the SearchBar
+            dropdown can overflow the band and overlay the table below without being clipped. */}
+        <div aria-hidden className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <FlickeringGrid
             className="size-full"
             squareSize={4}
