@@ -5,8 +5,7 @@ import { problemParamsSchema, fileSchema } from '../schemas';
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
-// Constant-time string compare so token checks don't leak the secret byte-by-byte
-// via response timing. Length mismatch short-circuits (that only leaks length).
+// Constant-time compare so a token check can't be timing-probed byte by byte.
 function safeEqual(a: string, b: string): boolean {
   const enc = new TextEncoder();
   const ab = enc.encode(a);
@@ -17,9 +16,9 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-// Bearer-token gate on every /admin route. Fails closed: an unset ADMIN_TOKEN
-// rejects everything. This is the only auth on the admin/write surface (see
-// AGENTS.md — no in-Worker Access check), and doubles as the AI-agent API key.
+// Fails closed: an unset ADMIN_TOKEN rejects every request.
+// TODO: replace this shared-secret bearer check with Supabase session/role
+// verification once auth lands; this manual token gate is interim.
 admin.use('*', async (c, next) => {
   const header = c.req.header('Authorization') ?? '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
@@ -27,23 +26,16 @@ admin.use('*', async (c, next) => {
   await next();
 });
 
-// HARD RULE (see AGENTS.md): every R2 write MUST purge the contest's cache tag.
-// Uses the new Workers Cache tag-purge (ctx.cache.purge) — GA 2026-07-06, days old
-// at time of writing. /list + /preview are served with Cache-Tag: contest:<year>:<code>
-// and an aggressive max-age; without this purge a fresh upload/delete would stay
-// invisible until that max-age expired. Purging here is precisely what makes the
-// aggressive caching safe. Fire-and-forget via waitUntil so the write isn't blocked.
+// RULE (see AGENTS.md): every R2 write MUST purge the contest cache tag, or the
+// cached /list + /preview go stale. Workers Cache tag-purge (GA 2026-07-06),
+// fire-and-forget via waitUntil.
 function purgeContest(c: Context<{ Bindings: Bindings }>, year: string, code: string): void {
-  // Hono's ExecutionContext type predates the Workers Cache binding, so reach for
-  // the Cloudflare runtime shape (worker-configuration.d.ts) to see `.cache`.
+  // Cast to the Cloudflare runtime shape; Hono's ExecutionContext type lacks .cache.
   const ctx = c.executionCtx as unknown as ExecutionContext;
   if (!ctx.cache) return;
   ctx.waitUntil(ctx.cache.purge({ tags: [`contest:${year}:${code}`] }));
 }
 
-// Admin upload: raw request body → R2 object at contests/<year>/<code>/<file>.
-// Writes go through the binding only (never S3 write keys). Also usable as an
-// AI-agent API — POST a solution with the Bearer token.
 admin.post('/contests/:year/:code/upload', async (c) => {
   const params = problemParamsSchema.safeParse({ year: c.req.param('year'), code: c.req.param('code') });
   const file = fileSchema.safeParse(c.req.query('file'));
@@ -57,7 +49,6 @@ admin.post('/contests/:year/:code/upload', async (c) => {
   return c.json({ ok: true, key });
 });
 
-// Admin delete: remove one file from a contest.
 admin.delete('/contests/:year/:code/file', async (c) => {
   const params = problemParamsSchema.safeParse({ year: c.req.param('year'), code: c.req.param('code') });
   const file = fileSchema.safeParse(c.req.query('file'));
