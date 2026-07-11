@@ -26,7 +26,7 @@ admin.use('*', async (c, next) => {
   await next();
 });
 
-// RULE (see AGENTS.md): every R2 write MUST purge the contest cache tag, or the
+// RULE: every R2 write MUST purge the contest cache tag, or the
 // cached /list + /preview go stale. Workers Cache tag-purge (GA 2026-07-06),
 // fire-and-forget via waitUntil.
 function purgeContest(c: Context<{ Bindings: Bindings }>, year: string, code: string): void {
