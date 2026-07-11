@@ -7,19 +7,14 @@ import { problemParamsSchema, fileSchema } from '../schemas';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
 
-// Contest data is effectively immutable once staged, so let the Workers Cache
-// (and any downstream cache) hold /list + /preview for a day, then serve stale
-// for a week while it revalidates. Cache-Tag lets a future upload endpoint purge
-// a single contest's entries by tag. Cloudflare strips Cache-Tag before the client.
+// Cached a full week: this is safe because every R2 write (admin upload/delete)
+// purges the contest's cache tag via Workers Cache (GA) — see the RULE in AGENTS.md.
+// Cache-Tag lets that purge target only this contest's entries; Cloudflare strips
+// Cache-Tag before it reaches the client.
 function setContestCache(c: Context, year: string, code: string): void {
-  c.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+  c.header('Cache-Control', 'public, max-age=604800, stale-while-revalidate=2592000');
   c.header('Cache-Tag', `contest:${year}:${code}`);
 }
-
-// TODO: when the admin upload endpoint lands, purge this contest's cached /list +
-// /preview so freshly staged files show up immediately, instead of after max-age:
-//   await c.executionCtx.cache.purge({ tags: [`contest:${year}:${code}`] });
-// (Workers Cache tag-purge — do NOT build the upload endpoint here.)
 
 // R2 list endpoint: enumerate one problem's files into a single api call
 // so the frontend can build tabs and know solution extension without probing

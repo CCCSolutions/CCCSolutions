@@ -1,4 +1,20 @@
 #!/usr/bin/env node
+//
+// =====================================================================
+//  DEPRECATED — DO NOT USE
+// =====================================================================
+//  This staging script is unreliable: `detectLanguage` mislabels
+//  solutions (heuristic guessing of Turing/C++/Java/Python from source
+//  frequently picks the wrong language), so the staged `solutions/{n}.{ext}`
+//  files end up with incorrect extensions.
+//
+//  It is superseded by the /admin R2 upload endpoint, which is the
+//  supported way to get contest data into R2. This file is kept for
+//  reference only and is guarded so it cannot be run accidentally (see the
+//  early exit at the bottom). Remove the guard only if you knowingly need
+//  to inspect its behaviour.
+// =====================================================================
+//
 // Stage website/public/past_contests/ into ~/r2-staging/contests/ in the
 // renamed/normalized layout that R2 will hold.
 //
@@ -210,4 +226,13 @@ function main() {
   console.log(`output:   ${DST}`);
 }
 
+// DEPRECATED / DO NOT USE — guarded so it cannot be run accidentally.
+// Unreliable language detection; superseded by the /admin R2 upload endpoint.
+console.error(
+  'scripts/stage-r2.js is DEPRECATED and disabled (unreliable language detection).\n' +
+    'Use the /admin R2 upload endpoint instead. Kept for reference only.'
+);
+process.exit(1);
+
+// eslint-disable-next-line no-unreachable
 main();
