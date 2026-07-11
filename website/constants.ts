@@ -2432,7 +2432,7 @@ const contributors: Contributor[] = [
 ];
 
 const stats: Stats = {
-  activeUsers: '2,700+',
+  activeUsers: '5,200+',
   numSolutions: '270+',
   history: '20+ years',
 };
