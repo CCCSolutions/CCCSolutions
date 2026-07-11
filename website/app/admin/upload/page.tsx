@@ -109,8 +109,7 @@ export default function AdminUploadPage() {
         Admin upload
       </h1>
       <p className="text-foreground-light mb-8">
-        Stage solutions and test cases into R2. Requires the admin bearer token. Every write purges
-        the contest cache, so changes show up right away.
+        Stage solutions and test cases into R2. Requires the admin bearer token.
       </p>
 
       <Card>
