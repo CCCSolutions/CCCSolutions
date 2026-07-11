@@ -1,10 +1,20 @@
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { AwsClient } from 'aws4fetch';
 import { z } from 'zod';
 import type { Bindings } from '../types';
 import { problemParamsSchema, fileSchema } from '../schemas';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
+
+// Cached a full week: this is safe because every R2 write (admin upload/delete)
+// purges the contest's cache tag via Workers Cache (GA), please see the rule in AGENTS.md.
+// Cache-Tag lets that purge target only this contest's entries; Cloudflare strips
+// Cache-Tag before it reaches the client.
+function setContestCache(c: Context, year: string, code: string): void {
+  c.header('Cache-Control', 'public, max-age=604800, stale-while-revalidate=2592000');
+  c.header('Cache-Tag', `contest:${year}:${code}`);
+}
 
 // R2 list endpoint: enumerate one problem's files into a single api call
 // so the frontend can build tabs and know solution extension without probing
@@ -40,6 +50,7 @@ r2.get('/:year/:code/list', async (c) => {
   const tests = Object.values(testsByKey).sort((a, b) => Number(a.sample) - Number(b.sample) || a.n - b.n);
   solutions.sort((a, b) => a.n - b.n);
 
+  setContestCache(c, year, code);
   return c.json({ tests, solutions });
 });
 
@@ -56,9 +67,15 @@ r2.get('/:year/:code/preview', async (c) => {
     ? await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key)
     : await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key, { range: { offset: 0, length: 8192 } });
 
-  if (!obj) return c.text('File not found. Does the solution exist?', 404);
+  // Don't cache a miss: a solution/testcase may be uploaded later, and a cached
+  // 404 (RFC 9111 heuristic freshness would cache one) would mask it for hours.
+  if (!obj) {
+    c.header('Cache-Control', 'no-store');
+    return c.text('File not found. Does the solution exist?', 404);
+  }
 
   const text = await obj.text();
+  setContestCache(c, params.data.year, params.data.code);
   return c.text(isSolution ? text : text.split('\n').slice(0, 50).join('\n'));
 });
 
@@ -106,6 +123,10 @@ r2.get('/:year/:code/download', async (c) => {
   if (!params.success || !file.success)
     return c.text('Bad request: /contests/<year>/<code>/download?file=solutions/1.cpp', 400);
 
+  // Never cache the redirect: the presigned URL is signed for a 5-minute window,
+  // so a cached 302 would hand out an already-expired link.
+  c.header('Cache-Control', 'no-store');
+
   const url = await presignDownload(c.env, params.data.year, params.data.code, file.data);
   return c.redirect(url, 302);
 });
@@ -130,6 +151,8 @@ r2.post('/:year/:code/download', async (c) => {
     })),
   );
 
+  // Same as GET /download: presigned URLs expire in 5 minutes, so never cache them.
+  c.header('Cache-Control', 'no-store');
   return c.json({ urls });
 });
 
