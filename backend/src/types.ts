@@ -11,4 +11,8 @@ export type Bindings = {
   R2_BUCKET: string;
   R2_ACCESS_KEY_ID: string;
   R2_SECRET_ACCESS_KEY: string;
+
+  // Bearer token gating the /admin write endpoints (upload/delete). Set in prod
+  // via `wrangler versions secret put ADMIN_TOKEN`; fail-closed if unset.
+  ADMIN_TOKEN: string;
 };

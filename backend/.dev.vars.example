@@ -7,5 +7,9 @@ R2_BUCKET=cccsolutions
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 
+# Bearer token for the /admin write endpoints (upload/delete). Leave empty to keep
+# admin locked in local dev; in prod set it via `wrangler versions secret put ADMIN_TOKEN`.
+ADMIN_TOKEN=
+
 # Postgres / Supabase — used by drizzle-kit (db:* scripts)
 DATABASE_URL=postgres://user:pass@host:5432/dbname

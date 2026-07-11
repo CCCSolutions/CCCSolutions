@@ -14,5 +14,22 @@ There is no in-Worker Cloudflare Access validation. A Worker has no origin IP, s
 - The public custom domains (`api.cccsolutions.ca`, `v2.cccsolutions.ca`) are intentionally public, protected by **WAF rate-limiting rules** (per-IP ceilings).
 - Anything needing real auth (admin R2 upload, user accounts) uses app-level auth — an admin secret via `wrangler secret`, or Supabase RLS — never Cloudflare Access JWTs.
 
+## HARD RULE — every R2 write MUST purge the contest cache tag
+
+`/list` and `/preview` are served with `Cache-Tag: contest:<year>:<code>` and an
+aggressive `max-age`. **Any endpoint that writes to R2 (upload, delete, overwrite)
+MUST purge that contest's cache tag**, or the cached `/list` + `/preview` go stale
+and a freshly staged/removed file stays invisible until the max-age expires.
+
+This purge is exactly what makes the aggressive caching safe — it is not optional.
+Use the Workers Cache tag-purge (GA 2026-07-06), fired via `waitUntil`:
+
+```ts
+c.executionCtx.waitUntil(c.executionCtx.cache.purge({ tags: [`contest:${year}:${code}`] }));
+```
+
+The admin router (`src/admin/routes.ts`) does this in `purgeContest()` — new write
+paths must call the same helper (or an equivalent purge). No purge, no merge.
+
 ## Migration / deploy notes
 Wrangler hardening, R2 serving pattern, and the Pages migration plan live in the repo-root `DEPLOYMENT_NOTES.local.md` (gitignored).
