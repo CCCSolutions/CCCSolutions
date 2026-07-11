@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { Bindings } from './types';
 import r2 from './r2/routes';
+import admin from './admin/routes';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -33,5 +34,6 @@ app.get('/health', (c) => {
 });
 
 app.route('/contests', r2);
+app.route('/admin', admin);
 
 export default app;
