@@ -8,7 +8,7 @@ import { problemParamsSchema, fileSchema } from '../schemas';
 const r2 = new Hono<{ Bindings: Bindings }>();
 
 // Cached a full week: this is safe because every R2 write (admin upload/delete)
-// purges the contest's cache tag via Workers Cache (GA) — see the RULE in AGENTS.md.
+// purges the contest's cache tag via Workers Cache (GA), please see the rule in AGENTS.md.
 // Cache-Tag lets that purge target only this contest's entries; Cloudflare strips
 // Cache-Tag before it reaches the client.
 function setContestCache(c: Context, year: string, code: string): void {
