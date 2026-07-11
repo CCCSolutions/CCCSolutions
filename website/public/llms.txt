@@ -65,7 +65,7 @@ This is a community-driven project. Contributors include students from across Ca
 ## Contact & Community
 - GitHub Issues: https://github.com/CCCSolutions/CCCSolutions/issues
 - Forum: https://cccsolutions.ca/forum
-- Active community of 2,700+ users
+- Active community of 5,200+ users
 
 ---
 Last updated: 2025
