@@ -26,7 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const authorName = post.expand?.author?.username || 'Unknown';
   const plainBody = (post.body || '').replace(/<[^>]*>/g, '').trim();
   const description =
-    plainBody.length > 155 ? plainBody.slice(0, 100) + '…' : plainBody || 'Discussion on the CCC Solutions forum.';
+    plainBody.length > 155
+      ? plainBody.slice(0, 100) + '…'
+      : plainBody || 'Discussion on the CCC Solutions forum.';
 
   const title = `${post.title} by ${authorName} | CCC Forum`;
 
