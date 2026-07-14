@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../lib/pocketbase-bug';
 import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -13,20 +15,23 @@ export default function AuthForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  // Ref, not state: setSubmitting only lands on the next render, so rapid clicks
+  // would all read submitting === false and each fire a request.
+  const submittingRef = useRef(false);
 
   const { push } = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       if (isLogin) {
         await pb.collection('users').authWithPassword(username, password);
-        setSuccess('Login successful!');
+        toast.success('Signed in.');
         push('/forum');
       } else {
         const data = {
@@ -35,19 +40,32 @@ export default function AuthForm() {
           passwordConfirm: password,
         };
 
-        await pb.collection('users').create(data);
-        setSuccess('User created successfully!');
+        try {
+          await pb.collection('users').create(data);
+        } catch (error) {
+          // The account actually got created; PocketHost's broken hook just reports
+          // 400. Swallow only that exact case and carry on to sign them in, so we
+          // don't tell someone their signup failed when they now have an account
+          // (and a retry would collide on a taken username). See lib/pocketbase-bug.ts.
+          if (!isPostCommitHookBug(error)) throw error;
+        }
 
         await pb.collection('users').authWithPassword(username, password);
+        toast.success('Account created.');
         push('/forum');
       }
     } catch (error) {
-      setError(
-        isLogin
-          ? 'Login failed. Please check your credentials.'
-          : 'Registration failed. Please try again.'
-      );
-      console.error('Auth error:', error);
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error('Auth error:', error);
+        toast.error(
+          isLogin
+            ? 'Login failed. Please check your credentials.'
+            : 'Registration failed. Please try again.'
+        );
+      }
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -109,8 +127,8 @@ export default function AuthForm() {
                 />
               </div>
 
-              <Button type="primary" size="medium" block htmlType="submit">
-                {isLogin ? 'Sign in' : 'Create account'}
+              <Button type="primary" size="medium" block htmlType="submit" disabled={submitting}>
+                {submitting ? 'Working…' : isLogin ? 'Sign in' : 'Create account'}
               </Button>
             </form>
 
@@ -123,16 +141,6 @@ export default function AuthForm() {
                 {isLogin ? 'Need to create an account?' : 'Already have an account?'}
               </button>
             </div>
-
-            {error && (
-              <div className="mt-4 text-center text-sm text-red-600 dark:text-red-400">{error}</div>
-            )}
-
-            {success && (
-              <div className="mt-4 text-center text-sm text-green-600 dark:text-green-400">
-                {success}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

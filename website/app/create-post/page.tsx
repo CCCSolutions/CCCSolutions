@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PocketBase from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../lib/pocketbase-bug';
 import { Button } from '../../components/ui/button';
 import { SectionContainer } from '../../components/ui/section-container';
 import dynamic from 'next/dynamic';
@@ -17,7 +19,10 @@ const pb = new PocketBase('https://mmhs.pockethost.io');
 export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  // Ref, not state: setSubmitting only lands on the next render, so rapid clicks
+  // would all read submitting === false and each fire a create().
+  const submittingRef = useRef(false);
   const { push } = useRouter();
 
   useEffect(() => {
@@ -30,35 +35,62 @@ export default function CreatePost() {
     e.preventDefault();
 
     if (!pb.authStore.isValid) {
-      setError('You need to log in to create a post.');
+      toast.warning('You need to log in to create a post.');
+      push('/login');
+      return;
+    }
+    if (submittingRef.current) return;
+
+    if (!pb.authStore.model) {
+      toast.warning('Session expired. Please log in again.');
       push('/login');
       return;
     }
 
+    submittingRef.current = true;
+    setSubmitting(true);
+    const authorId = pb.authStore.model.id;
     try {
-      if (!pb.authStore.model) {
-        setError('Session expired. Please log in again.');
-        push('/login');
+      const createdPost = await pb.collection('posts').create(
+        {
+          title: newPostTitle,
+          body: newPostBody,
+          author: authorId,
+          upvotes: 0,
+        },
+        { requestKey: null } // opt out of auto-cancellation; see PostPageClient
+      );
+
+      toast.success('Post created.');
+      push(`/forum/${createdPost.id}`);
+    } catch (error) {
+      const err = error as { isAbort?: boolean };
+
+      // The post actually saved; PocketHost's broken hook just reports 400, and it
+      // swallows the created record with it. Look the post back up so we can still
+      // land the user on it. See lib/pocketbase-bug.ts.
+      if (isPostCommitHookBug(error)) {
+        toast.success('Post created.');
+        try {
+          const recent = await pb.collection('posts').getList(1, 1, {
+            filter: `author="${authorId}"`,
+            sort: '-created',
+            requestKey: null,
+          });
+          const id = recent.items[0]?.id;
+          push(id ? `/forum/${id}` : '/forum');
+        } catch {
+          push('/forum');
+        }
         return;
       }
 
-      const data = {
-        title: newPostTitle,
-        body: newPostBody,
-        author: pb.authStore.model.id,
-        upvotes: 0,
-      };
-
-      const createdPost = await pb.collection('posts').create(data);
-
-      push(`/forum/${createdPost.id}`);
-
-      setNewPostTitle('');
-      setNewPostBody('');
-      setError(null);
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setError('An error occurred while creating the post.');
+      if (!err.isAbort) {
+        console.error('Error creating post:', error);
+        toast.error('Could not create the post.');
+      }
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -102,12 +134,6 @@ export default function CreatePost() {
           New post
         </h1>
 
-        {error && (
-          <div className="bg-destructive-200 border border-destructive-400 text-destructive-600 px-4 py-3 rounded-md mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleCreatePost} className="max-w-3xl space-y-5">
           <div>
             <label
@@ -144,8 +170,8 @@ export default function CreatePost() {
             />
           </div>
 
-          <Button type="primary" size="medium" htmlType="submit">
-            Create post
+          <Button type="primary" size="medium" htmlType="submit" disabled={submitting}>
+            {submitting ? 'Creating…' : 'Create post'}
           </Button>
         </form>
       </SectionContainer>

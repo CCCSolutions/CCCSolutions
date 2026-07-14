@@ -13,3 +13,6 @@ npm-debug.log
 # Local scratch notes (personal, never committed)
 *.local.md
 /backend/worker-configuration.d.ts
+
+# Playwright MCP debug artifacts (console logs / page snapshots)
+.playwright-mcp/

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import JSZip from 'jszip';
 import { Cross2Icon, DownloadIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { Button } from '../ui/button';
 
 interface TestMeta {
@@ -100,13 +101,11 @@ export function DownloadDialog({
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [zipping, setZipping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Nothing pre-selected; reset whenever the dialog re-opens or the file set changes.
   useEffect(() => {
     if (open) {
       setSelected(new Set());
-      setError(null);
     }
   }, [open, items]);
 
@@ -231,6 +230,7 @@ export function DownloadDialog({
     document.body.appendChild(a);
     a.click();
     a.remove();
+    toast.success(`Downloading ${items.find((i) => i.file === file)?.entryName ?? file}`);
     onClose();
   };
 
@@ -241,7 +241,6 @@ export function DownloadDialog({
       return;
     }
     setZipping(true);
-    setError(null);
     try {
       // One batch call → N presigned URLs, avoiding N rate-limited /download hits.
       const res = await fetch(`${apiBase}/contests/${year}/${code}/download`, {
@@ -273,10 +272,15 @@ export function DownloadDialog({
       a.click();
       a.remove();
       URL.revokeObjectURL(href);
+      toast.success(`Downloading ${year}_${code}.zip`, {
+        description: `${selectedItems.length} files`,
+      });
       onClose();
     } catch (err) {
       console.error('Error building zip:', err);
-      setError('Could not build the zip. Try individual downloads, or fewer files.');
+      toast.error('Could not build the zip.', {
+        description: 'Try individual downloads, or fewer files.',
+      });
     } finally {
       setZipping(false);
     }
@@ -370,7 +374,6 @@ export function DownloadDialog({
               </span>
             </p>
           )}
-          {error && <p className="mb-2 text-xs text-destructive">{error}</p>}
           <Button
             type="primary"
             size="small"
