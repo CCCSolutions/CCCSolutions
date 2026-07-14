@@ -13,7 +13,11 @@ interface SearchBarProps {
 const SearchBar = ({ problems }: SearchBarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [dropdownRect, setDropdownRect] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const [mounted, setMounted] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,8 +105,12 @@ const SearchBar = ({ problems }: SearchBarProps) => {
               >
                 <Link href={problem.link} className="block p-4">
                   <span className="text-brand font-medium hover:underline">{problem.name}</span>
-                  <p className="text-sm text-foreground-light mt-1">Difficulty: {problem.difficulty}</p>
-                  <p className="text-xs text-foreground-lighter mt-0.5">Tags: {problem.tags.join(', ')}</p>
+                  <p className="text-sm text-foreground-light mt-1">
+                    Difficulty: {problem.difficulty}
+                  </p>
+                  <p className="text-xs text-foreground-lighter mt-0.5">
+                    Tags: {problem.tags.join(', ')}
+                  </p>
                 </Link>
               </li>
             ))}
