@@ -101,11 +101,14 @@ export default function PostPageClient({ id, initialPost }: Props) {
 
     submittingRef.current = true;
     setSubmitting(true);
+
+    // Only the create() decides success. Anything after it (refetching the list)
+    // must not be able to trigger the failure toast: that's how a comment could
+    // post fine and still report "Could not post your comment".
+    let created = false;
     try {
-      // requestKey: null opts out of PocketBase's auto-cancellation. Otherwise a
-      // duplicate in-flight create aborts the earlier one client-side while the
-      // server still commits it, which is how one click could post twice and
-      // still surface an error.
+      // requestKey: null opts out of PocketBase's auto-cancellation, which aborts
+      // a duplicate in-flight request client-side while the server still commits it.
       await pb.collection('comments').create(
         {
           body: newComment,
@@ -114,17 +117,22 @@ export default function PostPageClient({ id, initialPost }: Props) {
         },
         { requestKey: null }
       );
-      setNewComment('');
-      await fetchComments();
-      toast.success('Comment posted.');
+      created = true;
     } catch (error) {
       const err = error as { isAbort?: boolean };
-      if (err.isAbort) return;
-      console.error('Error adding comment:', error);
-      toast.error('Could not post your comment.');
+      if (!err.isAbort) {
+        console.error('Error adding comment:', error);
+        toast.error('Could not post your comment.');
+      }
     } finally {
       submittingRef.current = false;
       setSubmitting(false);
+    }
+
+    if (created) {
+      setNewComment('');
+      toast.success('Comment posted.');
+      fetchComments(); // handles its own errors; must not affect the toast above
     }
   };
 
