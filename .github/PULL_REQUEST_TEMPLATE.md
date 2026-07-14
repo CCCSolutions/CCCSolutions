@@ -35,5 +35,4 @@ Resolves #
 - [ ] `tsc`, lint, and tests pass locally (CI checks these too)
 - [ ] New backend feature code (`backend/src/`) has vitest tests
 - [ ] Code is formatted and matches the surrounding style (CI checks this)
-- [ ] No `test_data` or other large files added to the repo
 - [ ] Docs/comments updated if behavior or APIs changed
