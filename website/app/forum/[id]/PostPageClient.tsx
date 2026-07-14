@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../../lib/pocketbase-bug';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
@@ -24,6 +26,11 @@ export default function PostPageClient({ id, initialPost }: Props) {
   const [comments, setComments] = useState<RecordModel[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  // The guard has to be a ref, not the state above: setSubmitting doesn't apply
+  // until the next render, so back-to-back clicks in one frame would all read
+  // submitting === false and each fire a create(). A ref writes synchronously.
+  const submittingRef = useRef(false);
 
   const fetchPost = useCallback(async () => {
     try {
@@ -65,7 +72,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
 
   const handleVote = async (voteType: 'upvote' | 'downvote') => {
     if (!isLoggedIn) {
-      alert('Please log in to vote.');
+      toast.warning('Please log in to vote.');
       return;
     }
     if (!post) return;
@@ -76,32 +83,60 @@ export default function PostPageClient({ id, initialPost }: Props) {
       setPost((prev) => (prev ? { ...prev, upvotes: updatedVotes } : null));
     } catch (error) {
       console.error('Error voting on post:', error);
+      toast.error('Could not register your vote.');
     }
   };
 
   const handleAddComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isLoggedIn) {
-      alert('Please log in to comment.');
+      toast.warning('Please log in to comment.');
       return;
     }
+    if (submittingRef.current) return;
+
+    if (!pb.authStore.model) {
+      toast.warning('Session expired. Please log in again.');
+      return;
+    }
+
+    submittingRef.current = true;
+    setSubmitting(true);
+
+    // Only the create() decides success. Anything after it (refetching the list)
+    // must not be able to trigger the failure toast: that's how a comment could
+    // post fine and still report "Could not post your comment".
+    let created = false;
     try {
-      if (!pb.authStore.model) {
-        alert('Session expired. Please log in again.');
-        return;
-      }
-
-      const data = {
-        body: newComment,
-        post: id,
-        author: pb.authStore.model.id,
-      };
-
-      await pb.collection('comments').create(data);
-      setNewComment('');
-      fetchComments();
+      // requestKey: null opts out of PocketBase's auto-cancellation, which aborts
+      // a duplicate in-flight request client-side while the server still commits it.
+      await pb.collection('comments').create(
+        {
+          body: newComment,
+          post: id,
+          author: pb.authStore.model.id,
+        },
+        { requestKey: null }
+      );
+      created = true;
     } catch (error) {
-      console.error('Error adding comment:', error);
+      const err = error as { isAbort?: boolean };
+      // The comment actually posted; PocketHost's broken hook just reports 400. See lib/pocketbase-bug.ts.
+      if (isPostCommitHookBug(error)) {
+        created = true;
+      } else if (!err.isAbort) {
+        console.error('Error adding comment:', error);
+        toast.error('Could not post your comment.');
+      }
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
+
+    if (created) {
+      setNewComment('');
+      toast.success('Comment posted.');
+      fetchComments(); // handles its own errors; must not affect the toast above
     }
   };
 
@@ -205,13 +240,18 @@ export default function PostPageClient({ id, initialPost }: Props) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={isLoggedIn ? 'Share your thoughts…' : 'Log in to comment.'}
-            disabled={!isLoggedIn}
+            disabled={!isLoggedIn || submitting}
             rows={4}
             className="w-full p-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
-          <Button type="primary" size="medium" htmlType="submit" disabled={!isLoggedIn}>
-            Add comment
+          <Button
+            type="primary"
+            size="medium"
+            htmlType="submit"
+            disabled={!isLoggedIn || submitting}
+          >
+            {submitting ? 'Posting…' : 'Add comment'}
           </Button>
         </form>
       </SectionContainer>

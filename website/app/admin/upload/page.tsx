@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardTitle, CardDescription } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
 import { Button } from '../../../components/ui/button';
@@ -18,8 +19,6 @@ const inputClass =
   'w-full rounded-md border border-border-strong bg-surface-100 px-3 py-2 text-sm text-foreground placeholder:text-foreground-lighter focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-highlight';
 const labelClass = 'block text-sm font-medium text-foreground-light mb-1.5';
 
-type Result = { kind: 'ok' | 'error'; message: string } | null;
-
 export default function AdminUploadPage() {
   const [year, setYear] = useState('');
   const [code, setCode] = useState('');
@@ -29,7 +28,6 @@ export default function AdminUploadPage() {
   const [token, setToken] = useState('');
   const [remember, setRemember] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<Result>(null);
 
   // Solution-path quick builder.
   const [solN, setSolN] = useState('1');
@@ -59,20 +57,20 @@ export default function AdminUploadPage() {
 
   async function send(method: 'POST' | 'DELETE') {
     if (!valid) {
-      setResult({ kind: 'error', message: 'Fix the year, code, or file path first.' });
+      toast.warning('Fix the year, code, or file path first.');
       return;
     }
     if (!token) {
-      setResult({ kind: 'error', message: 'Admin token is required.' });
+      toast.warning('Admin token is required.');
       return;
     }
 
     const path = method === 'POST' ? 'upload' : 'file';
     const url = `${API_BASE}/admin/contests/${year}/${code}/${path}?file=${encodeURIComponent(filePath)}`;
     const body = method === 'POST' ? (file ?? content) : undefined;
+    const target = `contests/${year}/${code}/${filePath}`;
 
     setBusy(true);
-    setResult(null);
     try {
       const res = await fetch(url, {
         method,
@@ -82,17 +80,15 @@ export default function AdminUploadPage() {
       const text = await res.text();
       if (res.ok) {
         persistToken();
-        setResult({
-          kind: 'ok',
-          message: method === 'POST' ? `Uploaded. ${text}` : `Deleted ${filePath}.`,
-        });
+        if (method === 'POST') toast.success('Uploaded.', { description: target });
+        else toast.success('Deleted.', { description: target });
       } else if (res.status === 401) {
-        setResult({ kind: 'error', message: 'Unauthorized (401). Check the admin token.' });
+        toast.error('Unauthorized (401).', { description: 'Check the admin token.' });
       } else {
-        setResult({ kind: 'error', message: `Failed (${res.status}). ${text}` });
+        toast.error(`Failed (${res.status}).`, { description: text });
       }
     } catch (err) {
-      setResult({ kind: 'error', message: `Request error: ${(err as Error).message}` });
+      toast.error('Request failed.', { description: (err as Error).message });
     } finally {
       setBusy(false);
     }
@@ -278,18 +274,6 @@ export default function AdminUploadPage() {
               Delete file
             </Button>
           </div>
-
-          {result && (
-            <div
-              className={`rounded-md border px-3 py-2 text-sm ${
-                result.kind === 'ok'
-                  ? 'border-brand-500 bg-brand-200 text-foreground'
-                  : 'border-destructive-500 bg-destructive-200 text-foreground'
-              }`}
-            >
-              {result.message}
-            </div>
-          )}
         </CardContent>
       </Card>
 

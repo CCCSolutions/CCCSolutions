@@ -5,6 +5,7 @@ import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
@@ -53,7 +54,7 @@ export default function ForumPage() {
 
   const handleVote = async (postId: string, voteType: 'upvote' | 'downvote') => {
     if (!user) {
-      alert('Please log in to vote.');
+      toast.warning('Please log in to vote.');
       return;
     }
     try {
@@ -70,6 +71,7 @@ export default function ForumPage() {
       });
     } catch (error) {
       console.error('Error voting on post:', error);
+      toast.error('Could not register your vote.');
     }
   };
 
