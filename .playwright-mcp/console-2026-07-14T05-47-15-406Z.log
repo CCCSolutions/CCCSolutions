@@ -1,8 +1,0 @@
-[    1450ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://deploy-preview-164--cccsolutions.netlify.app/website/public?_rsc=OpkGpYdHTV5nnYVb:0
-[   28338ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://mmhs.pockethost.io/api/collections/comments/records:0
-[   28339ms] [ERROR] Error adding comment: ClientResponseError 400: Something went wrong while processing your request.
-    at https://deploy-preview-164--cccsolutions.netlify.app/_next/static/chunks/4603-f51fc4263bfe25a4.js:1:36140
-    at async C (https://deploy-preview-164--cccsolutions.netlify.app/_next/static/chunks/app/forum/%5Bid%5D/page-2c83df14f64baf6a.js:1:4352) @ https://deploy-preview-164--cccsolutions.netlify.app/_next/static/chunks/app/forum/%5Bid%5D/page-2c83df14f64baf6a.js:0
-[   73247ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://mmhs.pockethost.io/api/collections/comments/records:0
-[   97275ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://mmhs.pockethost.io/api/collections/_superusers/auth-with-password:0
-[   97501ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://mmhs.pockethost.io/api/admins/auth-with-password:0
