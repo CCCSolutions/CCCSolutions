@@ -16,10 +16,10 @@ const SyntaxHighlighter = dynamic(
 );
 
 // Real solutions for CCC 2025 S4 (Floor is Lava) — Insane / graph theory.
-// Originally pulled verbatim from public/past_contests/2025/s4/.
-// DEPRECATED PATH: public/past_contests/ is deprecated and will be removed soon
-// (contest data now comes from R2 via the API). This code is inlined here, so it
-// has no runtime dependency on that directory — do not reintroduce one.
+// This code is inlined below; it was originally copied from the old
+// public/past_contests/2025/s4/ directory, which has since been removed
+// (contest data now comes from R2 via the API). There is no runtime
+// dependency on that directory — do not reintroduce one.
 type Solution = {
   language: 'Python' | 'C++';
   prismLang: 'python' | 'cpp';
