@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
@@ -26,6 +26,10 @@ export default function PostPageClient({ id, initialPost }: Props) {
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // The guard has to be a ref, not the state above: setSubmitting doesn't apply
+  // until the next render, so back-to-back clicks in one frame would all read
+  // submitting === false and each fire a create(). A ref writes synchronously.
+  const submittingRef = useRef(false);
 
   const fetchPost = useCallback(async () => {
     try {
@@ -88,29 +92,38 @@ export default function PostPageClient({ id, initialPost }: Props) {
       toast.warning('Please log in to comment.');
       return;
     }
-    // Without this guard, a fast double-click fires a second create() before the
-    // first resolves and the same comment posts twice.
-    if (submitting) return;
+    if (submittingRef.current) return;
 
     if (!pb.authStore.model) {
       toast.warning('Session expired. Please log in again.');
       return;
     }
 
+    submittingRef.current = true;
     setSubmitting(true);
     try {
-      await pb.collection('comments').create({
-        body: newComment,
-        post: id,
-        author: pb.authStore.model.id,
-      });
+      // requestKey: null opts out of PocketBase's auto-cancellation. Otherwise a
+      // duplicate in-flight create aborts the earlier one client-side while the
+      // server still commits it, which is how one click could post twice and
+      // still surface an error.
+      await pb.collection('comments').create(
+        {
+          body: newComment,
+          post: id,
+          author: pb.authStore.model.id,
+        },
+        { requestKey: null }
+      );
       setNewComment('');
       await fetchComments();
       toast.success('Comment posted.');
     } catch (error) {
+      const err = error as { isAbort?: boolean };
+      if (err.isAbort) return;
       console.error('Error adding comment:', error);
       toast.error('Could not post your comment.');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };

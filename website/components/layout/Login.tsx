@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -15,12 +15,16 @@ export default function AuthForm() {
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  // Ref, not state: setSubmitting only lands on the next render, so rapid clicks
+  // would all read submitting === false and each fire a request.
+  const submittingRef = useRef(false);
 
   const { push } = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (submitting) return;
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
 
     try {
@@ -41,12 +45,16 @@ export default function AuthForm() {
         push('/forum');
       }
     } catch (error) {
-      console.error('Auth error:', error);
-      toast.error(
-        isLogin
-          ? 'Login failed. Please check your credentials.'
-          : 'Registration failed. Please try again.'
-      );
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error('Auth error:', error);
+        toast.error(
+          isLogin
+            ? 'Login failed. Please check your credentials.'
+            : 'Registration failed. Please try again.'
+        );
+      }
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };

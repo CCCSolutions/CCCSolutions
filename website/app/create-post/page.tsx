@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PocketBase from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -19,6 +19,9 @@ export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  // Ref, not state: setSubmitting only lands on the next render, so rapid clicks
+  // would all read submitting === false and each fire a create().
+  const submittingRef = useRef(false);
   const { push } = useRouter();
 
   useEffect(() => {
@@ -35,8 +38,7 @@ export default function CreatePost() {
       push('/login');
       return;
     }
-    // Guards against a fast double-click creating the post twice.
-    if (submitting) return;
+    if (submittingRef.current) return;
 
     if (!pb.authStore.model) {
       toast.warning('Session expired. Please log in again.');
@@ -44,20 +46,28 @@ export default function CreatePost() {
       return;
     }
 
+    submittingRef.current = true;
     setSubmitting(true);
     try {
-      const createdPost = await pb.collection('posts').create({
-        title: newPostTitle,
-        body: newPostBody,
-        author: pb.authStore.model.id,
-        upvotes: 0,
-      });
+      const createdPost = await pb.collection('posts').create(
+        {
+          title: newPostTitle,
+          body: newPostBody,
+          author: pb.authStore.model.id,
+          upvotes: 0,
+        },
+        { requestKey: null } // opt out of auto-cancellation; see PostPageClient
+      );
 
       toast.success('Post created.');
       push(`/forum/${createdPost.id}`);
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast.error('Could not create the post.');
+      const err = error as { isAbort?: boolean };
+      if (!err.isAbort) {
+        console.error('Error creating post:', error);
+        toast.error('Could not create the post.');
+      }
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
