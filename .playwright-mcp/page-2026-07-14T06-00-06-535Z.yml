@@ -1,0 +1,88 @@
+- generic [ref=f7e3]:
+  - generic [ref=f7e4]:
+    - generic [ref=f7e5]:
+      - link [ref=f7e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f7e7]:
+          - img "PocketHost Logo" [ref=f7e8]
+          - heading "PocketHost" [level=1] [ref=f7e9]
+      - generic [ref=f7e11]:
+        - link "GitHub" [ref=f7e12] [cursor=pointer]:
+          - /url: https://github.com/pockethost/pockethost
+        - link "Product Hunt" [ref=f7e16] [cursor=pointer]:
+          - /url: https://www.producthunt.com/products/pockethost
+        - link "Discord" [ref=f7e20] [cursor=pointer]:
+          - /url: https://discord.gg/nVTxCMEcGT
+        - link "YouTube" [ref=f7e24] [cursor=pointer]:
+          - /url: https://www.youtube.com/@pocketba5ed
+    - navigation [ref=f7e29]:
+      - link "Pricing" [ref=f7e30] [cursor=pointer]:
+        - /url: /pricing
+      - link "Blog" [ref=f7e31] [cursor=pointer]:
+        - /url: /blog
+      - link "Docs" [ref=f7e32] [cursor=pointer]:
+        - /url: /docs
+      - link "Support" [ref=f7e33] [cursor=pointer]:
+        - /url: /support
+      - link "About" [ref=f7e34] [cursor=pointer]:
+        - /url: /about
+      - link "Login" [ref=f7e35] [cursor=pointer]:
+        - /url: /login
+  - paragraph [ref=f7e42]:
+    - text: Pay Per PocketBase at $9.99/mo, $59.99/yr, or $149.99 lifetime per slot.
+    - link "See pricing" [ref=f7e43] [cursor=pointer]:
+      - /url: /pricing
+  - generic [ref=f7e45]:
+    - generic [ref=f7e47]:
+      - heading "PocketBase Hosting, Simplified" [level=1] [ref=f7e48]
+      - paragraph [ref=f7e49]: No server configs. No downtime. Just build.
+      - button "Get Started" [ref=f7e160] [cursor=pointer]
+    - generic [ref=f7e60]:
+      - generic [ref=f7e61]:
+        - generic [ref=f7e62]: 30s
+        - generic [ref=f7e63]: Setup Time
+      - generic [ref=f7e64]:
+        - generic [ref=f7e65]: 99.961%
+        - generic [ref=f7e66]: Uptime
+      - generic [ref=f7e67]:
+        - generic [ref=f7e68]: 19.0K
+        - generic [ref=f7e69]: Developers
+      - generic [ref=f7e70]:
+        - generic [ref=f7e71]: 23.0K
+        - generic [ref=f7e72]: Instances
+      - generic [ref=f7e73]:
+        - generic [ref=f7e74]: 1,415
+        - generic [ref=f7e78]: On Github
+    - generic [ref=f7e79]:
+      - heading "Everything you need to build" [level=2] [ref=f7e81]
+      - generic [ref=f7e82]:
+        - generic [ref=f7e84]:
+          - heading "Database" [level=3] [ref=f7e90]
+          - paragraph [ref=f7e91]: Your PocketHost instance is powered by its own internal SQLite instance. SQLite is more performant than mySQL or Postgres and is perfect for powering your next app.
+        - generic [ref=f7e93]:
+          - heading "Auth" [level=3] [ref=f7e99]
+          - paragraph [ref=f7e100]: Email and oAuth authentication options work out of the box for your app users.
+        - generic [ref=f7e102]:
+          - heading "Cloud Functions" [level=3] [ref=f7e108]
+          - paragraph [ref=f7e109]: Run your own custom code on PocketHost with our cloud functions. Use the JS Client to call your functions from your frontend.
+        - generic [ref=f7e111]:
+          - heading "Custom Domain" [level=3] [ref=f7e117]
+          - paragraph [ref=f7e118]: Point your own domain at your PocketHost instance. SSL provisioning and verification are handled automatically.
+        - generic [ref=f7e120]:
+          - heading "Self-host" [level=3] [ref=f7e126]
+          - paragraph [ref=f7e127]: When you're ready to take your project in-house, download your full instance via SFTP and run PocketBase on your own hardware.
+        - generic [ref=f7e129]:
+          - heading "Zero Config" [level=3] [ref=f7e135]
+          - paragraph [ref=f7e136]: With PocketHost, batteries are included. You get a database, SSL, authentication, cloud functions, SFTP access, and high concurrency all in one stop.
+  - contentinfo [ref=f7e137]:
+    - generic [ref=f7e139]:
+      - generic [ref=f7e140]:
+        - link "Privacy" [ref=f7e141] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms" [ref=f7e142] [cursor=pointer]:
+          - /url: /terms
+        - link "System Status" [ref=f7e143] [cursor=pointer]:
+          - /url: https://status.pockethost.io/
+      - generic [ref=f7e144]:
+        - generic [ref=f7e145]: © 2026 PocketHost
+        - text: · Proudly hacking open source in Reno, NV ❤️

@@ -1,0 +1,3 @@
+[    2111ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://deploy-preview-164--cccsolutions.netlify.app/login:0
+[    2629ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://deploy-preview-164--cccsolutions.netlify.app/website/public?_rsc=j7s84HGI7papZ6oY:0
+[   11058ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://deploy-preview-164--cccsolutions.netlify.app/website/public?_rsc=LLnm6xMOuINLwjGR:0

@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../lib/pocketbase-bug';
 import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -39,7 +40,16 @@ export default function AuthForm() {
           passwordConfirm: password,
         };
 
-        await pb.collection('users').create(data);
+        try {
+          await pb.collection('users').create(data);
+        } catch (error) {
+          // The account actually got created; PocketHost's broken hook just reports
+          // 400. Swallow only that exact case and carry on to sign them in, so we
+          // don't tell someone their signup failed when they now have an account
+          // (and a retry would collide on a taken username). See lib/pocketbase-bug.ts.
+          if (!isPostCommitHookBug(error)) throw error;
+        }
+
         await pb.collection('users').authWithPassword(username, password);
         toast.success('Account created.');
         push('/forum');

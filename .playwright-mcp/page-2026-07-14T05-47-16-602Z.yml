@@ -1,0 +1,79 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - navigation [ref=f4e3]:
+      - generic [ref=f4e5]:
+        - generic [ref=f4e6]:
+          - link [ref=f4e7] [cursor=pointer]:
+            - /url: /
+            - img "MMHS Logo" [ref=f4e8]
+          - button "Switch to light mode" [ref=f4e9]
+        - generic [ref=f4e13]:
+          - link "Home" [ref=f4e14] [cursor=pointer]:
+            - /url: /
+          - link "About" [ref=f4e15] [cursor=pointer]:
+            - /url: /about
+          - link "Solutions" [ref=f4e16] [cursor=pointer]:
+            - /url: /solutions
+          - link "Forum" [ref=f4e17] [cursor=pointer]:
+            - /url: /forum
+          - link "Resources" [ref=f4e18] [cursor=pointer]:
+            - /url: /resources
+    - main [ref=f4e19]:
+      - generic [ref=f4e21]:
+        - link "Back to forum" [ref=f4e22] [cursor=pointer]:
+          - /url: /forum
+        - generic [ref=f4e26]:
+          - heading "Solution for CCC 2026 J4" [level=1] [ref=f4e27]
+          - generic [ref=f4e28]:
+            - generic [ref=f4e29]: By shawnduxy on 3/21/2026
+            - generic [ref=f4e30]:
+              - button "Upvote" [ref=f4e31]
+              - generic [ref=f4e34]: "0"
+              - button "Downvote" [ref=f4e35]
+        - heading "0 comments" [level=2] [ref=f4e38]
+        - paragraph [ref=f4e40]: No comments yet.
+        - generic [ref=f4e41]:
+          - generic [ref=f4e42]: Add a comment
+          - textbox "Add a comment" [ref=f4e43]:
+            - /placeholder: Share your thoughts…
+          - button "Add comment" [ref=f4e44] [cursor=pointer]
+    - contentinfo [ref=f4e46]:
+      - generic [ref=f4e47]:
+        - generic [ref=f4e48]:
+          - generic [ref=f4e49]:
+            - heading "Navigate" [level=4] [ref=f4e50]
+            - list [ref=f4e51]:
+              - listitem [ref=f4e52]:
+                - link "Home" [ref=f4e53] [cursor=pointer]:
+                  - /url: /website/public
+              - listitem [ref=f4e54]:
+                - link "Solutions" [ref=f4e55] [cursor=pointer]:
+                  - /url: /solutions
+              - listitem [ref=f4e56]:
+                - link "Forum" [ref=f4e57] [cursor=pointer]:
+                  - /url: /forum
+              - listitem [ref=f4e58]:
+                - link "Resources" [ref=f4e59] [cursor=pointer]:
+                  - /url: /resources
+          - generic [ref=f4e60]:
+            - heading "Project" [level=4] [ref=f4e61]
+            - list [ref=f4e62]:
+              - listitem [ref=f4e63]:
+                - link "About" [ref=f4e64] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f4e65]:
+                - link "License" [ref=f4e66] [cursor=pointer]:
+                  - /url: https://github.com/CCCSolutions/CCCSolutions/blob/main/LICENSE
+              - listitem [ref=f4e67]:
+                - link "Contribute" [ref=f4e68] [cursor=pointer]:
+                  - /url: https://github.com/CCCSolutions/CCCSolutions
+              - listitem [ref=f4e69]:
+                - link "Contact" [ref=f4e70] [cursor=pointer]:
+                  - /url: mailto:willi64645@gmail.com
+        - img "MMHS Logo" [ref=f4e71]
+      - separator [ref=f4e72]
+      - paragraph [ref=f4e73]: Made with love by the CCCSolutions team
+  - region "Notifications alt+T"
+  - iframe [ref=f4e75]:
+    - alert [ref=f5e1]
+  - alert [ref=f4e76]

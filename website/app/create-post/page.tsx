@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../lib/pocketbase-bug';
 import { Button } from '../../components/ui/button';
 import { SectionContainer } from '../../components/ui/section-container';
 import dynamic from 'next/dynamic';
@@ -48,12 +49,13 @@ export default function CreatePost() {
 
     submittingRef.current = true;
     setSubmitting(true);
+    const authorId = pb.authStore.model.id;
     try {
       const createdPost = await pb.collection('posts').create(
         {
           title: newPostTitle,
           body: newPostBody,
-          author: pb.authStore.model.id,
+          author: authorId,
           upvotes: 0,
         },
         { requestKey: null } // opt out of auto-cancellation; see PostPageClient
@@ -63,6 +65,26 @@ export default function CreatePost() {
       push(`/forum/${createdPost.id}`);
     } catch (error) {
       const err = error as { isAbort?: boolean };
+
+      // The post actually saved; PocketHost's broken hook just reports 400, and it
+      // swallows the created record with it. Look the post back up so we can still
+      // land the user on it. See lib/pocketbase-bug.ts.
+      if (isPostCommitHookBug(error)) {
+        toast.success('Post created.');
+        try {
+          const recent = await pb.collection('posts').getList(1, 1, {
+            filter: `author="${authorId}"`,
+            sort: '-created',
+            requestKey: null,
+          });
+          const id = recent.items[0]?.id;
+          push(id ? `/forum/${id}` : '/forum');
+        } catch {
+          push('/forum');
+        }
+        return;
+      }
+
       if (!err.isAbort) {
         console.error('Error creating post:', error);
         toast.error('Could not create the post.');

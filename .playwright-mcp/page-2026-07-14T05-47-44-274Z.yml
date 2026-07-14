@@ -1,0 +1,170 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - navigation [ref=f4e3]:
+      - generic [ref=f4e5]:
+        - generic [ref=f4e6]:
+          - link [ref=f4e7] [cursor=pointer]:
+            - /url: /
+            - img "MMHS Logo" [ref=f4e8]
+          - button "Switch to light mode" [ref=f4e9]
+        - generic [ref=f4e13]:
+          - link "Home" [ref=f4e14] [cursor=pointer]:
+            - /url: /
+          - link "About" [ref=f4e15] [cursor=pointer]:
+            - /url: /about
+          - link "Solutions" [ref=f4e16] [cursor=pointer]:
+            - /url: /solutions
+          - link "Forum" [ref=f4e17] [cursor=pointer]:
+            - /url: /forum
+          - link "Resources" [ref=f4e18] [cursor=pointer]:
+            - /url: /resources
+    - main [ref=f4e19]:
+      - generic [ref=f4e21]:
+        - link "Back to forum" [ref=f4e22] [cursor=pointer]:
+          - /url: /forum
+        - generic [ref=f4e26]:
+          - heading "Solution for CCC 2026 J4" [level=1] [ref=f4e27]
+          - generic [ref=f4e175]:
+            - generic [ref=f4e176]: "#include <bits/stdc++.h>"
+            - generic [ref=f4e177]: using namespace std;
+            - generic [ref=f4e179]: "int main() {"
+            - generic [ref=f4e180]: int m;
+            - generic [ref=f4e181]: cin >> m;
+            - generic [ref=f4e183]: unordered_set<string> grid;
+            - generic [ref=f4e184]: grid.insert("0_0");
+            - generic [ref=f4e185]: int t = 0;
+            - generic [ref=f4e186]: string s;
+            - generic [ref=f4e187]: int x = 0, y = 0;
+            - generic [ref=f4e188]: "for (int i = 0; i < m; i++) {"
+            - generic [ref=f4e189]: cin >> s;
+            - generic [ref=f4e190]: char d = s[0];
+            - generic [ref=f4e191]: int n = s[1] - '0';
+            - generic [ref=f4e192]: "if (s.length() > 2) {"
+            - generic [ref=f4e193]: n = n * 10 + s[2] - '0';
+            - generic [ref=f4e194]: "}"
+            - generic [ref=f4e195]: "for (int j = 0; j < n; j++) {"
+            - generic [ref=f4e196]: "switch (d) {"
+            - generic [ref=f4e197]: "case 'S':"
+            - generic [ref=f4e198]: y--;
+            - generic [ref=f4e199]: break;
+            - generic [ref=f4e200]: "case 'N':"
+            - generic [ref=f4e201]: y++;
+            - generic [ref=f4e202]: break;
+            - generic [ref=f4e203]: "case 'W':"
+            - generic [ref=f4e204]: x--;
+            - generic [ref=f4e205]: break;
+            - generic [ref=f4e206]: "case 'E':"
+            - generic [ref=f4e207]: x++;
+            - generic [ref=f4e208]: break;
+            - generic [ref=f4e209]: "}"
+            - generic [ref=f4e210]: string pos = to_string(x) + "_" + to_string(y);
+            - generic [ref=f4e211]: "if (grid.find(pos) != grid.end()) {"
+            - generic [ref=f4e212]: t++;
+            - generic [ref=f4e213]: "} else {"
+            - generic [ref=f4e214]: grid.insert(pos);
+            - generic [ref=f4e215]: "}"
+            - generic [ref=f4e216]: "}"
+            - generic [ref=f4e217]: "}"
+            - generic [ref=f4e218]: cout << t << endl;
+            - generic [ref=f4e219]: "}"
+          - generic [ref=f4e28]:
+            - generic [ref=f4e29]: By shawnduxy on 3/21/2026
+            - generic [ref=f4e30]:
+              - button "Upvote" [ref=f4e31]
+              - generic [ref=f4e34]: "0"
+              - button "Downvote" [ref=f4e35]
+        - heading "1 comment" [level=2] [ref=f4e125]
+        - generic [ref=f4e127]:
+          - paragraph [ref=f4e128]: added thx
+          - paragraph [ref=f4e129]: By Admin on 7/14/2026
+        - generic [ref=f4e41]:
+          - generic [ref=f4e42]: Add a comment
+          - textbox "Add a comment" [ref=f4e43]:
+            - /placeholder: Share your thoughts…
+            - text: added thx
+          - button "Add comment" [ref=f4e44] [cursor=pointer]
+    - contentinfo [ref=f4e46]:
+      - generic [ref=f4e47]:
+        - generic [ref=f4e48]:
+          - generic [ref=f4e49]:
+            - heading "Navigate" [level=4] [ref=f4e50]
+            - list [ref=f4e51]:
+              - listitem [ref=f4e52]:
+                - link "Home" [ref=f4e53] [cursor=pointer]:
+                  - /url: /website/public
+              - listitem [ref=f4e54]:
+                - link "Solutions" [ref=f4e55] [cursor=pointer]:
+                  - /url: /solutions
+              - listitem [ref=f4e56]:
+                - link "Forum" [ref=f4e57] [cursor=pointer]:
+                  - /url: /forum
+              - listitem [ref=f4e58]:
+                - link "Resources" [ref=f4e59] [cursor=pointer]:
+                  - /url: /resources
+          - generic [ref=f4e60]:
+            - heading "Project" [level=4] [ref=f4e61]
+            - list [ref=f4e62]:
+              - listitem [ref=f4e63]:
+                - link "About" [ref=f4e64] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f4e65]:
+                - link "License" [ref=f4e66] [cursor=pointer]:
+                  - /url: https://github.com/CCCSolutions/CCCSolutions/blob/main/LICENSE
+              - listitem [ref=f4e67]:
+                - link "Contribute" [ref=f4e68] [cursor=pointer]:
+                  - /url: https://github.com/CCCSolutions/CCCSolutions
+              - listitem [ref=f4e69]:
+                - link "Contact" [ref=f4e70] [cursor=pointer]:
+                  - /url: mailto:willi64645@gmail.com
+        - img "MMHS Logo" [ref=f4e71]
+      - separator [ref=f4e72]
+      - paragraph [ref=f4e73]: Made with love by the CCCSolutions team
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=f4e220]:
+        - button "Close toast" [ref=f4e221] [cursor=pointer]
+        - generic [ref=f4e228]: Could not post your comment.
+  - iframe [ref=f4e75]:
+    - generic:
+      - generic:
+        - generic [ref=f5e2]:
+          - tablist [ref=f5e3]:
+            - tab [ref=f5e4] [cursor=pointer]:
+              - strong [ref=f5e6]: Deploy Preview
+          - tablist [ref=f5e7]:
+            - button [ref=f5e8] [cursor=pointer]
+          - tablist [ref=f5e12]:
+            - button [ref=f5e13] [cursor=pointer]
+        - generic [ref=f5e18]:
+          - generic [ref=f5e19]:
+            - generic [ref=f5e20]:
+              - tablist [ref=f5e21]:
+                - tab "Logo Collaborate on this Deploy Preview" [ref=f5e22] [cursor=pointer]:
+                  - img "Logo" [ref=f5e23]
+                  - strong [ref=f5e24]:
+                    - text: Collaborate
+                    - generic [ref=f5e25]: on this Deploy Preview
+              - tablist [ref=f5e26]:
+                - tab [ref=f5e27] [cursor=pointer]:
+                  - strong [ref=f5e28]: Log in to the Netlify Drawer
+            - generic [ref=f5e31]:
+              - tablist [ref=f5e32]:
+                - tab "Copy URL" [ref=f5e33] [cursor=pointer]
+              - tablist [ref=f5e37]:
+                - button "Minimize" [ref=f5e38] [cursor=pointer]
+          - generic "Netlify Drawer" [ref=f5e42]:
+            - generic [ref=f5e43]:
+              - generic:
+                - heading [level=2] [ref=f5e44]:
+                  - generic [ref=f5e45]: Collaborate
+                  - text: on projectsbefore going
+                  - generic [ref=f5e47]: live
+                - generic [ref=f5e53]:
+                  - paragraph [ref=f5e57]: Share feedback — with images & video — directly from the browser.
+                  - paragraph [ref=f5e61]: It flows right into the tools you already know and love.
+                  - paragraph [ref=f5e65]: Notify with @replies and make sure that the whole team stays aligned.
+                - generic [ref=f5e71]:
+                  - button "Create a free account" [ref=f5e72] [cursor=pointer]
+                  - paragraph [ref=f5e73]: Already have a Netlify account? Log in
+      - alert [ref=f5e1]
+  - alert [ref=f4e76]

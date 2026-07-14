@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import { toast } from 'sonner';
+import { isPostCommitHookBug } from '../../../lib/pocketbase-bug';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
@@ -120,7 +121,10 @@ export default function PostPageClient({ id, initialPost }: Props) {
       created = true;
     } catch (error) {
       const err = error as { isAbort?: boolean };
-      if (!err.isAbort) {
+      // The comment actually posted; PocketHost's broken hook just reports 400. See lib/pocketbase-bug.ts.
+      if (isPostCommitHookBug(error)) {
+        created = true;
+      } else if (!err.isAbort) {
         console.error('Error adding comment:', error);
         toast.error('Could not post your comment.');
       }
