@@ -47,7 +47,7 @@
     "postcss": "^8.5.16",
     "prettier": "^3.9.4",
     "tailwindcss": "^4.3.2",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "overrides": {
     "react": "$react",
