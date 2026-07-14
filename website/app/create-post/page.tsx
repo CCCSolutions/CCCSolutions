@@ -5,6 +5,7 @@ import PocketBase from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { SectionContainer } from '../../components/ui/section-container';
 import dynamic from 'next/dynamic';
@@ -17,7 +18,7 @@ const pb = new PocketBase('https://mmhs.pockethost.io');
 export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { push } = useRouter();
 
   useEffect(() => {
@@ -30,35 +31,34 @@ export default function CreatePost() {
     e.preventDefault();
 
     if (!pb.authStore.isValid) {
-      setError('You need to log in to create a post.');
+      toast.warning('You need to log in to create a post.');
+      push('/login');
+      return;
+    }
+    // Guards against a fast double-click creating the post twice.
+    if (submitting) return;
+
+    if (!pb.authStore.model) {
+      toast.warning('Session expired. Please log in again.');
       push('/login');
       return;
     }
 
+    setSubmitting(true);
     try {
-      if (!pb.authStore.model) {
-        setError('Session expired. Please log in again.');
-        push('/login');
-        return;
-      }
-
-      const data = {
+      const createdPost = await pb.collection('posts').create({
         title: newPostTitle,
         body: newPostBody,
         author: pb.authStore.model.id,
         upvotes: 0,
-      };
+      });
 
-      const createdPost = await pb.collection('posts').create(data);
-
+      toast.success('Post created.');
       push(`/forum/${createdPost.id}`);
-
-      setNewPostTitle('');
-      setNewPostBody('');
-      setError(null);
     } catch (error) {
       console.error('Error creating post:', error);
-      setError('An error occurred while creating the post.');
+      toast.error('Could not create the post.');
+      setSubmitting(false);
     }
   };
 
@@ -102,12 +102,6 @@ export default function CreatePost() {
           New post
         </h1>
 
-        {error && (
-          <div className="bg-destructive-200 border border-destructive-400 text-destructive-600 px-4 py-3 rounded-md mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleCreatePost} className="max-w-3xl space-y-5">
           <div>
             <label
@@ -144,8 +138,8 @@ export default function CreatePost() {
             />
           </div>
 
-          <Button type="primary" size="medium" htmlType="submit">
-            Create post
+          <Button type="primary" size="medium" htmlType="submit" disabled={submitting}>
+            {submitting ? 'Creating…' : 'Create post'}
           </Button>
         </form>
       </SectionContainer>

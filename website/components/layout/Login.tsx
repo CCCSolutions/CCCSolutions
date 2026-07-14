@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import PocketBase from 'pocketbase';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -13,20 +14,19 @@ export default function AuthForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const { push } = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    if (submitting) return;
+    setSubmitting(true);
 
     try {
       if (isLogin) {
         await pb.collection('users').authWithPassword(username, password);
-        setSuccess('Login successful!');
+        toast.success('Signed in.');
         push('/forum');
       } else {
         const data = {
@@ -36,18 +36,18 @@ export default function AuthForm() {
         };
 
         await pb.collection('users').create(data);
-        setSuccess('User created successfully!');
-
         await pb.collection('users').authWithPassword(username, password);
+        toast.success('Account created.');
         push('/forum');
       }
     } catch (error) {
-      setError(
+      console.error('Auth error:', error);
+      toast.error(
         isLogin
           ? 'Login failed. Please check your credentials.'
           : 'Registration failed. Please try again.'
       );
-      console.error('Auth error:', error);
+      setSubmitting(false);
     }
   };
 
@@ -109,8 +109,8 @@ export default function AuthForm() {
                 />
               </div>
 
-              <Button type="primary" size="medium" block htmlType="submit">
-                {isLogin ? 'Sign in' : 'Create account'}
+              <Button type="primary" size="medium" block htmlType="submit" disabled={submitting}>
+                {submitting ? 'Working…' : isLogin ? 'Sign in' : 'Create account'}
               </Button>
             </form>
 
@@ -123,16 +123,6 @@ export default function AuthForm() {
                 {isLogin ? 'Need to create an account?' : 'Already have an account?'}
               </button>
             </div>
-
-            {error && (
-              <div className="mt-4 text-center text-sm text-red-600 dark:text-red-400">{error}</div>
-            )}
-
-            {success && (
-              <div className="mt-4 text-center text-sm text-green-600 dark:text-green-400">
-                {success}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

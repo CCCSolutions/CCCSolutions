@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import PocketBase, { RecordModel } from 'pocketbase';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
@@ -24,6 +25,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
   const [comments, setComments] = useState<RecordModel[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchPost = useCallback(async () => {
     try {
@@ -65,7 +67,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
 
   const handleVote = async (voteType: 'upvote' | 'downvote') => {
     if (!isLoggedIn) {
-      alert('Please log in to vote.');
+      toast.warning('Please log in to vote.');
       return;
     }
     if (!post) return;
@@ -76,32 +78,40 @@ export default function PostPageClient({ id, initialPost }: Props) {
       setPost((prev) => (prev ? { ...prev, upvotes: updatedVotes } : null));
     } catch (error) {
       console.error('Error voting on post:', error);
+      toast.error('Could not register your vote.');
     }
   };
 
   const handleAddComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isLoggedIn) {
-      alert('Please log in to comment.');
+      toast.warning('Please log in to comment.');
       return;
     }
-    try {
-      if (!pb.authStore.model) {
-        alert('Session expired. Please log in again.');
-        return;
-      }
+    // Without this guard, a fast double-click fires a second create() before the
+    // first resolves and the same comment posts twice.
+    if (submitting) return;
 
-      const data = {
+    if (!pb.authStore.model) {
+      toast.warning('Session expired. Please log in again.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await pb.collection('comments').create({
         body: newComment,
         post: id,
         author: pb.authStore.model.id,
-      };
-
-      await pb.collection('comments').create(data);
+      });
       setNewComment('');
-      fetchComments();
+      await fetchComments();
+      toast.success('Comment posted.');
     } catch (error) {
       console.error('Error adding comment:', error);
+      toast.error('Could not post your comment.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -205,13 +215,18 @@ export default function PostPageClient({ id, initialPost }: Props) {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={isLoggedIn ? 'Share your thoughts…' : 'Log in to comment.'}
-            disabled={!isLoggedIn}
+            disabled={!isLoggedIn || submitting}
             rows={4}
             className="w-full p-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight disabled:opacity-50 disabled:cursor-not-allowed"
             required
           />
-          <Button type="primary" size="medium" htmlType="submit" disabled={!isLoggedIn}>
-            Add comment
+          <Button
+            type="primary"
+            size="medium"
+            htmlType="submit"
+            disabled={!isLoggedIn || submitting}
+          >
+            {submitting ? 'Posting…' : 'Add comment'}
           </Button>
         </form>
       </SectionContainer>
