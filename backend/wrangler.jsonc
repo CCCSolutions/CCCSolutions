@@ -3,11 +3,17 @@
   "name": "cccsolutions-backend",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-08",
+  // Explicit, not inherited: workers_dev defaults to true and preview_urls
+  // defaults to workers_dev, so leaving these unset lets every deploy reassert
+  // the defaults over a dashboard change. Both URLs are gated by edge
+  // Cloudflare Access (see AGENTS.md); the public domain is WAF rate-limited.
+  "workers_dev": true,
+  "preview_urls": true,
   // Workers Cache (GA): a per-Worker edge cache in front of this Worker. Cache-
   // ability is driven entirely by the Cache-Control headers we set per route
   // (see src/r2/routes.ts) — /list and /preview opt in, /download opts out.
   "cache": {
-    "enabled": true
+    "enabled": true,
   },
   // "compatibility_flags": [
   //   "nodejs_compat"
@@ -21,13 +27,12 @@
   //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   //   }
   // ],
-   "r2_buckets": [
-     {
-       "binding": "TESTCASES_SOLUTIONS_BUCKET",
-       "bucket_name": "cccsolutions"
-     }
-   ]
-
+  "r2_buckets": [
+    {
+      "binding": "TESTCASES_SOLUTIONS_BUCKET",
+      "bucket_name": "cccsolutions",
+    },
+  ],
 
   // "d1_databases": [
   //   {
