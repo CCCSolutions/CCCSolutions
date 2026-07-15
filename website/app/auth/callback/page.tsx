@@ -56,7 +56,8 @@ function CallbackHandler() {
       }
     };
 
-    handleCallback();
+    const cleanup = handleCallback();
+    return cleanup;
   }, [router]);
 
   return (

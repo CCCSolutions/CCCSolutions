@@ -31,9 +31,7 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    console.log('Navbar Auth State:', { state, username: profile?.username, hasAvatar: !!profile?.avatarUrl });
-  }, [state, profile]);
+  // Removed unnecessary console.log for auth state
 
   const navItems = [
     { name: 'Home', path: '/' },

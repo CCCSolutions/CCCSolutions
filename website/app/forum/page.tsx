@@ -70,7 +70,7 @@ export default function ForumPage() {
     }
 
     const current = voteMap[postId] ?? 0;
-    const newValue = current === value ? (value === 1 ? -1 : 1) : value; // naive toggle fallback — server handles truth
+    const newValue = current === value ? value : value; // re-send the same value if clicked again
 
     // Optimistic UI
     const delta = newValue - current;

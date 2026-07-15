@@ -32,10 +32,18 @@ export default function OnboardingPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // If not logged in, send to /login
-  if (state === 'out') {
-    router.replace('/login');
-    return null;
-  }
+  React.useEffect(() => {
+    if (state === 'out') {
+      router.replace('/login');
+    }
+  }, [state, router]);
+
+    React.useEffect(() => {
+      if (state === 'out') {
+        router.replace('/login');
+      }
+    }, [state, router]);
+
 
   // If already onboarded (non-placeholder username), go straight to forum
   if (state === 'in' && profile && !/^user_\d+$/.test(profile.username) && step === 'username') {
@@ -123,6 +131,12 @@ export default function OnboardingPage() {
     await refreshProfile();
     setStep('done');
   };
+
+  React.useEffect(() => {
+    if (step === 'done') {
+      router.replace('/forum');
+    }
+  }, [step, router]);
 
   // --------------------------------------------------------------------------
   // Done

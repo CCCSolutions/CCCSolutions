@@ -88,10 +88,10 @@ export default function PostPageClient({ id }: Props) {
     if (!canWrite) { router.push('/onboarding'); return; }
     if (!post) return;
 
-    const newValue = postVote === value ? (value === 1 ? -1 : 1) : value;
-    const delta = newValue - postVote;
+    if (postVote === value) return; // No-op if the same vote is clicked
+    const delta = value - postVote;
     setPost((p) => p ? { ...p, score: p.score + delta } : null);
-    setPostVote(newValue as 1 | -1 | 0);
+    setPostVote(value as 1 | -1 | 0);
 
     const res = await apiFetch('/forum/vote', {
       method: 'POST',

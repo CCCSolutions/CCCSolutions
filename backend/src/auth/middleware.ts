@@ -76,7 +76,6 @@ export async function requireAuth(
     payload = await verifyJwt(token, c.env.SUPABASE_URL);
   } catch (err: any) {
     console.error('JWT verification failed:', err.message || err);
-    console.error('JWT Debug - Raw Token:', token);
     return c.json({ error: 'Unauthorized' }, 401);
   }
 

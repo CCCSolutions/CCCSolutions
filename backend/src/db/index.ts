@@ -8,10 +8,15 @@ import postgres from 'postgres';
 import * as schema from './schema';
 import type { Bindings } from '../types';
 
+let cachedClient: ReturnType<typeof drizzle> | null = null;
+
 export function getDb(env: Bindings) {
-  const client = postgres(env.DATABASE_URL, {
-    // Transaction pooler expects a single-use connection per query.
-    max: 1,
-  });
-  return drizzle(client, { schema });
+  if (!cachedClient) {
+    const client = postgres(env.DATABASE_URL, {
+      // Transaction pooler expects a single-use connection per query.
+      max: 1,
+    });
+    cachedClient = drizzle(client, { schema });
+  }
+  return cachedClient;
 }
