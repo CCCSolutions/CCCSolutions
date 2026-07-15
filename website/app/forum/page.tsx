@@ -26,6 +26,7 @@ type PostRow = {
   createdAt: string;
   authorUsername: string | null;
   authorAvatarUrl: string | null;
+  authorRole?: string | null;
 };
 
 // Track the current user's votes so the UI reflects their state
@@ -60,53 +61,48 @@ export default function ForumPage() {
   }, [fetchPosts]);
 
   const handleVote = async (postId: string, value: 1 | -1) => {
-    if (state !== 'in') {
-      push('/login');
-      return;
-    }
-    if (profile && /^user_\d+$/.test(profile.username)) {
-      push('/onboarding');
-      return;
-    }
+    if (state !== 'in') { push('/login'); return; }
+    if (profile && /^user_\d+$/.test(profile.username)) { push('/onboarding'); return; }
 
     const current = voteMap[postId] ?? 0;
-    const newValue = current === value ? value : value; // re-send the same value if clicked again
 
-    // Optimistic UI
-    const delta = newValue - current;
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, score: p.score + delta } : p)),
-    );
-    setVoteMap((prev) => ({ ...prev, [postId]: newValue as 1 | -1 }));
+    // Clicking the same arrow again cancels the vote
+    if (current === value) {
+      // Optimistic
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score - value } : p));
+      setVoteMap((prev) => ({ ...prev, [postId]: 0 }));
+      try {
+        const res = await apiFetch('/forum/vote', {
+          method: 'DELETE',
+          body: JSON.stringify({ votableType: 'post', votableId: postId }),
+        });
+        if (!res.ok) {
+          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score + value } : p));
+          setVoteMap((prev) => ({ ...prev, [postId]: current }));
+        }
+      } catch {
+        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score + value } : p));
+        setVoteMap((prev) => ({ ...prev, [postId]: current }));
+      }
+      return;
+    }
 
+    // New vote or flipping direction — upsert
+    const delta = value - current;
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score + delta } : p));
+    setVoteMap((prev) => ({ ...prev, [postId]: value }));
     try {
       const res = await apiFetch('/forum/vote', {
         method: 'POST',
-        body: JSON.stringify({ votableType: 'post', votableId: postId, value: newValue }),
+        body: JSON.stringify({ votableType: 'post', votableId: postId, value }),
       });
       if (!res.ok) {
-        // Revert on failure
-        setPosts((prev) =>
-          prev.map((p) => (p.id === postId ? { ...p, score: p.score - delta } : p)),
-        );
-        setVoteMap((prev) => ({ ...prev, [postId]: current as 1 | -1 | 0 }));
-      } else {
-        const { delta: serverDelta } = await res.json() as { delta: number };
-        // Reconcile with server delta in case our optimistic delta was wrong
-        if (serverDelta !== delta) {
-          setPosts((prev) =>
-            prev.map((p) =>
-              p.id === postId ? { ...p, score: p.score - delta + serverDelta } : p,
-            ),
-          );
-        }
+        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score - delta } : p));
+        setVoteMap((prev) => ({ ...prev, [postId]: current }));
       }
     } catch {
-      // Revert on network error
-      setPosts((prev) =>
-        prev.map((p) => (p.id === postId ? { ...p, score: p.score - delta } : p)),
-      );
-      setVoteMap((prev) => ({ ...prev, [postId]: current as 1 | -1 | 0 }));
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, score: p.score - delta } : p));
+      setVoteMap((prev) => ({ ...prev, [postId]: current }));
     }
   };
 
@@ -219,8 +215,8 @@ export default function ForumPage() {
                         aria-label="Upvote"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           userVote === 1
-                            ? 'text-brand'
-                            : 'text-foreground-lighter hover:text-brand'
+                            ? 'text-green-600 dark:text-green-400 font-bold'
+                            : 'text-foreground-lighter hover:text-green-600 dark:hover:text-green-400'
                         }`}
                       >
                         <ArrowUpIcon width="16" height="16" />
@@ -233,8 +229,8 @@ export default function ForumPage() {
                         aria-label="Downvote"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           userVote === -1
-                            ? 'text-destructive'
-                            : 'text-foreground-lighter hover:text-destructive'
+                            ? 'text-red-600 dark:text-red-400 font-bold'
+                            : 'text-foreground-lighter hover:text-red-600 dark:hover:text-red-400'
                         }`}
                       >
                         <ArrowDownIcon width="16" height="16" />
@@ -262,6 +258,11 @@ export default function ForumPage() {
                           unoptimized
                         />
                         <span>{post.authorUsername ?? 'Unknown'}</span>
+                        {(post.authorRole === 'moderator' || post.authorRole === 'admin') && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                            Admin
+                          </span>
+                        )}
                         <span>·</span>
                         <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                       </div>

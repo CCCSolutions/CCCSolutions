@@ -8,6 +8,9 @@ function CallbackHandler() {
   const router = useRouter();
 
   useEffect(() => {
+    let active = true;
+    let cleanupFn: (() => void) | undefined;
+
     const handleCallback = async () => {
       // 1. Check for PKCE code in query parameters
       const params = new URLSearchParams(window.location.search);
@@ -18,18 +21,20 @@ function CallbackHandler() {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
             console.error('Error exchanging code for session:', error.message);
-            router.push('/login?error=auth_failed');
+            if (active) router.push('/login?error=auth_failed');
             return;
           }
         } catch (err) {
           console.error('Unexpected error during code exchange:', err);
-          router.push('/login?error=auth_failed');
+          if (active) router.push('/login?error=auth_failed');
           return;
         }
       }
 
       // 2. Retrieve session (works for both PKCE code exchange and implicit hash flow)
       const { data } = await supabase.auth.getSession();
+      if (!active) return;
+
       if (data.session) {
         router.push('/forum');
       } else {
@@ -37,7 +42,7 @@ function CallbackHandler() {
         const {
           data: { subscription },
         } = supabase.auth.onAuthStateChange((event, session) => {
-          if (session) {
+          if (session && active) {
             subscription.unsubscribe();
             router.push('/forum');
           }
@@ -46,18 +51,22 @@ function CallbackHandler() {
         // Timeout after 5 seconds if no session is established
         const timeoutId = setTimeout(() => {
           subscription.unsubscribe();
-          router.push('/login?error=timeout');
+          if (active) router.push('/login?error=timeout');
         }, 5000);
 
-        return () => {
+        cleanupFn = () => {
           clearTimeout(timeoutId);
           subscription.unsubscribe();
         };
       }
     };
 
-    const cleanup = handleCallback();
-    return cleanup;
+    handleCallback();
+
+    return () => {
+      active = false;
+      if (cleanupFn) cleanupFn();
+    };
   }, [router]);
 
   return (

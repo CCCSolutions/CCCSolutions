@@ -15,6 +15,13 @@
       "when": 1784089397828,
       "tag": "0001_slippery_prodigy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784137877724,
+      "tag": "0002_confused_cammi",
+      "breakpoints": true
     }
   ]
 }

@@ -35,6 +35,7 @@ forum.get('/posts', async (c) => {
       createdAt: posts.createdAt,
       authorUsername: profiles.username,
       authorAvatarUrl: profiles.avatarUrl,
+      authorRole: profiles.role,
     })
     .from(posts)
     .leftJoin(profiles, eq(posts.profileId, profiles.id))
@@ -61,6 +62,7 @@ forum.get('/posts/:id', async (c) => {
       createdAt: posts.createdAt,
       authorUsername: profiles.username,
       authorAvatarUrl: profiles.avatarUrl,
+      authorRole: profiles.role,
     })
     .from(posts)
     .leftJoin(profiles, eq(posts.profileId, profiles.id))
@@ -79,6 +81,7 @@ forum.get('/posts/:id', async (c) => {
       createdAt: comments.createdAt,
       authorUsername: profiles.username,
       authorAvatarUrl: profiles.avatarUrl,
+      authorRole: profiles.role,
     })
     .from(comments)
     .leftJoin(profiles, eq(comments.profileId, profiles.id))
@@ -219,21 +222,6 @@ forum.post('/vote', requireAuth, zValidator('json', voteSchema), async (c) => {
         target: [votes.profileId, votes.votableType, votes.votableId],
         set: { value },
       });
-
-    // Apply delta to the denormalized score column
-    if (delta !== 0) {
-      if (votableType === 'post') {
-        await db
-          .update(posts)
-          .set({ score: sql`${posts.score} + ${delta}` })
-          .where(eq(posts.id, votableId));
-      } else {
-        await db
-          .update(comments)
-          .set({ score: sql`${comments.score} + ${delta}` })
-          .where(eq(comments.id, votableId));
-      }
-    }
   } catch (err: unknown) {
     // The check constraint votes_value_check fires if value is not 1 or -1.
     // Zod already prevents that, so this is belt-and-suspenders.
@@ -245,6 +233,44 @@ forum.post('/vote', requireAuth, zValidator('json', voteSchema), async (c) => {
   }
 
   return c.json({ ok: true, delta });
+});
+
+// ---------------------------------------------------------------------------
+// DELETE /forum/vote — remove a vote (cancel/unvote)
+//
+// The trg_votes_sync_score trigger fires on DELETE and subtracts the old
+// vote value from posts.score / comments.score automatically.
+// ---------------------------------------------------------------------------
+
+const deleteVoteSchema = z.object({
+  votableType: z.enum(['post', 'comment']),
+  votableId: z.string().uuid(),
+});
+
+forum.delete('/vote', requireAuth, zValidator('json', deleteVoteSchema), async (c) => {
+  const profile = c.get('profile');
+
+  if (!requireUsername(profile)) {
+    return c.json(
+      { error: 'You must complete onboarding before voting.' },
+      403,
+    );
+  }
+
+  const { votableType, votableId } = c.req.valid('json');
+  const db = getDb(c.env);
+
+  await db
+    .delete(votes)
+    .where(
+      and(
+        eq(votes.profileId, profile.id),
+        eq(votes.votableType, votableType),
+        eq(votes.votableId, votableId),
+      ),
+    );
+
+  return c.json({ ok: true });
 });
 
 export default forum;

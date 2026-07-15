@@ -1,37 +1,51 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { HamburgerMenuIcon, Cross1Icon, PersonIcon } from '@radix-ui/react-icons';
+import { HamburgerMenuIcon, Cross1Icon, PersonIcon, CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../auth/AuthProvider';
+import { apiFetch } from '../../lib/supabase';
 
-// Default avatar SVG (used when profile.avatarUrl is null)
-const DEFAULT_AVATAR_SVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect width='32' height='32' rx='16' fill='%23312e81'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='white' font-family='sans-serif'>?</text></svg>`;
+const DEFAULT_AVATAR_SVG = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect width='32' height='32' rx='16' fill='%23312e81'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='white' font-family='sans-serif'>?</text></svg>`;
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [usernameInput, setUsernameInput] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameLoading, setUsernameLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  const { state, profile, logout } = useAuth();
+  const { state, profile, logout, refreshProfile } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsOpen(false);
-      }
+      if (window.innerWidth >= 768) setIsOpen(false);
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Removed unnecessary console.log for auth state
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+        setEditingUsername(false);
+        setUsernameError('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -42,9 +56,135 @@ const Navbar = () => {
   ];
 
   const handleLogout = async () => {
+    setDropdownOpen(false);
     await logout();
     router.push('/');
   };
+
+  const handleSaveUsername = async () => {
+    if (!usernameInput.trim()) return;
+    setUsernameError('');
+    setUsernameLoading(true);
+    const res = await apiFetch('/user/me/username', {
+      method: 'PATCH',
+      body: JSON.stringify({ username: usernameInput.trim() }),
+    });
+    setUsernameLoading(false);
+    if (res.ok) {
+      await refreshProfile();
+      setEditingUsername(false);
+      setUsernameInput('');
+    } else {
+      const body = await res.json().catch(() => ({})) as { error?: string };
+      setUsernameError(body.error ?? 'Failed to update username.');
+    }
+  };
+
+  const openEditUsername = () => {
+    setUsernameInput(profile?.username ?? '');
+    setUsernameError('');
+    setEditingUsername(true);
+  };
+
+  // Desktop profile dropdown
+  const ProfileDropdown = () => (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        id="profile-menu-btn"
+        onClick={() => { setDropdownOpen((v) => !v); setEditingUsername(false); setUsernameError(''); }}
+        className="flex items-center gap-2 cursor-pointer rounded-full p-0.5 hover:ring-2 hover:ring-brand/40 transition-all"
+        aria-label="Profile menu"
+      >
+        <Image
+          src={profile?.avatarUrl ?? DEFAULT_AVATAR_SVG}
+          alt={profile?.username ?? 'Profile'}
+          width={30}
+          height={30}
+          className="rounded-full object-cover border border-border-strong"
+          unoptimized
+        />
+        <HamburgerMenuIcon width={14} height={14} className="text-foreground-lighter" />
+      </button>
+
+      {dropdownOpen && (
+        <div className="absolute right-0 top-full mt-2 w-60 rounded-lg border border-border-default bg-surface-100 shadow-lg z-50 overflow-hidden">
+          {/* User info header */}
+          <div className="px-4 py-3 border-b border-border-default">
+            <p className="text-xs text-foreground-lighter mb-0.5">Signed in as</p>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">{profile?.username}</p>
+              {profile?.role === 'admin' && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 shrink-0">
+                  Admin
+                </span>
+              )}
+              {profile?.role === 'moderator' && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 shrink-0">
+                  Moderator
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Edit username */}
+          <div className="px-4 py-2.5 border-b border-border-default">
+            {!editingUsername ? (
+              <button
+                id="edit-username-btn"
+                onClick={openEditUsername}
+                className="w-full text-left text-sm text-foreground-light hover:text-foreground transition-colors"
+              >
+                ✏️ Edit username
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <input
+                  id="username-input"
+                  type="text"
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveUsername(); if (e.key === 'Escape') { setEditingUsername(false); setUsernameError(''); } }}
+                  className="w-full px-2.5 py-1.5 text-sm rounded border border-border-strong bg-background text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight"
+                  placeholder="New username"
+                  autoFocus
+                />
+                {usernameError && <p className="text-xs text-destructive">{usernameError}</p>}
+                <div className="flex gap-1.5">
+                  <button
+                    id="save-username-btn"
+                    onClick={handleSaveUsername}
+                    disabled={usernameLoading}
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs rounded bg-brand text-white hover:bg-brand/90 disabled:opacity-50 transition-colors"
+                  >
+                    <CheckIcon width={10} height={10} />
+                    {usernameLoading ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => { setEditingUsername(false); setUsernameError(''); }}
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs rounded border border-border-strong text-foreground-light hover:text-foreground transition-colors"
+                  >
+                    <Cross2Icon width={10} height={10} />
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sign out */}
+          <div className="px-4 py-2.5">
+            <button
+              id="signout-btn"
+              onClick={handleLogout}
+              className="w-full text-left text-sm text-foreground-light hover:text-destructive transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <nav className="bg-surface-100 border-b border-border-default">
@@ -93,41 +233,8 @@ const Navbar = () => {
 
               {/* Auth section */}
               {state === 'in' && profile ? (
-                <div className="flex items-center gap-3 ml-2">
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={profile.avatarUrl ?? DEFAULT_AVATAR_SVG}
-                      alt={profile.username}
-                      width={28}
-                      height={28}
-                      className="rounded-full object-cover border border-border-strong"
-                      unoptimized
-                    />
-                    <span className="text-sm font-medium text-foreground-light leading-none">
-                      {profile.username}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    title="Sign out"
-                    className="cursor-pointer text-foreground-lighter hover:text-destructive transition-colors p-1.5 rounded-md hover:bg-surface-200"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 15 15"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        d="M13.625 7.5C13.625 10.8827 10.8827 13.625 7.5 13.625C4.11726 13.625 1.375 10.8827 1.375 7.5C1.375 4.11726 4.11726 1.375 7.5 1.375C9.07342 1.375 10.5097 1.97011 11.595 2.94318L10.8037 3.82794C9.93297 3.03606 8.77259 2.55357 7.5 2.55357C4.76814 2.55357 2.55357 4.76814 2.55357 7.5C2.55357 10.2319 4.76814 12.4464 7.5 12.4464C10.2319 12.4464 12.4464 10.2319 12.4464 7.5C12.4464 6.84074 12.3174 6.21156 12.0836 5.63737L13.1784 4.88701C13.4682 5.69466 13.625 6.57868 13.625 7.5ZM13.8536 2.14645C14.0488 2.34171 14.0488 2.65829 13.8536 2.85355L8.85355 7.85355C8.65829 8.04882 8.34171 8.04882 8.14645 7.85355C7.95118 7.65829 7.95118 7.34171 8.14645 7.14645L13.1464 2.14645C13.3417 1.95118 13.6583 1.95118 13.8536 2.14645Z"
-                        fill="currentColor"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
+                <div className="ml-2">
+                  <ProfileDropdown />
                 </div>
               ) : state === 'out' ? (
                 <Link
@@ -187,24 +294,72 @@ const Navbar = () => {
               </Link>
             ))}
             {state === 'in' && profile ? (
-              <div className="px-3 py-2 flex items-center gap-3 border-t border-border-default mt-2">
-                <Image
-                  src={profile.avatarUrl ?? DEFAULT_AVATAR_SVG}
-                  alt={profile.username}
-                  width={30}
-                  height={30}
-                  className="rounded-full object-cover border border-border-strong"
-                  unoptimized
-                />
-                <div className="flex-grow">
-                  <span className="block text-sm font-semibold text-foreground">{profile.username}</span>
-                  <button
-                    onClick={() => { handleLogout(); setIsOpen(false); }}
-                    className="text-xs text-foreground-lighter hover:text-foreground underline"
-                  >
-                    Sign out
-                  </button>
+              <div className="px-3 py-3 border-t border-border-default mt-2 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={profile.avatarUrl ?? DEFAULT_AVATAR_SVG}
+                    alt={profile.username}
+                    width={30}
+                    height={30}
+                    className="rounded-full object-cover border border-border-strong"
+                    unoptimized
+                  />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-sm font-semibold text-foreground">{profile.username}</span>
+                    {profile.role === 'admin' && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        Admin
+                      </span>
+                    )}
+                    {profile.role === 'moderator' && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        Moderator
+                      </span>
+                    )}
+                  </div>
                 </div>
+                {/* Mobile edit username */}
+                {editingUsername ? (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={usernameInput}
+                      onChange={(e) => setUsernameInput(e.target.value)}
+                      className="w-full px-2.5 py-1.5 text-sm rounded border border-border-strong bg-background text-foreground focus:outline-none focus:border-brand-highlight"
+                      placeholder="New username"
+                      autoFocus
+                    />
+                    {usernameError && <p className="text-xs text-destructive">{usernameError}</p>}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSaveUsername}
+                        disabled={usernameLoading}
+                        className="px-3 py-1 text-xs rounded bg-brand text-white hover:bg-brand/90 disabled:opacity-50"
+                      >
+                        {usernameLoading ? 'Saving…' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => { setEditingUsername(false); setUsernameError(''); }}
+                        className="px-3 py-1 text-xs rounded border border-border-strong text-foreground-light"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={openEditUsername}
+                    className="text-sm text-foreground-light hover:text-foreground transition-colors"
+                  >
+                    ✏️ Edit username
+                  </button>
+                )}
+                <button
+                  onClick={() => { handleLogout(); setIsOpen(false); }}
+                  className="block text-sm text-foreground-lighter hover:text-destructive transition-colors"
+                >
+                  Sign out
+                </button>
               </div>
             ) : state === 'out' ? (
               <div className="px-3 py-2 border-t border-border-default mt-2">

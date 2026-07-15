@@ -25,6 +25,7 @@ type PostDetail = {
   createdAt: string;
   authorUsername: string | null;
   authorAvatarUrl: string | null;
+  authorRole?: string | null;
 };
 
 type CommentRow = {
@@ -34,6 +35,7 @@ type CommentRow = {
   createdAt: string;
   authorUsername: string | null;
   authorAvatarUrl: string | null;
+  authorRole?: string | null;
 };
 
 type Props = {
@@ -88,14 +90,28 @@ export default function PostPageClient({ id }: Props) {
     if (!canWrite) { router.push('/onboarding'); return; }
     if (!post) return;
 
-    if (postVote === value) return; // No-op if the same vote is clicked
+    // Clicking the active vote cancels it
+    if (postVote === value) {
+      setPost((p) => p ? { ...p, score: p.score - value } : null);
+      setPostVote(0);
+      const res = await apiFetch('/forum/vote', {
+        method: 'DELETE',
+        body: JSON.stringify({ votableType: 'post', votableId: id }),
+      });
+      if (!res.ok) {
+        setPost((p) => p ? { ...p, score: p.score + value } : null);
+        setPostVote(value);
+      }
+      return;
+    }
+
+    // New vote or flip direction — upsert
     const delta = value - postVote;
     setPost((p) => p ? { ...p, score: p.score + delta } : null);
-    setPostVote(value as 1 | -1 | 0);
-
+    setPostVote(value);
     const res = await apiFetch('/forum/vote', {
       method: 'POST',
-      body: JSON.stringify({ votableType: 'post', votableId: id, value: newValue }),
+      body: JSON.stringify({ votableType: 'post', votableId: id, value }),
     });
     if (!res.ok) {
       setPost((p) => p ? { ...p, score: p.score - delta } : null);
@@ -108,23 +124,33 @@ export default function PostPageClient({ id }: Props) {
     if (!canWrite) { router.push('/onboarding'); return; }
 
     const current = commentVotes[commentId] ?? 0;
-    const newValue = current === value ? (value === 1 ? -1 : 1) : value;
-    const delta = newValue - current;
 
-    setComments((prev) =>
-      prev.map((c) => (c.id === commentId ? { ...c, score: c.score + delta } : c)),
-    );
-    setCommentVotes((prev) => ({ ...prev, [commentId]: newValue as 1 | -1 | 0 }));
+    // Clicking the active vote cancels it
+    if (current === value) {
+      setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, score: c.score - value } : c));
+      setCommentVotes((prev) => ({ ...prev, [commentId]: 0 }));
+      const res = await apiFetch('/forum/vote', {
+        method: 'DELETE',
+        body: JSON.stringify({ votableType: 'comment', votableId: commentId }),
+      });
+      if (!res.ok) {
+        setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, score: c.score + value } : c));
+        setCommentVotes((prev) => ({ ...prev, [commentId]: value }));
+      }
+      return;
+    }
 
+    // New vote or flip direction — upsert
+    const delta = value - current;
+    setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, score: c.score + delta } : c));
+    setCommentVotes((prev) => ({ ...prev, [commentId]: value }));
     const res = await apiFetch('/forum/vote', {
       method: 'POST',
-      body: JSON.stringify({ votableType: 'comment', votableId: commentId, value: newValue }),
+      body: JSON.stringify({ votableType: 'comment', votableId: commentId, value }),
     });
     if (!res.ok) {
-      setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? { ...c, score: c.score - delta } : c)),
-      );
-      setCommentVotes((prev) => ({ ...prev, [commentId]: current as 1 | -1 | 0 }));
+      setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, score: c.score - delta } : c));
+      setCommentVotes((prev) => ({ ...prev, [commentId]: current }));
     }
   };
 
@@ -215,12 +241,17 @@ export default function PostPageClient({ id }: Props) {
                   className="rounded-full"
                   unoptimized
                 />
-                <span>
-                  By{' '}
+                <span className="flex items-center gap-1.5 flex-wrap">
+                  <span>By</span>
                   <span className="font-semibold text-foreground-light">
                     {post.authorUsername ?? 'Unknown'}
-                  </span>{' '}
-                  on {new Date(post.createdAt).toLocaleDateString()}
+                  </span>
+                  {(post.authorRole === 'moderator' || post.authorRole === 'admin') && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      Admin
+                    </span>
+                  )}
+                  <span>on {new Date(post.createdAt).toLocaleDateString()}</span>
                 </span>
               </div>
 
@@ -231,7 +262,9 @@ export default function PostPageClient({ id }: Props) {
                   disabled={!isLoggedIn}
                   aria-label="Upvote post"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                    postVote === 1 ? 'text-brand' : 'text-foreground-lighter hover:text-brand'
+                    postVote === 1
+                      ? 'text-green-600 dark:text-green-400 font-bold'
+                      : 'text-foreground-lighter hover:text-green-600 dark:hover:text-green-400'
                   }`}
                 >
                   <ArrowUpIcon width="16" height="16" />
@@ -244,8 +277,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Downvote post"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === -1
-                      ? 'text-destructive'
-                      : 'text-foreground-lighter hover:text-destructive'
+                      ? 'text-red-600 dark:text-red-400 font-bold'
+                      : 'text-foreground-lighter hover:text-red-600 dark:hover:text-red-400'
                   }`}
                 >
                   <ArrowDownIcon width="16" height="16" />
@@ -278,12 +311,17 @@ export default function PostPageClient({ id }: Props) {
                         className="rounded-full"
                         unoptimized
                       />
-                      <span>
-                        By{' '}
+                      <span className="flex items-center gap-1.5 flex-wrap">
+                        <span>By</span>
                         <span className="font-medium text-foreground-light">
                           {comment.authorUsername ?? 'Unknown'}
-                        </span>{' '}
-                        on {new Date(comment.createdAt).toLocaleDateString()}
+                        </span>
+                        {(comment.authorRole === 'moderator' || comment.authorRole === 'admin') && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-xs text-[10px] font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                            Admin
+                          </span>
+                        )}
+                        <span>on {new Date(comment.createdAt).toLocaleDateString()}</span>
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -294,8 +332,8 @@ export default function PostPageClient({ id }: Props) {
                         aria-label="Upvote comment"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           commentVotes[comment.id] === 1
-                            ? 'text-brand'
-                            : 'text-foreground-lighter hover:text-brand'
+                            ? 'text-green-600 dark:text-green-400 font-bold'
+                            : 'text-foreground-lighter hover:text-green-600 dark:hover:text-green-400'
                         }`}
                       >
                         <ArrowUpIcon width="12" height="12" />
@@ -308,8 +346,8 @@ export default function PostPageClient({ id }: Props) {
                         aria-label="Downvote comment"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           commentVotes[comment.id] === -1
-                            ? 'text-destructive'
-                            : 'text-foreground-lighter hover:text-destructive'
+                            ? 'text-red-600 dark:text-red-400 font-bold'
+                            : 'text-foreground-lighter hover:text-red-600 dark:hover:text-red-400'
                         }`}
                       >
                         <ArrowDownIcon width="12" height="12" />

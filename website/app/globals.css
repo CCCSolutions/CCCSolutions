@@ -267,3 +267,75 @@ body {
     animation: none;
   }
 }
+
+/* Highlight.js (rehypeHighlight) light mode syntax highlighting override */
+[data-theme='light'] .hljs,
+[data-theme='light'] pre {
+  background: #fafafa !important;
+  color: #383a42 !important;
+}
+[data-theme='light'] .hljs-comment,
+[data-theme='light'] .hljs-quote {
+  color: #a0a1a7 !important;
+  font-style: italic !important;
+}
+[data-theme='light'] .hljs-doctag,
+[data-theme='light'] .hljs-keyword,
+[data-theme='light'] .hljs-formula {
+  color: #a626a4 !important;
+}
+[data-theme='light'] .hljs-section,
+[data-theme='light'] .hljs-name,
+[data-theme='light'] .hljs-selector-tag,
+[data-theme='light'] .hljs-deletion,
+[data-theme='light'] .hljs-subst {
+  color: #e45649 !important;
+}
+[data-theme='light'] .hljs-literal {
+  color: #0184a6 !important;
+}
+[data-theme='light'] .hljs-string,
+[data-theme='light'] .hljs-regexp,
+[data-theme='light'] .hljs-addition,
+[data-theme='light'] .hljs-attribute-value {
+  color: #50a14f !important;
+}
+[data-theme='light'] .hljs-built_in,
+[data-theme='light'] .hljs-class .hljs-title {
+  color: #c18401 !important;
+}
+[data-theme='light'] .hljs-attr,
+[data-theme='light'] .hljs-variable,
+[data-theme='light'] .hljs-template-variable,
+[data-theme='light'] .hljs-type,
+[data-theme='light'] .hljs-selector-class,
+[data-theme='light'] .hljs-selector-id,
+[data-theme='light'] .hljs-selector-attr,
+[data-theme='light'] .hljs-selector-pseudo,
+[data-theme='light'] .hljs-number {
+  color: #986801 !important;
+}
+[data-theme='light'] .hljs-symbol,
+[data-theme='light'] .hljs-bullet,
+[data-theme='light'] .hljs-link,
+[data-theme='light'] .hljs-meta,
+[data-theme='light'] .hljs-selector-type,
+[data-theme='light'] .hljs-title,
+[data-theme='light'] .hljs-name {
+  color: #4078f2 !important;
+}
+[data-theme='light'] .hljs-emphasis {
+  font-style: italic !important;
+}
+[data-theme='light'] .hljs-strong {
+  font-weight: bold !important;
+}
+
+/* Quill Editor syntax blocks light mode override */
+[data-theme='light'] .ql-syntax,
+[data-theme='light'] .ql-editor pre,
+[data-theme='light'] pre[data-language] {
+  background-color: #fafafa !important;
+  color: #383a42 !important;
+  border: 1px solid var(--color-border-default) !important;
+}

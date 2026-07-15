@@ -188,7 +188,12 @@ export function SolutionPreview() {
   useEffect(() => setMounted(true), []);
 
   const current = solutions[active];
-  const style = mounted && resolvedTheme === 'dark' ? oneDark : oneLight;
+  const isDark = mounted && resolvedTheme === 'dark';
+  const style = isDark ? oneDark : oneLight;
+
+  // oneLight uses a near-white bg (#fafafa); oneDark uses #282c34.
+  // We match the code body background to each theme so there are no colour clashes.
+  const codeBg = isDark ? '#282c34' : '#fafafa';
 
   return (
     <div className="relative mx-auto w-full max-w-[620px] min-w-0">
@@ -228,7 +233,7 @@ export function SolutionPreview() {
         </div>
 
         {/* Code body — Fills remaining space, never expands card height/width */}
-        <div className="flex-1 min-h-0 w-full relative bg-surface-75">
+        <div className="flex-1 min-h-0 w-full relative" style={{ background: codeBg }}>
           <div className="absolute inset-0 overflow-auto">
             <SyntaxHighlighter
               language={current.prismLang}
