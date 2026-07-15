@@ -1,8 +1,13 @@
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "cccsolutions-website",
-    "compatibility_date": "2026-07-15",
-    "compatibility_flags": [
-      "nodejs_compat"
-    ]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cccsolutions-frontend",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-07-15",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
   }
+}
