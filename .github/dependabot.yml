@@ -10,12 +10,14 @@ updates:
           - minor
           - patch
     ignore:
-      # typescript-eslint pins `typescript: <6.1.0`, so TS 7 crashes eslint with
-      # "Cannot read properties of undefined (reading 'Cjs')". Drop this once
-      # typescript-eslint ships TS 7 support.
+      # TS 7.0 (the native Go port) breaks @typescript-eslint, which pins
+      # `typescript: <6.1.0`, so eslint dies with "Cannot read properties of
+      # undefined (reading 'Cjs')". Pin out ONLY the 7.0.x line: eslint compat
+      # is expected in TS 7.1, which Dependabot will then propose automatically
+      # with no manual change here.
       - dependency-name: typescript
-        update-types:
-          - version-update:semver-major
+        versions:
+          - 7.0.x
 
   - package-ecosystem: bun
     directory: /website
@@ -27,12 +29,12 @@ updates:
           - minor
           - patch
     ignore:
-      # Same as backend: `next lint` pulls in @typescript-eslint, which pins
-      # `typescript: <6.1.0`, so a TS 7 bump breaks linting here too. Drop this
-      # once typescript-eslint (and eslint-config-next) ship TS 7 support.
+      # Same as backend: `next lint` pulls in @typescript-eslint, so TS 7.0
+      # breaks linting here too. Pin out ONLY 7.0.x; TS 7.1 is expected to carry
+      # eslint compat and Dependabot will pick it up automatically.
       - dependency-name: typescript
-        update-types:
-          - version-update:semver-major
+        versions:
+          - 7.0.x
 
   - package-ecosystem: github-actions
     directory: /
