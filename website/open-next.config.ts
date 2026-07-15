@@ -1,14 +1,7 @@
 // website/open-next.config.ts
-import type { OpenNextConfig } from "@opennextjs/cloudflare";
+import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
-const config: OpenNextConfig = {
-  default: {
-    runtime: "edge",
-  },
-
-  middleware: {
-    external: true,
-  },
-};
-
-export default config;
+export default defineCloudflareConfig({
+  // You can pass custom overrides here if needed, 
+  // but calling it empty defaults to the correct settings.
+});
