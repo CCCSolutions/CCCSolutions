@@ -38,11 +38,11 @@ export default function OnboardingPage() {
     }
   }, [state, router]);
 
-    React.useEffect(() => {
-      if (state === 'out') {
-        router.replace('/login');
-      }
-    }, [state, router]);
+  React.useEffect(() => {
+    if (step === 'done') {
+      router.replace('/forum');
+    }
+  }, [step, router]);
 
 
   // If already onboarded (non-placeholder username), go straight to forum
@@ -131,12 +131,6 @@ export default function OnboardingPage() {
     await refreshProfile();
     setStep('done');
   };
-
-  React.useEffect(() => {
-    if (step === 'done') {
-      router.replace('/forum');
-    }
-  }, [step, router]);
 
   // --------------------------------------------------------------------------
   // Done
