@@ -5,6 +5,12 @@
   // nodejs_compat requires a compatibility_date of 2024-09-23 or later.
   "compatibility_date": "2024-12-30",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // preview_urls defaults to whatever workers_dev is, and the pre-existing
+  // cccsolutions-frontend Worker had workers_dev off — which is why its Git
+  // deployments showed no Preview URL while cccsolutions-backend's did. Set
+  // both explicitly so PR previews work regardless of the dashboard state.
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
