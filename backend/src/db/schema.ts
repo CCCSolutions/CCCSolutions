@@ -1,5 +1,11 @@
 // drizzle/schema.ts
-// Basic schema: users, posts, solutions, comments, votes.
+//
+// profiles.auth_user_id is nullable and separate from profiles.id:
+//   - Real, logged-in users: auth_user_id points at their auth.users row.
+//   - Migrated PocketBase users: auth_user_id is NULL. They exist only so old
+//     posts/comments still show an author, but nobody can log in as them.
+//     If they want back in, they sign up fresh via Google OAuth and get a
+//     brand new profiles row — no linking/merging with their old one.
 
 import { sql } from 'drizzle-orm';
 import {
@@ -12,23 +18,28 @@ import {
   uniqueIndex,
   check,
 } from 'drizzle-orm/pg-core';
+import { authUsers } from 'drizzle-orm/supabase';
 
 // ----------------------------------------------------------------------------
-// Users
+// Profiles
 // ----------------------------------------------------------------------------
-export const users = pgTable('users', {
+export const profiles = pgTable('profiles', {
   id: uuid('id').primaryKey().defaultRandom(),
+  authUserId: uuid('auth_user_id')
+    .unique()
+    .references(() => authUsers.id, { onDelete: 'set null' }), // nullable — see note above
   username: text('username').notNull().unique(),
+  avatarUrl: text('avatar_url'),
   role: text('role').notNull().default('user'), // "user" | "moderator" | "admin"
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ----------------------------------------------------------------------------
-// Posts (forum-style content)
+// Posts
 // ----------------------------------------------------------------------------
 export const posts = pgTable('posts', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
   title: text('title').notNull(),
   content: text('content').notNull(),
   score: integer('score').notNull().default(0),
@@ -36,47 +47,34 @@ export const posts = pgTable('posts', {
 });
 
 // ----------------------------------------------------------------------------
-// Solutions (attached to a post, e.g. a solution write-up/code)
-// ----------------------------------------------------------------------------
-export const solutions = pgTable('solutions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  postId: uuid('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
-  language: text('language').notNull(), // "cpp" | "python" | "java" | ...
-  content: text('content').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
-
-// ----------------------------------------------------------------------------
-// Comments (on a post)
+// Comments
 // ----------------------------------------------------------------------------
 export const comments = pgTable('comments', {
   id: uuid('id').primaryKey().defaultRandom(),
   postId: uuid('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
   content: text('content').notNull(),
   score: integer('score').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ----------------------------------------------------------------------------
-// Votes — one row per (user, thing voted on). The unique index is what
-// actually prevents double voting: a second insert for the same
-// user+votableType+votableId hits a constraint violation at the DB level,
-// no matter how many requests fire at once.
+// Votes — only real (auth_user_id IS NOT NULL) profiles should ever be able
+// to insert one; enforce that in the API layer (check the caller's own
+// profile row has auth_user_id = auth.uid() before allowing an insert).
 // ----------------------------------------------------------------------------
 export const votes = pgTable(
   'votes',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    votableType: text('votable_type').notNull(), // "post" | "comment" | "solution"
+    profileId: uuid('profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+    votableType: text('votable_type').notNull(), // "post" | "comment"
     votableId: uuid('votable_id').notNull(),
     value: smallint('value').notNull(), // 1 or -1
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex('votes_user_votable_idx').on(table.userId, table.votableType, table.votableId),
+    uniqueIndex('votes_profile_votable_idx').on(table.profileId, table.votableType, table.votableId),
     check('votes_value_check', sql`${table.value} in (1, -1)`),
   ],
 );
