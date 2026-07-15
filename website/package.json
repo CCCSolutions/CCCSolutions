@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "typescript --noEmit",
-    "cf-build": "bunx @opennextjs/cloudflare build"
+    "cf-build": "opennextjs-cloudflare build"
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
