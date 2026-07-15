@@ -194,15 +194,6 @@ const Problem = () => {
     };
   }, [contestYear, problemCode]);
 
-  useEffect(() => {
-    if (problemInfo) {
-      document.title = problemInfo.name;
-      return () => {
-        document.title = 'CCCSolutions';
-      };
-    }
-  }, [problemInfo]);
-
   const testFilePath = (test: TestMeta, kind: 'in' | 'out') =>
     `${test.sample ? 'tests/sample' : 'tests'}/${test.n}.${kind}`;
 
