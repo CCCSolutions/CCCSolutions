@@ -431,7 +431,9 @@ const Problem = () => {
             <h2 className="text-xl font-semibold text-foreground">
               {loading
                 ? 'Loading solutions…'
-                : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
+                : solutionsMeta.length === 0
+                  ? 'No solutions yet'
+                  : `${solutionsMeta.length} Solution${solutionsMeta.length !== 1 ? 's' : ''} available`}
             </h2>
           </div>
 
