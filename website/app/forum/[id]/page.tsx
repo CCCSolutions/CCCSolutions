@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import PocketBase from 'pocketbase';
 import PostPageClient from './PostPageClient';
 
-async function getPost(id: string) {
+const getPost = cache(async (id: string) => {
   const pb = new PocketBase('https://mmhs.pockethost.io');
   try {
     return await pb.collection('posts').getOne(id, { expand: 'author' });
   } catch {
     return null;
   }
-}
+});
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const plainBody = (post.body || '').replace(/<[^>]*>/g, '').trim();
   const description =
     plainBody.length > 155
-      ? plainBody.slice(0, 100) + '…'
+      ? plainBody.slice(0, 155) + '…'
       : plainBody || 'Discussion on the CCC Solutions forum.';
 
   const title = `${post.title} by ${authorName} | CCC Forum`;

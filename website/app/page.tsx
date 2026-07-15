@@ -23,7 +23,7 @@ import { SolutionPreview } from '../components/solutions/SolutionPreview';
 async function getGithubStars(): Promise<number | null> {
   try {
     const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
       headers: { Accept: 'application/vnd.github+json' },
     });
     if (!res.ok) return null;

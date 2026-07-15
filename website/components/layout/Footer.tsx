@@ -9,7 +9,7 @@ const Footer = () => {
             <h4 className="font-bold mb-3 text-sm text-foreground-lighter">Navigate</h4>
             <ul className="space-y-2.5 text-sm text-foreground-light">
               <li>
-                <Link href="/website/public" className="hover:text-foreground hover:underline">
+                <Link href="/" className="hover:text-foreground hover:underline">
                   Home
                 </Link>
               </li>
