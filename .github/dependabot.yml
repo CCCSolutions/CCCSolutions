@@ -26,6 +26,13 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Same as backend: `next lint` pulls in @typescript-eslint, which pins
+      # `typescript: <6.1.0`, so a TS 7 bump breaks linting here too. Drop this
+      # once typescript-eslint (and eslint-config-next) ship TS 7 support.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
