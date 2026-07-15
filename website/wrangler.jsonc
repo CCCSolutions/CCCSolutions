@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cccsolutions-frontend",
+  "main": ".open-next/worker.js",
+  // nodejs_compat requires a compatibility_date of 2024-09-23 or later.
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  // Lets the worker call itself; required by OpenNext for ISR revalidation.
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "cccsolutions-frontend",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
+}

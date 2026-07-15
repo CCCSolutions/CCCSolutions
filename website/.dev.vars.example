@@ -1,0 +1,2 @@
+# Copy to .dev.vars for local `opennextjs-cloudflare preview`.
+NEXTJS_ENV=development
