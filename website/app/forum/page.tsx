@@ -1,87 +1,118 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import Image from 'next/image';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
+import { useAuth } from '../../components/auth/AuthProvider';
+import { apiFetch } from '../../lib/supabase';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 import 'react-quill-new/dist/quill.bubble.css';
 
-const pb = new PocketBase('https://mmhs.pockethost.io');
+const DEFAULT_AVATAR = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><rect width='24' height='24' rx='12' fill='%23312e81'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='10' fill='white' font-family='sans-serif'>?</text></svg>`;
+
+type PostRow = {
+  id: string;
+  title: string;
+  content: string;
+  score: number;
+  createdAt: string;
+  authorUsername: string | null;
+  authorAvatarUrl: string | null;
+};
+
+// Track the current user's votes so the UI reflects their state
+type VoteMap = Record<string, 1 | -1 | 0>; // votableId -> value
 
 export default function ForumPage() {
-  const [posts, setPosts] = useState<RecordModel[]>([]);
+  const [posts, setPosts] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
-  const [user, setUser] = useState<AuthModel | null>(null);
+  const [voteMap, setVoteMap] = useState<VoteMap>({});
 
+  const { profile, state } = useAuth();
   const { push } = useRouter();
 
-  useEffect(() => {
-    setUser(pb.authStore.model);
-  }, []);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const sortField = sortBy === 'new' ? '-created' : '-upvotes';
-        const resultList = await pb.collection('posts').getList(1, 50, {
-          sort: sortField,
-          expand: 'author',
-          requestKey: `posts_${sortField}`,
-        });
-        setPosts(resultList.items);
-      } catch (error: unknown) {
-        const err = error as { isAbort?: boolean };
-        if (!err.isAbort) {
-          console.error('Error fetching posts:', error);
-        }
-      } finally {
-        setLoading(false);
+  const fetchPosts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch(`/forum/posts?sort=${sortBy}`);
+      if (res.ok) {
+        const data = await res.json() as PostRow[];
+        setPosts(data);
       }
-    };
-    fetchPosts();
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [sortBy]);
 
-  const handleVote = async (postId: string, voteType: 'upvote' | 'downvote') => {
-    if (!user) {
-      alert('Please log in to vote.');
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleVote = async (postId: string, value: 1 | -1) => {
+    if (state !== 'in') {
+      push('/login');
       return;
     }
-    try {
-      const post = posts.find((p) => p.id === postId);
-      if (!post) return;
-      const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
-      await pb.collection('posts').update(postId, { upvotes: updatedVotes });
-      setPosts((prev) => {
-        const next = prev.map((p) => (p.id === postId ? { ...p, upvotes: updatedVotes } : p));
-        if (sortBy === 'top') {
-          next.sort((a, b) => b.upvotes - a.upvotes);
-        }
-        return next;
-      });
-    } catch (error) {
-      console.error('Error voting on post:', error);
+    if (profile && /^user_\d+$/.test(profile.username)) {
+      push('/onboarding');
+      return;
     }
-  };
 
-  const handleLogout = () => {
-    pb.authStore.clear();
-    setUser(null);
+    const current = voteMap[postId] ?? 0;
+    const newValue = current === value ? (value === 1 ? -1 : 1) : value; // naive toggle fallback — server handles truth
+
+    // Optimistic UI
+    const delta = newValue - current;
+    setPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, score: p.score + delta } : p)),
+    );
+    setVoteMap((prev) => ({ ...prev, [postId]: newValue as 1 | -1 }));
+
+    try {
+      const res = await apiFetch('/forum/vote', {
+        method: 'POST',
+        body: JSON.stringify({ votableType: 'post', votableId: postId, value: newValue }),
+      });
+      if (!res.ok) {
+        // Revert on failure
+        setPosts((prev) =>
+          prev.map((p) => (p.id === postId ? { ...p, score: p.score - delta } : p)),
+        );
+        setVoteMap((prev) => ({ ...prev, [postId]: current as 1 | -1 | 0 }));
+      } else {
+        const { delta: serverDelta } = await res.json() as { delta: number };
+        // Reconcile with server delta in case our optimistic delta was wrong
+        if (serverDelta !== delta) {
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === postId ? { ...p, score: p.score - delta + serverDelta } : p,
+            ),
+          );
+        }
+      }
+    } catch {
+      // Revert on network error
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, score: p.score - delta } : p)),
+      );
+      setVoteMap((prev) => ({ ...prev, [postId]: current as 1 | -1 | 0 }));
+    }
   };
 
   return (
     <div className="bg-background text-foreground">
-      {/* Header — same colors as the primary Button in dark mode: brand-500 fill,
-          brand-highlight for the flickering grid (its border color). */}
+      {/* Header */}
       <div
         data-theme="dark"
         className="relative overflow-hidden border-b border-border-default"
@@ -105,32 +136,33 @@ export default function ForumPage() {
         </SectionContainer>
       </div>
 
-      {/* Login status — moved below the hero, right-aligned */}
+      {/* Auth status row */}
       <SectionContainer size="large" className="pt-4">
         <div className="flex justify-end text-sm text-foreground-light">
-          {user ? (
+          {state === 'in' && profile ? (
             <span>
-              Logged in as <span className="font-semibold text-foreground">{user.username}</span>
-              {' · '}
-              <button
-                className="cursor-pointer underline hover:text-foreground"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
+              Logged in as{' '}
+              <span className="font-semibold text-foreground">{profile.username}</span>
+              {profile && /^user_\d+$/.test(profile.username) && (
+                <span className="ml-2 text-warning text-xs">
+                  ·{' '}
+                  <Link href="/onboarding" className="underline hover:text-foreground">
+                    Complete setup to post
+                  </Link>
+                </span>
+              )}
             </span>
-          ) : (
+          ) : state === 'out' ? (
             <span className="italic">
-              Not logged in
-              {' · '}
+              Not logged in{' · '}
               <button
                 className="cursor-pointer underline not-italic hover:text-foreground"
                 onClick={() => push('/login')}
               >
-                Login
+                Sign in
               </button>
             </span>
-          )}
+          ) : null}
         </div>
       </SectionContainer>
 
@@ -173,49 +205,71 @@ export default function ForumPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {posts.map((post) => (
-              <Card key={post.id} className="hover:bg-surface-200/40 transition-colors">
-                <div className="flex gap-4 px-5 py-4">
-                  <div className="flex flex-col items-center justify-start gap-1 pt-1 shrink-0 w-10">
-                    <button
-                      onClick={() => handleVote(post.id, 'upvote')}
-                      disabled={!user}
-                      aria-label="Upvote"
-                      className="text-foreground-lighter hover:text-brand disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ArrowUpIcon width="16" height="16" />
-                    </button>
-                    <span className="text-sm font-semibold text-foreground">{post.upvotes}</span>
-                    <button
-                      onClick={() => handleVote(post.id, 'downvote')}
-                      disabled={!user}
-                      aria-label="Downvote"
-                      className="text-foreground-lighter hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ArrowDownIcon width="16" height="16" />
-                    </button>
-                  </div>
+            {posts.map((post) => {
+              const userVote = voteMap[post.id] ?? 0;
+              return (
+                <Card key={post.id} className="hover:bg-surface-200/40 transition-colors">
+                  <div className="flex gap-4 px-5 py-4">
+                    {/* Vote column */}
+                    <div className="flex flex-col items-center justify-start gap-1 pt-1 shrink-0 w-10">
+                      <button
+                        id={`upvote-post-${post.id}`}
+                        onClick={() => handleVote(post.id, 1)}
+                        disabled={state !== 'in'}
+                        aria-label="Upvote"
+                        className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          userVote === 1
+                            ? 'text-brand'
+                            : 'text-foreground-lighter hover:text-brand'
+                        }`}
+                      >
+                        <ArrowUpIcon width="16" height="16" />
+                      </button>
+                      <span className="text-sm font-semibold text-foreground">{post.score}</span>
+                      <button
+                        id={`downvote-post-${post.id}`}
+                        onClick={() => handleVote(post.id, -1)}
+                        disabled={state !== 'in'}
+                        aria-label="Downvote"
+                        className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          userVote === -1
+                            ? 'text-destructive'
+                            : 'text-foreground-lighter hover:text-destructive'
+                        }`}
+                      >
+                        <ArrowDownIcon width="16" height="16" />
+                      </button>
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-semibold text-foreground hover:text-brand transition-colors mb-1">
-                      <Link href={`/forum/${post.id}`}>{post.title}</Link>
-                    </h2>
-                    <ReactQuill
-                      value={
-                        post.body.length > 200 ? post.body.substring(0, 200) + '...' : post.body
-                      }
-                      readOnly
-                      theme="bubble"
-                      className="text-foreground-light max-h-24 overflow-hidden"
-                    />
-                    <div className="mt-2 text-xs text-foreground-lighter">
-                      By {post.expand?.author?.username || 'Unknown'} ·{' '}
-                      {new Date(post.created).toLocaleDateString()}
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-lg font-semibold text-foreground hover:text-brand transition-colors mb-1">
+                        <Link href={`/forum/${post.id}`}>{post.title}</Link>
+                      </h2>
+                      <ReactQuill
+                        value={post.content}
+                        readOnly
+                        theme="bubble"
+                        className="text-foreground-light max-h-24 overflow-hidden"
+                      />
+                      <div className="mt-2 flex items-center gap-1.5 text-xs text-foreground-lighter">
+                        <Image
+                          src={post.authorAvatarUrl ?? DEFAULT_AVATAR}
+                          alt={post.authorUsername ?? 'Unknown'}
+                          width={16}
+                          height={16}
+                          className="rounded-full"
+                          unoptimized
+                        />
+                        <span>{post.authorUsername ?? 'Unknown'}</span>
+                        <span>·</span>
+                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </SectionContainer>

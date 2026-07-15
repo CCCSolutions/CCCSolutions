@@ -3,6 +3,7 @@
   "name": "cccsolutions-backend",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-08",
+  "compatibility_flags": ["nodejs_compat"],
   // Workers Cache (GA): a per-Worker edge cache in front of this Worker. Cache-
   // ability is driven entirely by the Cache-Control headers we set per route
   // (see src/r2/routes.ts) — /list and /preview opt in, /download opts out.

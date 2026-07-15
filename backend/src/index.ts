@@ -3,6 +3,8 @@ import { cors } from 'hono/cors';
 import type { Bindings } from './types';
 import r2 from './r2/routes';
 import admin from './admin/routes';
+import forum from './forum/routes';
+import user from './user/routes';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -21,7 +23,14 @@ function isAllowedOrigin(origin: string): boolean {
   }
 }
 
-app.use('*', cors({ origin: (origin) => (origin && isAllowedOrigin(origin) ? origin : undefined) }));
+app.use(
+  '*',
+  cors({
+    origin: (origin) => (origin && isAllowedOrigin(origin) ? origin : undefined),
+    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  })
+);
 
 app.get('/', (c) => {
   return c.json({ name: 'cccsolutions-api', version: 'v1' });
@@ -35,5 +44,7 @@ app.get('/health', (c) => {
 
 app.route('/contests', r2);
 app.route('/admin', admin);
+app.route('/forum', forum);
+app.route('/user', user);
 
 export default app;

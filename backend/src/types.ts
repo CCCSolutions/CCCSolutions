@@ -15,4 +15,14 @@ export type Bindings = {
   // Bearer token gating the /admin write endpoints (upload/delete). Set in prod
   // via `wrangler versions secret put ADMIN_TOKEN`; fail-closed if unset.
   ADMIN_TOKEN: string;
+
+  // Supabase — used for JWT verification and DB access.
+  // DATABASE_URL: Supabase Postgres connection string (Transaction pooler, port 6543).
+  // SUPABASE_JWT_SECRET: found in Supabase dashboard → Settings → API → JWT Secret.
+  // SUPABASE_URL: your project URL, e.g. https://xyz.supabase.co
+  // SUPABASE_SERVICE_ROLE_KEY: service-role key for server-side Storage uploads.
+  DATABASE_URL: string;
+  SUPABASE_JWT_SECRET: string;
+  SUPABASE_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
 };

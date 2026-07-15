@@ -1,64 +1,59 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import PocketBase from 'pocketbase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { Button } from '../../components/ui/button';
 import { SectionContainer } from '../../components/ui/section-container';
+import { useAuth } from '../../components/auth/AuthProvider';
+import { apiFetch } from '../../lib/supabase';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 import 'react-quill-new/dist/quill.snow.css';
 
-const pb = new PocketBase('https://mmhs.pockethost.io');
-
 export default function CreatePost() {
-  const [newPostTitle, setNewPostTitle] = useState('');
-  const [newPostBody, setNewPostBody] = useState('');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { push } = useRouter();
+  const { state, profile } = useAuth();
 
+  // Redirect unauthenticated users
   useEffect(() => {
-    if (!pb.authStore.isValid) {
-      push('/login');
+    if (state === 'out') push('/login');
+  }, [state, push]);
+
+  // Redirect users who haven't completed onboarding
+  useEffect(() => {
+    if (state === 'in' && profile && /^user_\d+$/.test(profile.username)) {
+      push('/onboarding');
     }
-  }, [push]);
+  }, [state, profile, push]);
 
   const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (state !== 'in') { push('/login'); return; }
+    if (profile && /^user_\d+$/.test(profile.username)) { push('/onboarding'); return; }
 
-    if (!pb.authStore.isValid) {
-      setError('You need to log in to create a post.');
-      push('/login');
-      return;
-    }
+    setError(null);
+    setSubmitting(true);
 
-    try {
-      if (!pb.authStore.model) {
-        setError('Session expired. Please log in again.');
-        push('/login');
-        return;
-      }
+    const res = await apiFetch('/forum/posts', {
+      method: 'POST',
+      body: JSON.stringify({ title, content }),
+    });
 
-      const data = {
-        title: newPostTitle,
-        body: newPostBody,
-        author: pb.authStore.model.id,
-        upvotes: 0,
-      };
+    setSubmitting(false);
 
-      const createdPost = await pb.collection('posts').create(data);
-
-      push(`/forum/${createdPost.id}`);
-
-      setNewPostTitle('');
-      setNewPostBody('');
-      setError(null);
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setError('An error occurred while creating the post.');
+    if (res.ok) {
+      const created = await res.json() as { id: string };
+      push(`/forum/${created.id}`);
+    } else {
+      const body = await res.json().catch(() => ({})) as { error?: string };
+      setError(body.error ?? 'An error occurred while creating the post.');
     }
   };
 
@@ -86,6 +81,16 @@ export default function CreatePost() {
     'image',
     'code-block',
   ];
+
+  if (state === 'pending') {
+    return (
+      <div className="bg-background text-foreground">
+        <SectionContainer size="large" className="pt-12 pb-20">
+          <p className="text-foreground-light">Loading…</p>
+        </SectionContainer>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-foreground">
@@ -119,8 +124,8 @@ export default function CreatePost() {
             <input
               id="postTitle"
               type="text"
-              value={newPostTitle}
-              onChange={(e) => setNewPostTitle(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter your post title"
               className="w-full h-10 px-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight"
               required
@@ -136,16 +141,16 @@ export default function CreatePost() {
             </label>
             <ReactQuill
               theme="snow"
-              value={newPostBody}
-              onChange={setNewPostBody}
+              value={content}
+              onChange={setContent}
               modules={modules}
               formats={formats}
               className="bg-surface-100 rounded-md"
             />
           </div>
 
-          <Button type="primary" size="medium" htmlType="submit">
-            Create post
+          <Button type="primary" size="medium" htmlType="submit" disabled={submitting}>
+            {submitting ? 'Creating…' : 'Create post'}
           </Button>
         </form>
       </SectionContainer>

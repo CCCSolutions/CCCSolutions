@@ -11,5 +11,19 @@ R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 # admin locked in local dev; in prod set it via `wrangler versions secret put ADMIN_TOKEN`.
 ADMIN_TOKEN=
 
-# Postgres / Supabase — used by drizzle-kit (db:* scripts)
-DATABASE_URL=postgres://user:pass@host:5432/dbname
+# Postgres / Supabase — used by drizzle-kit (db:* scripts) AND the Worker at runtime.
+# Use the Transaction Pooler connection string from Supabase dashboard → Settings → Database
+# (port 6543, not 5432 — the pooler handles connection reuse in a stateless Worker).
+DATABASE_URL=postgres://user:pass@host:6543/postgres?pgbouncer=true
+
+# Supabase Auth — JWT verification
+# Found in: Supabase dashboard → Settings → API → JWT Settings → JWT Secret
+SUPABASE_JWT_SECRET=your-supabase-jwt-secret
+
+# Supabase project URL (e.g. https://xyzxyz.supabase.co)
+SUPABASE_URL=https://your-project.supabase.co
+
+# Supabase service-role key — used server-side for Storage uploads (Worker acts as trusted proxy).
+# Found in: Supabase dashboard → Settings → API → service_role key
+# NEVER expose this to the browser.
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
