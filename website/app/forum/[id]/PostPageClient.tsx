@@ -180,7 +180,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
                 <span className="font-semibold text-foreground-light">
                   {post.expand?.author?.username || 'Unknown'}
                 </span>{' '}
-                on {new Date(post.created).toLocaleDateString()}
+                on {new Date(post.created).toISOString().split('T')[0]}
               </span>
 
               <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
                     <span className="font-medium text-foreground-light">
                       {comment.expand?.author?.username || 'Unknown'}
                     </span>{' '}
-                    on {new Date(comment.created).toLocaleDateString()}
+                    on {new Date(comment.created).toISOString().split('T')[0]}
                   </p>
                 </CardContent>
               </Card>

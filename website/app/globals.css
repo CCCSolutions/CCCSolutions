@@ -267,3 +267,115 @@ body {
     animation: none;
   }
 }
+
+/* React Quill styling overrides for light and dark themes */
+.ql-container {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  background-color: hsl(var(--background-surface-100)) !important;
+}
+
+.ql-editor {
+  font-family: inherit !important;
+  color: currentColor !important;
+  padding: 0 !important; /* Removes default Quill indent/padding for read-only view */
+  background-color: hsl(var(--background-surface-100)) !important;
+}
+
+/* Ensure placeholder text matches themes */
+.ql-editor.ql-blank::before {
+  color: hsl(var(--foreground-lighter)) !important;
+  font-style: normal !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Links */
+.ql-editor a {
+  color: hsl(var(--brand-link)) !important;
+  text-decoration: underline !important;
+}
+
+.ql-editor a:hover {
+  color: hsl(var(--brand-default)) !important;
+}
+
+/* Blockquotes */
+.ql-editor blockquote {
+  border-left: 4px solid hsl(var(--brand-default)) !important;
+  padding-left: 1rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  color: hsl(var(--foreground-light)) !important;
+  font-style: italic !important;
+}
+
+.ql-editor .ql-code-block-container {
+  background-color: hsl(var(--background-surface-100)) !important;
+  border: 1px solid hsl(var(--border-default)) !important;
+  border-radius: 6px !important;
+  padding: 1rem !important;
+}
+
+.ql-editor .ql-code-block-container .ql-code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  color: hsl(var(--foreground-default)) !important;
+}
+/* Lists */
+.ql-editor ol, .ql-editor ul {
+  padding-left: 1.5rem !important;
+}
+
+/* Snow theme toolbar and editor styling (used in create post) */
+.ql-toolbar.ql-snow {
+  border-color: hsl(var(--border-strong)) !important;
+  background-color: hsl(var(--background-surface-100)) !important;
+  border-top-left-radius: 6px !important;
+  border-top-right-radius: 6px !important;
+}
+
+.ql-container.ql-snow {
+  border-color: hsl(var(--border-strong)) !important;
+  border-bottom-left-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
+  background-color: hsl(var(--background-surface-100)) !important;
+}
+
+.ql-snow .ql-editor {
+  padding: 12px 15px !important; /* Keep padding for active writing area */
+}
+
+/* Fix SVG colors in Quill toolbar for dark mode */
+[data-theme='dark'] .ql-snow .ql-stroke {
+  stroke: hsl(var(--foreground-light)) !important;
+}
+
+[data-theme='dark'] .ql-snow .ql-fill {
+  fill: hsl(var(--foreground-light)) !important;
+}
+
+[data-theme='dark'] .ql-snow .ql-picker {
+  color: hsl(var(--foreground-light)) !important;
+}
+
+[data-theme='dark'] .ql-snow .ql-picker-options {
+  background-color: hsl(var(--background-surface-200)) !important;
+  border-color: hsl(var(--border-default)) !important;
+}
+
+[data-theme='dark'] .ql-snow .ql-picker-item {
+  color: hsl(var(--foreground-light)) !important;
+}
+
+
+/* Light mode background for Quill editor */
+.light .ql-container,
+.light .ql-editor,
+.light .ql-container.ql-snow {
+  background-color: hsl(var(--background-surface-100)) !important;
+}
+
+/* Dark mode background for Quill editor */
+[data-theme='dark'] .ql-editor {
+  background-color: hsl(var(--background-surface-200)) !important;
+}
