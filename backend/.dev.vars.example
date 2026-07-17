@@ -23,6 +23,10 @@ ADMIN_TOKEN=
 #   merge to main, never by a developer running db:migrate by hand.
 # DATABASE_URL — transaction pooler (6543 hosted / 54322 local). Used by the Worker
 #   at runtime, where a stateless pooled connection is what you want.
+#
+# In PROD, copy both from the Supabase dashboard's "Connect" panel — use the POOLER
+# host (postgres.<ref>@...pooler.supabase.com), NOT the IPv6-only "Direct connection"
+# (db.<ref>.supabase.co): Transaction pooler -> DATABASE_URL, Session pooler -> DIRECT.
 DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 

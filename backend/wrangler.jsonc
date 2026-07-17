@@ -18,9 +18,13 @@
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+  // Public, non-secret config lives here so a deploy keeps it in sync (no dashboard
+  // drift). SUPABASE_URL is the project's API gateway — not a secret (it also ships
+  // in the frontend bundle). The real secrets — DATABASE_URL, SUPABASE_SECRET_KEY,
+  // ADMIN_TOKEN, R2_* — stay as `wrangler secret` and must never be added here.
+  "vars": {
+    "SUPABASE_URL": "https://ccjcesfbqlnosienatsz.supabase.co",
+  },
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",
