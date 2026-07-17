@@ -8,8 +8,29 @@ R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 
 # Bearer token for the /admin write endpoints (upload/delete). Leave empty to keep
-# admin locked in local dev; in prod set it via `wrangler versions secret put ADMIN_TOKEN`.
+# admin locked in local dev; in prod set it via `wrangler secret put ADMIN_TOKEN`.
 ADMIN_TOKEN=
 
-# Postgres / Supabase — used by drizzle-kit (db:* scripts)
-DATABASE_URL=postgres://user:pass@host:5432/dbname
+# ---------------------------------------------------------------------------
+# Postgres / Supabase
+# ---------------------------------------------------------------------------
+# Local dev uses the Supabase CLI stack (`supabase start`), which serves Postgres
+# on 127.0.0.1:54322 with password `postgres`. The defaults below point there, so
+# a fresh copy Just Works against your local stack with no editing.
+#
+# DIRECT_DATABASE_URL — session mode (5432 hosted / 54322 local). Used by drizzle-kit
+#   for migrations. Keep this pointed at LOCAL only: production is migrated by CI on
+#   merge to main, never by a developer running db:migrate by hand.
+# DATABASE_URL — transaction pooler (6543 hosted / 54322 local). Used by the Worker
+#   at runtime, where a stateless pooled connection is what you want.
+#
+# In PROD, copy both from the Supabase dashboard's "Connect" panel — use the POOLER
+# host (postgres.<ref>@...pooler.supabase.com), NOT the IPv6-only "Direct connection"
+# (db.<ref>.supabase.co): Transaction pooler -> DATABASE_URL, Session pooler -> DIRECT.
+DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+# Supabase API — set these as real backend Worker secrets in prod (`wrangler secret put`).
+# SUPABASE_SECRET_KEY replaces the deprecated service_role key; it is server-only.
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SECRET_KEY=your-supabase-secret-key
