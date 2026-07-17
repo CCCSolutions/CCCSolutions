@@ -322,7 +322,8 @@ body {
   color: hsl(var(--foreground-default)) !important;
 }
 /* Lists */
-.ql-editor ol, .ql-editor ul {
+.ql-editor ol,
+.ql-editor ul {
   padding-left: 1.5rem !important;
 }
 
@@ -366,7 +367,6 @@ body {
 [data-theme='dark'] .ql-snow .ql-picker-item {
   color: hsl(var(--foreground-light)) !important;
 }
-
 
 /* Light mode background for Quill editor */
 .light .ql-container,
