@@ -46,9 +46,11 @@ jobs:
       - name: Fail if schema.ts has an un-generated migration (drift)
         run: |
           bun run db:generate
-          if ! git diff --quiet -- drizzle; then
+          # --porcelain, not `git diff`: a new migration is an UNTRACKED file, which
+          # `git diff` does not report.
+          if [ -n "$(git status --porcelain -- drizzle)" ]; then
             echo "::error::schema.ts changed but no migration was committed. Run 'bun run db:generate' and commit drizzle/."
-            git --no-pager diff -- drizzle
+            git status --porcelain -- drizzle
             exit 1
           fi
 
@@ -59,6 +61,11 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: production
+    # Two merges landing close together must not migrate production concurrently.
+    # Never cancel a run mid-migration.
+    concurrency:
+      group: db-migrate-production
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
