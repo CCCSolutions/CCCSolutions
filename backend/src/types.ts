@@ -15,4 +15,13 @@ export type Bindings = {
   // Bearer token gating the /admin write endpoints (upload/delete). Set in prod
   // via `wrangler versions secret put ADMIN_TOKEN`; fail-closed if unset.
   ADMIN_TOKEN: string;
+
+  // Supabase — set as backend Worker secrets (`wrangler secret put`).
+  // DATABASE_URL: transaction-pooler connection string (port 6543) for runtime queries.
+  // SUPABASE_URL: project API URL, e.g. https://xyz.supabase.co (JWKS + Storage).
+  // SUPABASE_SECRET_KEY: server-only secret key (replaces the deprecated service_role
+  //   key); used for trusted server-side Storage/admin calls. Never sent to a browser.
+  DATABASE_URL: string;
+  SUPABASE_URL: string;
+  SUPABASE_SECRET_KEY: string;
 };

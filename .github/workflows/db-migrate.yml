@@ -1,0 +1,69 @@
+name: db migrations
+
+# Migrations are applied ONLY by this workflow — never by a developer running
+# db:migrate against production. On a PR we prove the committed migrations apply
+# to a fresh database; on merge to main we apply them to the hosted project.
+
+on:
+  pull_request:
+    paths:
+      - 'backend/src/db/**'
+      - 'backend/drizzle/**'
+      - 'backend/drizzle.config.ts'
+      - 'backend/supabase/**'
+      - '.github/workflows/db-migrate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'backend/drizzle/**'
+      - 'backend/drizzle.config.ts'
+      - '.github/workflows/db-migrate.yml'
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  # PRs: apply the committed migrations to a throwaway Supabase stack (which
+  # provides the auth schema + roles our migration references), and fail if
+  # schema.ts was changed without generating a matching migration.
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: bun install --frozen-lockfile
+      - name: Start local Supabase (Postgres + auth schema)
+        run: supabase start
+      - name: Apply migrations to the fresh database
+        run: bun run db:migrate
+        env:
+          DIRECT_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      - name: Fail if schema.ts has an un-generated migration (drift)
+        run: |
+          bun run db:generate
+          if ! git diff --quiet -- drizzle; then
+            echo "::error::schema.ts changed but no migration was committed. Run 'bun run db:generate' and commit drizzle/."
+            git --no-pager diff -- drizzle
+            exit 1
+          fi
+
+  # Merge to main: the ONLY place production is migrated. DIRECT_DATABASE_URL
+  # lives only as a GitHub secret, never in a developer's .dev.vars, so prod
+  # cannot be migrated by hand.
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Apply migrations to production
+        run: bun run db:migrate
+        env:
+          DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
