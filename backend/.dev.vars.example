@@ -29,8 +29,3 @@ ADMIN_TOKEN=
 # (db.<ref>.supabase.co): Transaction pooler -> DATABASE_URL, Session pooler -> DIRECT.
 DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
-
-# Supabase API — set these as real backend Worker secrets in prod (`wrangler secret put`).
-# SUPABASE_SECRET_KEY replaces the deprecated service_role key; it is server-only.
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SECRET_KEY=your-supabase-secret-key
