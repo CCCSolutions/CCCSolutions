@@ -51,10 +51,8 @@ interface SolutionMeta {
 interface SolutionEntry {
   code: string;
   language: string;
-  // Present for real solutions (enables the per-card download); absent for the
-  // "no solution yet" placeholder entry.
-  n?: number;
-  ext?: string;
+  n: number;
+  ext: string;
 }
 
 interface ListResponse {
@@ -64,6 +62,15 @@ interface ListResponse {
 
 const SOLUTION_MISSING_MESSAGE =
   'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!';
+
+const SOLUTION_ERROR_MESSAGE =
+  'Unable to load solutions right now. The API may be temporarily unavailable, please try again shortly.';
+
+const PROBLEM_INVALID_MESSAGE =
+  'This problem does not exist. Double check the year and problem code.';
+
+const PROBLEM_ERROR_MESSAGE =
+  'Unable to load this problem right now. The API may be temporarily unavailable, please try again shortly.';
 
 const formatSize = (bytes: number) =>
   bytes > 1024 * 1024
@@ -76,6 +83,8 @@ const Problem = () => {
     problemCode: string;
   }>();
   const [solutions, setSolutions] = useState<SolutionEntry[]>([]);
+  const [solutionsError, setSolutionsError] = useState(false);
+  const [listStatus, setListStatus] = useState<'loading' | 'invalid' | 'error' | 'ok'>('loading');
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: '', output: '' });
   const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
@@ -136,12 +145,26 @@ const Problem = () => {
       setLoading(true);
       setActiveTab(null);
       setTestCaseState('idle');
+      setSolutionsError(false);
+      setListStatus('loading');
 
       try {
         const res = await fetch(`${API_BASE}/contests/${contestYear}/${problemCode}/list`);
+
+        // 400 means the year/code itself is invalid (e.g. j8, or a s/j code
+        // before 2000) — a different situation from a real API failure.
+        if (res.status === 400) {
+          if (cancelled) return;
+          setTests([]);
+          setSolutionsMeta([]);
+          setSolutions([]);
+          setListStatus('invalid');
+          return;
+        }
         if (!res.ok) throw new Error(`list ${res.status}`);
         const data: ListResponse = await res.json();
         if (cancelled) return;
+        setListStatus('ok');
 
         // Show sample cases first, then graded — each group by ascending n.
         const listTests = [...(data.tests ?? [])].sort(
@@ -149,7 +172,6 @@ const Problem = () => {
         );
         setTests(listTests);
         setSolutionsMeta([...(data.solutions ?? [])].sort((a, b) => a.n - b.n));
-        if (listTests.length === 0) setTestCaseState('error');
 
         const solutionEntries = await Promise.all(
           (data.solutions ?? []).map(async (s) => {
@@ -171,18 +193,25 @@ const Problem = () => {
         const validSolutions = solutionEntries.filter(
           (e): e is NonNullable<typeof e> => e !== null
         );
-        setSolutions(
-          validSolutions.length > 0
-            ? validSolutions
-            : [{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]
-        );
+        const attemptedCount = (data.solutions ?? []).length;
+
+        if (validSolutions.length > 0) {
+          setSolutions(validSolutions);
+        } else if (attemptedCount === 0) {
+          // API responded fine, there just isn't a solution uploaded yet.
+          setSolutions([]);
+        } else {
+          // Solutions exist server-side but every fetch for them failed.
+          setSolutions([]);
+          setSolutionsError(true);
+        }
       } catch (error) {
         console.error('Error loading contest data:', error);
         if (cancelled) return;
         setTests([]);
         setSolutionsMeta([]);
-        setTestCaseState('error');
-        setSolutions([{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]);
+        setSolutions([]);
+        setListStatus('error');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -422,7 +451,13 @@ const Problem = () => {
             <h2 className="text-xl font-semibold text-foreground">
               {loading
                 ? 'Loading solutions…'
-                : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
+                : listStatus === 'invalid'
+                  ? 'Problem not found'
+                  : listStatus === 'error' || solutionsError
+                    ? 'Solutions unavailable'
+                    : solutions.length === 0
+                      ? 'No solution available yet'
+                      : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
             </h2>
           </div>
 
@@ -430,6 +465,31 @@ const Problem = () => {
             <div className="animate-pulse">
               <div className="h-64 bg-surface-200 rounded-lg" />
             </div>
+          ) : solutions.length === 0 ? (
+            <Card>
+              <div
+                className={`flex items-center justify-center gap-2 py-8 ${
+                  listStatus === 'error' || solutionsError
+                    ? 'text-destructive'
+                    : 'text-foreground-lighter'
+                }`}
+              >
+                {listStatus === 'error' || solutionsError ? (
+                  <ExclamationTriangleIcon width="18" height="18" />
+                ) : (
+                  <InfoCircledIcon width="18" height="18" />
+                )}
+                <p className="font-medium text-sm">
+                  {listStatus === 'invalid'
+                    ? PROBLEM_INVALID_MESSAGE
+                    : listStatus === 'error'
+                      ? PROBLEM_ERROR_MESSAGE
+                      : solutionsError
+                        ? SOLUTION_ERROR_MESSAGE
+                        : SOLUTION_MISSING_MESSAGE}
+                </p>
+              </div>
+            </Card>
           ) : (
             <div className="flex flex-col gap-4">
               {solutions.map((solution, idx) => (
@@ -442,16 +502,14 @@ const Problem = () => {
                       <span className="text-xs font-medium text-foreground-lighter uppercase">
                         {solution.language}
                       </span>
-                      {solution.n !== undefined && solution.ext && (
-                        <a
-                          href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
-                          className="text-foreground-lighter hover:text-brand transition-colors"
-                          aria-label={`Download solution ${idx + 1}`}
-                          title="Download solution"
-                        >
-                          <DownloadIcon width="15" height="15" />
-                        </a>
-                      )}
+                      <a
+                        href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
+                        className="text-foreground-lighter hover:text-brand transition-colors"
+                        aria-label={`Download solution ${idx + 1}`}
+                        title="Download solution"
+                      >
+                        <DownloadIcon width="15" height="15" />
+                      </a>
                     </div>
                   </div>
                   <SyntaxHighlighter
@@ -496,30 +554,54 @@ const Problem = () => {
 
           <Card>
             {/* Tab strip */}
-            <div className="flex items-center p-3 border-b border-border-default overflow-x-auto">
-              {tests.map((test, idx) => (
-                <button
-                  key={`${test.sample ? 'sample' : 'case'}-${test.n}`}
-                  onClick={() => handleTabClick(idx)}
-                  className={`px-3 py-1 mr-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
-                    activeTab === idx
-                      ? 'bg-brand-500 text-white'
-                      : 'bg-surface-200 text-foreground-light hover:bg-surface-300 hover:text-foreground'
-                  }`}
-                >
-                  {test.sample ? `Sample ${test.n}` : `Case ${test.n}`}
-                </button>
-              ))}
-            </div>
+            {tests.length > 0 && (
+              <div className="flex items-center p-3 border-b border-border-default overflow-x-auto">
+                {tests.map((test, idx) => (
+                  <button
+                    key={`${test.sample ? 'sample' : 'case'}-${test.n}`}
+                    onClick={() => handleTabClick(idx)}
+                    className={`px-3 py-1 mr-2 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                      activeTab === idx
+                        ? 'bg-brand-500 text-white'
+                        : 'bg-surface-200 text-foreground-light hover:bg-surface-300 hover:text-foreground'
+                    }`}
+                  >
+                    {test.sample ? `Sample ${test.n}` : `Case ${test.n}`}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="p-4">
-              {activeTab === null && tests.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full size-8 border-4 border-surface-300 border-t-brand" />
+                  <p className="mt-2 text-foreground-light">Loading test cases…</p>
+                </div>
+              ) : listStatus === 'invalid' ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-foreground-lighter">
+                  <InfoCircledIcon width="20" height="20" />
+                  <p className="font-medium text-sm">{PROBLEM_INVALID_MESSAGE}</p>
+                </div>
+              ) : listStatus === 'error' ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-destructive">
+                  <ExclamationTriangleIcon width="20" height="20" />
+                  <p className="font-medium text-sm">{PROBLEM_ERROR_MESSAGE}</p>
+                </div>
+              ) : tests.length === 0 ? (
+                <div className="flex items-center justify-center py-8 text-destructive">
+                  <InfoCircledIcon width="20" height="20" className="mr-2" />
+                  <p className="font-medium">
+                    Test case not available. See GitHub repo for test data.
+                  </p>
+                </div>
+              ) : activeTab === null ? (
                 <div className="text-center py-8 text-foreground-lighter text-sm">
                   Select a test case to view input and output
                 </div>
               ) : testCaseState === 'loading' ? (
                 <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full size-8 border-b-2 border-brand" />
+                  <div className="inline-block animate-spin rounded-full size-8 border-4 border-surface-300 border-t-brand" />
                   {(() => {
                     if (activeTest) {
                       const maxBytes = Math.max(activeTest.inputBytes, activeTest.outputBytes);

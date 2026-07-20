@@ -2,10 +2,27 @@ import { describe, it, expect } from 'vitest';
 import { problemParamsSchema, fileSchema } from '../../src/schemas';
 
 describe('problemParamsSchema', () => {
-  it('accepts valid CCC problem codes', () => {
-    for (const code of ['s1', 's5', 'j1', 'j5', 'p1', 'p5']) {
+  it('accepts s/j codes for 2000 onward', () => {
+    for (const code of ['s1', 's5', 'j1', 'j5']) {
       expect(problemParamsSchema.safeParse({ year: '2024', code }).success).toBe(true);
+      expect(problemParamsSchema.safeParse({ year: '2000', code }).success).toBe(true);
     }
+  });
+
+  it('accepts p codes only before 2000', () => {
+    for (const code of ['p1', 'p5']) {
+      expect(problemParamsSchema.safeParse({ year: '1999', code }).success).toBe(true);
+    }
+  });
+
+  it('rejects p codes from 2000 onward and s/j codes before 2000', () => {
+    const bad = [
+      { year: '2024', code: 'p1' }, // p-codes stopped existing after 1999
+      { year: '2000', code: 'p1' }, // 2000 is the first s/j year, not p
+      { year: '1999', code: 's1' }, // s/j didn't exist yet
+      { year: '1996', code: 'j1' },
+    ];
+    for (const b of bad) expect(problemParamsSchema.safeParse(b).success).toBe(false);
   });
 
   it('rejects bad years and codes', () => {
