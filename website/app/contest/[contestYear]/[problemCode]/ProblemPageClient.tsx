@@ -13,6 +13,7 @@ import {
   DownloadIcon,
   ExclamationTriangleIcon,
 } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
 import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
@@ -51,10 +52,8 @@ interface SolutionMeta {
 interface SolutionEntry {
   code: string;
   language: string;
-  // Present for real solutions (enables the per-card download); absent for the
-  // "no solution yet" placeholder entry.
-  n?: number;
-  ext?: string;
+  n: number;
+  ext: string;
 }
 
 interface ListResponse {
@@ -64,6 +63,9 @@ interface ListResponse {
 
 const SOLUTION_MISSING_MESSAGE =
   'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!';
+
+const SOLUTION_ERROR_MESSAGE =
+  'Unable to load solutions right now. The API may be temporarily unavailable, please try again shortly.';
 
 const formatSize = (bytes: number) =>
   bytes > 1024 * 1024
@@ -76,6 +78,7 @@ const Problem = () => {
     problemCode: string;
   }>();
   const [solutions, setSolutions] = useState<SolutionEntry[]>([]);
+  const [solutionsError, setSolutionsError] = useState(false);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: '', output: '' });
   const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
@@ -136,6 +139,7 @@ const Problem = () => {
       setLoading(true);
       setActiveTab(null);
       setTestCaseState('idle');
+      setSolutionsError(false);
 
       try {
         const res = await fetch(`${API_BASE}/contests/${contestYear}/${problemCode}/list`);
@@ -171,18 +175,28 @@ const Problem = () => {
         const validSolutions = solutionEntries.filter(
           (e): e is NonNullable<typeof e> => e !== null
         );
-        setSolutions(
-          validSolutions.length > 0
-            ? validSolutions
-            : [{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]
-        );
+        const attemptedCount = (data.solutions ?? []).length;
+
+        if (validSolutions.length > 0) {
+          setSolutions(validSolutions);
+        } else if (attemptedCount === 0) {
+          // API responded fine, there just isn't a solution uploaded yet.
+          setSolutions([]);
+        } else {
+          // Solutions exist server-side but every fetch for them failed.
+          setSolutions([]);
+          setSolutionsError(true);
+          toast.error('Unable to load solutions. The API may be temporarily unavailable.');
+        }
       } catch (error) {
         console.error('Error loading contest data:', error);
         if (cancelled) return;
         setTests([]);
         setSolutionsMeta([]);
         setTestCaseState('error');
-        setSolutions([{ code: SOLUTION_MISSING_MESSAGE, language: 'text' }]);
+        setSolutions([]);
+        setSolutionsError(true);
+        toast.error('Unable to load solutions. The API may be temporarily unavailable.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -422,7 +436,11 @@ const Problem = () => {
             <h2 className="text-xl font-semibold text-foreground">
               {loading
                 ? 'Loading solutions…'
-                : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
+                : solutionsError
+                  ? 'Solutions unavailable'
+                  : solutions.length === 0
+                    ? 'No solution available yet'
+                    : `${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} available`}
             </h2>
           </div>
 
@@ -430,6 +448,23 @@ const Problem = () => {
             <div className="animate-pulse">
               <div className="h-64 bg-surface-200 rounded-lg" />
             </div>
+          ) : solutions.length === 0 ? (
+            <Card>
+              <div
+                className={`flex items-center justify-center gap-2 py-8 ${
+                  solutionsError ? 'text-destructive' : 'text-foreground-lighter'
+                }`}
+              >
+                {solutionsError ? (
+                  <ExclamationTriangleIcon width="18" height="18" />
+                ) : (
+                  <InfoCircledIcon width="18" height="18" />
+                )}
+                <p className="font-medium text-sm">
+                  {solutionsError ? SOLUTION_ERROR_MESSAGE : SOLUTION_MISSING_MESSAGE}
+                </p>
+              </div>
+            </Card>
           ) : (
             <div className="flex flex-col gap-4">
               {solutions.map((solution, idx) => (
@@ -442,16 +477,14 @@ const Problem = () => {
                       <span className="text-xs font-medium text-foreground-lighter uppercase">
                         {solution.language}
                       </span>
-                      {solution.n !== undefined && solution.ext && (
-                        <a
-                          href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
-                          className="text-foreground-lighter hover:text-brand transition-colors"
-                          aria-label={`Download solution ${idx + 1}`}
-                          title="Download solution"
-                        >
-                          <DownloadIcon width="15" height="15" />
-                        </a>
-                      )}
+                      <a
+                        href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
+                        className="text-foreground-lighter hover:text-brand transition-colors"
+                        aria-label={`Download solution ${idx + 1}`}
+                        title="Download solution"
+                      >
+                        <DownloadIcon width="15" height="15" />
+                      </a>
                     </div>
                   </div>
                   <SyntaxHighlighter
