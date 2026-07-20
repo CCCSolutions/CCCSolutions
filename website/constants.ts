@@ -78,7 +78,7 @@ const problems: Problem[] = [
     difficulty: 'Hard',
     tags: ['number theory', 'constructive'],
     link: '/contest/2026/s3',
-    hasSolution: false,
+    hasSolution: true,
   },
   {
     name: '2026 S4 - Minecarts',
