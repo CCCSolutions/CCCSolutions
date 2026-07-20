@@ -67,7 +67,8 @@ const SOLUTION_MISSING_MESSAGE =
 const SOLUTION_ERROR_MESSAGE =
   'Unable to load solutions right now. The API may be temporarily unavailable, please try again shortly.';
 
-const PROBLEM_INVALID_MESSAGE = 'This problem does not exist. Double check the year and problem code.';
+const PROBLEM_INVALID_MESSAGE =
+  'This problem does not exist. Double check the year and problem code.';
 
 const PROBLEM_ERROR_MESSAGE =
   'Unable to load this problem right now. The API may be temporarily unavailable, please try again shortly.';
@@ -471,7 +472,9 @@ const Problem = () => {
             <Card>
               <div
                 className={`flex items-center justify-center gap-2 py-8 ${
-                  listStatus === 'error' || solutionsError ? 'text-destructive' : 'text-foreground-lighter'
+                  listStatus === 'error' || solutionsError
+                    ? 'text-destructive'
+                    : 'text-foreground-lighter'
                 }`}
               >
                 {listStatus === 'error' || solutionsError ? (
