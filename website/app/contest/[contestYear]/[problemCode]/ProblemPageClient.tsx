@@ -13,7 +13,6 @@ import {
   DownloadIcon,
   ExclamationTriangleIcon,
 } from '@radix-ui/react-icons';
-import { toast } from 'sonner';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
 import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
@@ -205,7 +204,6 @@ const Problem = () => {
           // Solutions exist server-side but every fetch for them failed.
           setSolutions([]);
           setSolutionsError(true);
-          toast.error('Unable to load solutions. The API may be temporarily unavailable.');
         }
       } catch (error) {
         console.error('Error loading contest data:', error);
@@ -214,7 +212,6 @@ const Problem = () => {
         setSolutionsMeta([]);
         setSolutions([]);
         setListStatus('error');
-        toast.error('Unable to load this problem. The API may be temporarily unavailable.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -576,7 +573,12 @@ const Problem = () => {
             )}
 
             <div className="p-4">
-              {listStatus === 'invalid' ? (
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full size-8 border-4 border-surface-300 border-t-brand" />
+                  <p className="mt-2 text-foreground-light">Loading test cases…</p>
+                </div>
+              ) : listStatus === 'invalid' ? (
                 <div className="flex items-center justify-center gap-2 py-8 text-foreground-lighter">
                   <InfoCircledIcon width="20" height="20" />
                   <p className="font-medium text-sm">{PROBLEM_INVALID_MESSAGE}</p>
