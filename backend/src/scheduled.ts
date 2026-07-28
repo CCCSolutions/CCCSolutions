@@ -7,11 +7,7 @@ import { sql } from 'drizzle-orm';
 import { getDb } from './db';
 import type { Bindings } from './types';
 
-export async function scheduled(
-  _event: ScheduledController,
-  env: Bindings,
-  ctx: ExecutionContext,
-): Promise<void> {
+export async function scheduled(_event: ScheduledController, env: Bindings, ctx: ExecutionContext): Promise<void> {
   ctx.waitUntil(keepAlive(env));
 }
 
