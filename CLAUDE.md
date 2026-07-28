@@ -24,6 +24,8 @@ Package manager is **bun** in both.
 - 🔜 Forum still on PocketBase on `main` until the Supabase cutover
 - 🔜 Netlify decommission after DNS cutover
 
+This may be out of date as changes often happen rapidly so always check the state of the existing project before treating this as fact.
+
 ## Load-bearing facts (don't relearn these the hard way)
 
 - **Migrations run only in CI**, never by hand, never `db:push` — `backend/docs/DATABASE.md`.
