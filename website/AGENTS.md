@@ -4,7 +4,7 @@ Next.js 15 (App Router) + React 18 + Tailwind v4. Package manager: **bun** (`bun
 
 ## Environment variables
 
-Every frontend var is `NEXT_PUBLIC_*`, which Next.js **bakes into the bundle at build time** — nothing is read at Worker runtime. So in the cloud they go in the **build** environment: Cloudflare **Workers Builds → Build → Variables** *and* **Netlify** env (the site double-deploys during the hosting migration). Putting them in the Worker's *Secrets* tab does nothing — the build has already finished. Locally they live in `.env.local` (gitignored; copy `.env.local.example`). `NEXT_PUBLIC_API_URL` takes **no trailing slash**.
+Every frontend var is `NEXT_PUBLIC_*`, which Next.js **bakes into the bundle at build time** — nothing is read at Worker runtime. So in the cloud they go in the **build** environment: Cloudflare **Workers Builds → Build → Variables** _and_ **Netlify** env (the site double-deploys during the hosting migration). Putting them in the Worker's _Secrets_ tab does nothing — the build has already finished. Locally they live in `.env.local` (gitignored; copy `.env.local.example`). `NEXT_PUBLIC_API_URL` takes **no trailing slash**.
 
 ## Layout map
 
