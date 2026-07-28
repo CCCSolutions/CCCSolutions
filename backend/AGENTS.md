@@ -31,5 +31,14 @@ c.executionCtx.waitUntil(c.executionCtx.cache.purge({ tags: [`contest:${year}:${
 The admin router (`src/admin/routes.ts`) does this in `purgeContest()`. New write
 paths must call the same helper (or an equivalent purge). No purge, no merge.
 
+## Database — Supabase + Drizzle
+
+App data (forum, users) lives in **Supabase Postgres**, accessed with **Drizzle ORM**. Full workflow in `docs/DATABASE.md`. The load-bearing rules:
+
+- **Migrations run only in CI** (`.github/workflows/db-migrate.yml`): applied to a throwaway Supabase on PRs, to prod on merge to main. Never hand-edit the DB, never `db:push`. Drizzle owns the `public` schema only — Supabase owns `auth`/`storage`.
+- **Two connection strings.** `DATABASE_URL` = transaction pooler (6543), for the Worker at runtime — construct clients as `postgres(url, { max: 1, prepare: false })` (transaction pooling breaks server-side prepared statements). `DIRECT_DATABASE_URL` = session mode (5432), for migrations only, and it lives **only** as a CI secret so prod can't be migrated by hand.
+- **Keys:** use `SUPABASE_SECRET_KEY` (server) and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (browser) — the old `service_role`/`anon` keys are deprecated. Verify JWTs via JWKS off `SUPABASE_URL` (no `SUPABASE_JWT_SECRET`). `SUPABASE_URL` is a non-secret var in `wrangler.jsonc`, not a secret.
+- **RLS is currently inert.** The Worker connects as a privileged pooler role, so `auth.uid()` is NULL and `pgPolicy` rules are bypassed — authorization is enforced in the API layer. Defined policies are defense-in-depth until we set `request.jwt.claims` per request (planned; see `../docs/Roadmap40.md`).
+
 ## Migration / deploy notes
 Wrangler hardening, R2 serving pattern, and the Pages migration plan live in the repo-root `DEPLOYMENT_NOTES.local.md` (gitignored).
