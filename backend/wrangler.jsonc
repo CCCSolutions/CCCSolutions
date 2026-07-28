@@ -3,6 +3,12 @@
   "name": "cccsolutions-backend",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-08",
+  // cron trigger for preventing supabase inactivity  
+  "triggers": {
+    "crons": [
+      "0 0 * * *"
+    ]
+  },
   // Explicit, not inherited: workers_dev defaults to true and preview_urls
   // defaults to workers_dev, so leaving these unset lets every deploy reassert
   // the defaults over a dashboard change. Both URLs are gated by edge
@@ -37,7 +43,6 @@
       "bucket_name": "cccsolutions",
     },
   ],
-
   // "d1_databases": [
   //   {
   //     "binding": "MY_DB",

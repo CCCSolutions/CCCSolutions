@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import app from '../src/index';
+import { app } from '../src/index';
 
 // Pins the CORS allow/deny contract so a future hono upgrade that changes the
 // origin-callback behavior fails here instead of silently in prod.
