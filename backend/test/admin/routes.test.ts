@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import app from '../../src/index';
+import { app } from '../../src/index';
 
 const ADMIN_TOKEN = 'test-admin-token';
 

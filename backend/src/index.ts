@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import type { Bindings } from './types';
 import r2 from './r2/routes';
 import admin from './admin/routes';
+import { scheduled } from './scheduled';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -36,4 +37,7 @@ app.get('/health', (c) => {
 app.route('/contests', r2);
 app.route('/admin', admin);
 
-export default app;
+// `app` is exported by name for tests (Hono's app.request/app.fetch helpers);
+// the default export is the Worker's runtime handler (HTTP + cron).
+export { app };
+export default { fetch: app.fetch, scheduled } satisfies ExportedHandler<Bindings>;

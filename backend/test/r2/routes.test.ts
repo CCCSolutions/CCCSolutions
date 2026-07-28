@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import app from '../../src/index';
+import { app } from '../../src/index';
 
 // Fake R2 binding: get() returns a stand-in R2ObjectBody (just .text()) or null;
 // list() returns stand-in R2Objects (key + size).
