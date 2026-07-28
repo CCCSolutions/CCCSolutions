@@ -21,9 +21,7 @@
   "cache": {
     "enabled": true,
   },
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
+  "compatibility_flags": ["nodejs_compat"],
   // Public, non-secret config lives here so a deploy keeps it in sync (no dashboard
   // drift). SUPABASE_URL is the project's API gateway — not a secret (it also ships
   // in the frontend bundle). The real secrets — DATABASE_URL, SUPABASE_SECRET_KEY,
