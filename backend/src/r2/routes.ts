@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { AwsClient } from 'aws4fetch';
 import { z } from 'zod';
 import type { Bindings } from '../types';
-import { problemParamsSchema, fileSchema } from '../schemas';
+import { problemParamsSchema, fileSchema } from './validation';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
 
