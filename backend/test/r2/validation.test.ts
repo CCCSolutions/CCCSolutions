@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { problemParamsSchema, fileSchema } from '../../src/schemas';
+import { problemParamsSchema, fileSchema } from '../../src/r2/validation';
 
 describe('problemParamsSchema', () => {
   it('accepts s/j codes for 2000 onward', () => {

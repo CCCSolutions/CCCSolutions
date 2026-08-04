@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Bindings } from '../types';
-import { problemParamsSchema, fileSchema } from '../schemas';
+import { problemParamsSchema, fileSchema } from '../r2/validation';
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
