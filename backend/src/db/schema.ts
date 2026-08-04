@@ -56,14 +56,15 @@ export const profiles = pgTable(
 const ownProfileId = sql`(select id from profiles where auth_user_id = (select auth.uid()))`;
 
 export const posts = pgTable(
-  'posts', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-},
+  'posts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
   (t) => [
     pgPolicy('posts_select_all', {
       for: 'select',
@@ -92,7 +93,9 @@ export const comments = pgTable(
   'comments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    postId: uuid('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => posts.id, { onDelete: 'cascade' }),
     profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
     content: text('content').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -126,7 +129,9 @@ export const votes = pgTable(
   'votes',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    profileId: uuid('profile_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
     votableType: text('votable_type').notNull(), // this is for 'post' | 'comment' for adding later
     votableId: uuid('votable_id').notNull(), // no foreign key (polymorphic)
     value: smallint('value').notNull(), // -1 or 1
@@ -138,7 +143,7 @@ export const votes = pgTable(
     uniqueIndex('votes_profile_votable_index').on(t.profileId, t.votableType, t.votableId),
     check('votes_votable_type_check', sql`${t.votableType} in ('post', 'comment')`),
     check('votes_value_check', sql`${t.value} in (-1, 1)`),
-    // selecting votes for counting everyone's scores done by JOINs, user can only select their own otherwise 
+    // selecting votes for counting everyone's scores done by JOINs, user can only select their own otherwise
     pgPolicy('votes_select_own', {
       for: 'select',
       to: authenticatedRole,
@@ -160,7 +165,5 @@ export const votes = pgTable(
       to: authenticatedRole,
       using: sql`${t.profileId} = ${ownProfileId}`,
     }),
-
   ],
 );
-
