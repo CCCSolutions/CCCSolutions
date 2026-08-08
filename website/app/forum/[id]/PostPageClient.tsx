@@ -7,8 +7,8 @@ import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
-import { supabase, apiFetch } from '../../../lib/supabase';
-import type { Session } from '@supabase/supabase-js';
+import { apiFetch } from '../../../lib/supabase';
+import { useAuth } from '../../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -39,7 +39,7 @@ export default function PostPageClient({ id }: Props) {
   const [post, setPost] = useState<PostDetail | null>(null);
   const [comments, setComments] = useState<CommentRow[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [session, setSession] = useState<Session | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [postVote, setPostVote] = useState<1 | -1 | 0>(0);
   const [commentVotes, setCommentVotes] = useState<Record<string, 1 | -1 | 0>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -48,18 +48,16 @@ export default function PostPageClient({ id }: Props) {
   // submitting === false and each fire a create(). A ref writes synchronously.
   const submittingRef = useRef(false);
 
-  const isLoggedIn = !!session;
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
-    return () => listener.subscription.unsubscribe();
-  }, []);
+  const { state } = useAuth();
+  const isLoggedIn = state === 'in';
 
   const fetchPost = useCallback(async () => {
     try {
       const res = await apiFetch(`/forum/posts/${id}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        setNotFound(true);
+        return;
+      }
       const { post: p, comments: c } = (await res.json()) as {
         post: PostDetail;
         comments: CommentRow[];
@@ -180,6 +178,23 @@ export default function PostPageClient({ id }: Props) {
       fetchPost(); // handles its own errors; must not affect the toast above
     }
   };
+
+  if (notFound) {
+    return (
+      <div className="bg-background text-foreground">
+        <SectionContainer size="large" className="py-16">
+          <Link
+            href="/forum"
+            className="inline-flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground transition-colors mb-6"
+          >
+            <ArrowLeftIcon width="14" height="14" />
+            Back to forum
+          </Link>
+          <p className="text-foreground-light">Post not found.</p>
+        </SectionContainer>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
