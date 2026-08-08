@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -13,6 +13,11 @@ import { TurnstileWidget } from './TurnstileWidget';
 const inputClass =
   'w-full h-10 px-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight';
 const labelClass = 'block text-sm font-medium text-foreground-light mb-1.5';
+
+// Persistent error toast — one shared id so retries replace it instead of stacking.
+function errorToast(message: string) {
+  toast.error(message, { id: 'auth-error', duration: Infinity });
+}
 
 function GoogleIcon() {
   return (
@@ -44,7 +49,6 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [checkEmail, setCheckEmail] = useState(false);
   const [code, setCode] = useState('');
@@ -54,25 +58,37 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
   const { push } = useRouter();
 
+  // Surface OAuth-callback failures (which redirect here as ?error=...) as a toast.
+  useEffect(() => {
+    const err = new URLSearchParams(window.location.search).get('error');
+    if (err) {
+      errorToast(
+        err === 'timeout'
+          ? 'Sign-in timed out. Please try again.'
+          : 'Sign-in failed. Please try again.'
+      );
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submittingRef.current) return;
     submittingRef.current = true;
     setSubmitting(true);
-    setError(null);
 
     try {
       if (mode === 'signin') {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
           options: captchaToken ? { captchaToken } : undefined,
         });
-        if (signInError) throw signInError;
+        if (error) throw error;
+        toast.dismiss('auth-error');
         toast.success('Logged in.');
         push('/forum');
       } else {
-        const { data, error: signUpError } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -80,7 +96,8 @@ export default function AuthForm({ mode }: { mode: Mode }) {
             ...(captchaToken ? { captchaToken } : {}),
           },
         });
-        if (signUpError) throw signUpError;
+        if (error) throw error;
+        toast.dismiss('auth-error');
         // With email confirmation on, signUp returns no session until the email is
         // verified (via the link or the code below). A session-less user is also
         // returned for an already-registered email, avoiding account enumeration.
@@ -94,8 +111,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong.';
-      setError(message);
+      errorToast(err instanceof Error ? err.message : 'Something went wrong.');
       submittingRef.current = false;
       setSubmitting(false);
     }
@@ -104,33 +120,29 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
-    const { data, error: otpError } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: code.trim(),
       type: 'signup',
     });
     setSubmitting(false);
-    if (otpError) {
-      setError(otpError.message);
+    if (error) {
+      errorToast(error.message);
     } else if (data.session) {
+      toast.dismiss('auth-error');
       toast.success('Email confirmed.');
       push('/forum');
     }
   };
 
   const handleGoogle = async () => {
-    setError(null);
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (oauthError) {
-      setError(oauthError.message);
-      toast.error('Could not start Google sign-in.');
-    }
+    if (error) errorToast(error.message);
   };
 
   return (
@@ -170,11 +182,10 @@ export default function AuthForm({ mode }: { mode: Mode }) {
                     inputMode="numeric"
                     autoComplete="one-time-code"
                     placeholder="Enter code"
-                    className={`${inputClass} text-center tracking-[0.3em]`}
+                    className={`${inputClass} text-center tracking-[0.15em] placeholder:tracking-normal`}
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                   />
-                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
                   <Button
                     type="primary"
                     size="medium"
@@ -191,7 +202,6 @@ export default function AuthForm({ mode }: { mode: Mode }) {
                     onClick={() => {
                       setCheckEmail(false);
                       setCode('');
-                      setError(null);
                     }}
                     className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
                   >
@@ -229,6 +239,8 @@ export default function AuthForm({ mode }: { mode: Mode }) {
                         required
                         minLength={2}
                         maxLength={24}
+                        pattern="[a-z0-9_]{2,24}"
+                        title="Lowercase letters, numbers, and underscores only (2–24 characters)."
                         className={inputClass}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -285,8 +297,6 @@ export default function AuthForm({ mode }: { mode: Mode }) {
                     onVerify={setCaptchaToken}
                     onExpire={() => setCaptchaToken(null)}
                   />
-
-                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
 
                   <Button
                     type="primary"

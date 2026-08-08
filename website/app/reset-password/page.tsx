@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
 import { Button } from '../../components/ui/button';
@@ -12,11 +13,14 @@ import { TurnstileWidget } from '../../components/auth/TurnstileWidget';
 const inputClass =
   'w-full h-10 px-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight';
 
+function errorToast(message: string) {
+  toast.error(message, { id: 'auth-error', duration: Infinity });
+}
+
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [code, setCode] = useState('');
 
@@ -26,17 +30,17 @@ export default function ResetPasswordPage() {
   const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/update-password`,
       ...(captchaToken ? { captchaToken } : {}),
     });
 
     setSubmitting(false);
-    if (resetError) {
-      setError(resetError.message);
+    if (error) {
+      errorToast(error.message);
     } else {
+      toast.dismiss('auth-error');
       setSent(true);
     }
   };
@@ -46,16 +50,16 @@ export default function ResetPasswordPage() {
   const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
-    const { data, error: otpError } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: code.trim(),
       type: 'recovery',
     });
     setSubmitting(false);
-    if (otpError) {
-      setError(otpError.message);
+    if (error) {
+      errorToast(error.message);
     } else if (data.session) {
+      toast.dismiss('auth-error');
       push('/update-password');
     }
   };
@@ -83,9 +87,8 @@ export default function ResetPasswordPage() {
             {sent ? (
               <div className="space-y-5">
                 <p className="text-sm text-foreground-light text-center">
-                  We sent a reset link and a code to{' '}
-                  <span className="text-foreground">{email}</span>. Click the link, or enter the
-                  code below.
+                  If an account exists for <span className="text-foreground">{email}</span>,
+                  we&apos;ve sent a reset link and a code. Click the link, or enter the code below.
                 </p>
                 <form className="space-y-4" onSubmit={handleVerifyCode}>
                   <input
@@ -93,11 +96,10 @@ export default function ResetPasswordPage() {
                     inputMode="numeric"
                     autoComplete="one-time-code"
                     placeholder="Enter code"
-                    className={`${inputClass} text-center tracking-[0.3em]`}
+                    className={`${inputClass} text-center tracking-[0.15em] placeholder:tracking-normal`}
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                   />
-                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
                   <Button
                     type="primary"
                     size="medium"
@@ -133,8 +135,6 @@ export default function ResetPasswordPage() {
                   onVerify={setCaptchaToken}
                   onExpire={() => setCaptchaToken(null)}
                 />
-
-                {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
 
                 <Button
                   type="primary"

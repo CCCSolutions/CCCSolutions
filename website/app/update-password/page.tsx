@@ -15,7 +15,6 @@ export default function UpdatePasswordPage() {
   const [ready, setReady] = useState(false);
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   // Supabase's password-recovery link lands here with the recovery session
@@ -34,15 +33,15 @@ export default function UpdatePasswordPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
     const { error: updateError } = await supabase.auth.updateUser({ password });
 
     setSubmitting(false);
     if (updateError) {
-      setError(updateError.message);
+      toast.error(updateError.message, { id: 'auth-error', duration: Infinity });
       return;
     }
+    toast.dismiss('auth-error');
     toast.success('Password updated.');
     router.push('/forum');
   };
@@ -92,8 +91,6 @@ export default function UpdatePasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-
-                {error && <p className="text-sm text-destructive-600">{error}</p>}
 
                 <Button type="primary" size="medium" block htmlType="submit" disabled={submitting}>
                   {submitting ? 'Saving…' : 'Update password'}
