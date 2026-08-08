@@ -20,9 +20,9 @@ Blockers.
 - **PR A** — https://github.com/CCCSolutions/CCCSolutions/pull/199
   `feat(website): migrate forum data layer to Hono API + Supabase auth env`
   (base `feat/auth-oauth`)
-- **PR B** — opened as part of this loop, base `feat/frontend-foundation`.
+- **PR B** — https://github.com/CCCSolutions/CCCSolutions/pull/200
   `fix(website): auth UI + forum bug fixes (upvote, toasts, full-flow)`
-  (URL added below once opened)
+  (base `feat/frontend-foundation`)
 
 ## What shipped
 
