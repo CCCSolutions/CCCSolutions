@@ -39,8 +39,7 @@ function GoogleIcon() {
 
 type Mode = 'signin' | 'signup';
 
-export default function AuthForm() {
-  const [mode, setMode] = useState<Mode>('signin');
+export default function AuthForm({ mode }: { mode: Mode }) {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -48,6 +47,7 @@ export default function AuthForm() {
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [checkEmail, setCheckEmail] = useState(false);
+  const [code, setCode] = useState('');
   const submittingRef = useRef(false);
 
   const captchaRequired = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -69,7 +69,7 @@ export default function AuthForm() {
           options: captchaToken ? { captchaToken } : undefined,
         });
         if (signInError) throw signInError;
-        toast.success('Signed in.');
+        toast.success('Logged in.');
         push('/forum');
       } else {
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -81,9 +81,9 @@ export default function AuthForm() {
           },
         });
         if (signUpError) throw signUpError;
-        // With email confirmation on, signUp returns no session until the link is
-        // clicked. (A session-less user is also returned for an already-registered
-        // email, so this same path avoids leaking whether the account exists.)
+        // With email confirmation on, signUp returns no session until the email is
+        // verified (via the link or the code below). A session-less user is also
+        // returned for an already-registered email, avoiding account enumeration.
         if (!data.session) {
           setCheckEmail(true);
           setSubmitting(false);
@@ -98,6 +98,24 @@ export default function AuthForm() {
       setError(message);
       submittingRef.current = false;
       setSubmitting(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const { data, error: otpError } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: 'signup',
+    });
+    setSubmitting(false);
+    if (otpError) {
+      setError(otpError.message);
+    } else if (data.session) {
+      toast.success('Email confirmed.');
+      push('/forum');
     }
   };
 
@@ -116,7 +134,7 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
+    <div className="relative min-h-[calc(100svh-var(--nav-h))] flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <FlickeringGrid
           className="size-full"
@@ -133,29 +151,53 @@ export default function AuthForm() {
           {checkEmail
             ? 'Confirm your email'
             : mode === 'signin'
-              ? 'Sign in to your account'
+              ? 'Log in to your account'
               : 'Create a new account'}
         </h2>
 
         <Card>
           <CardContent className="py-8 px-6 border-none">
             {checkEmail ? (
-              <div className="text-center space-y-4">
-                <p className="text-sm text-foreground-light">
-                  We sent a confirmation link to <span className="text-foreground">{email}</span>.
-                  Click it to finish creating your account, then sign in.
+              <div className="space-y-5">
+                <p className="text-sm text-foreground-light text-center">
+                  We sent a confirmation link and a code to{' '}
+                  <span className="text-foreground">{email}</span>. Click the link, or enter the
+                  code below.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCheckEmail(false);
-                    setMode('signin');
-                    setPassword('');
-                  }}
-                  className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
-                >
-                  Back to sign in
-                </button>
+                <form className="space-y-4" onSubmit={handleVerifyCode}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="Enter code"
+                    className={`${inputClass} text-center tracking-[0.3em]`}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
+                  <Button
+                    type="primary"
+                    size="medium"
+                    block
+                    htmlType="submit"
+                    disabled={submitting || code.trim().length === 0}
+                  >
+                    {submitting ? 'Verifying…' : 'Verify code'}
+                  </Button>
+                </form>
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCheckEmail(false);
+                      setCode('');
+                      setError(null);
+                    }}
+                    className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+                  >
+                    Back
+                  </button>
+                </div>
               </div>
             ) : (
               <>
@@ -244,7 +286,7 @@ export default function AuthForm() {
                     onExpire={() => setCaptchaToken(null)}
                   />
 
-                  {error && <p className="text-sm text-destructive-600">{error}</p>}
+                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
 
                   <Button
                     type="primary"
@@ -253,21 +295,17 @@ export default function AuthForm() {
                     htmlType="submit"
                     disabled={submitting || (captchaRequired && !captchaToken)}
                   >
-                    {submitting ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}
+                    {submitting ? 'Working…' : mode === 'signin' ? 'Log in' : 'Create account'}
                   </Button>
                 </form>
 
                 <div className="mt-5 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode(mode === 'signin' ? 'signup' : 'signin');
-                      setError(null);
-                    }}
+                  <Link
+                    href={mode === 'signin' ? '/signup' : '/login'}
                     className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
                   >
                     {mode === 'signin' ? 'Need to create an account?' : 'Already have an account?'}
-                  </button>
+                  </Link>
                 </div>
               </>
             )}

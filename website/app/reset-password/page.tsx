@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
 import { Button } from '../../components/ui/button';
@@ -18,10 +18,12 @@ export default function ResetPasswordPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [code, setCode] = useState('');
 
   const captchaRequired = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const { push } = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
@@ -39,8 +41,27 @@ export default function ResetPasswordPage() {
     }
   };
 
+  // Code path: verify the OTP to establish a recovery session, then hand off to
+  // /update-password (which picks up the session and lets them set a new password).
+  const handleVerifyCode = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const { data, error: otpError } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: 'recovery',
+    });
+    setSubmitting(false);
+    if (otpError) {
+      setError(otpError.message);
+    } else if (data.session) {
+      push('/update-password');
+    }
+  };
+
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
+    <div className="relative min-h-[calc(100svh-var(--nav-h))] flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <FlickeringGrid
           className="size-full"
@@ -53,14 +74,6 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-1.5 text-sm text-foreground-light hover:text-foreground transition-colors mb-6"
-        >
-          <ArrowLeftIcon width="14" height="14" />
-          Back to sign in
-        </Link>
-
         <h2 className="text-3xl font-semibold tracking-tight text-foreground text-center mb-6">
           Reset your password
         </h2>
@@ -68,12 +81,36 @@ export default function ResetPasswordPage() {
         <Card>
           <CardContent className="py-8 px-6 border-none">
             {sent ? (
-              <p className="text-sm text-foreground-light text-center">
-                If an account exists for <span className="text-foreground">{email}</span>,
-                we&apos;ve sent a link to reset your password.
-              </p>
+              <div className="space-y-5">
+                <p className="text-sm text-foreground-light text-center">
+                  We sent a reset link and a code to{' '}
+                  <span className="text-foreground">{email}</span>. Click the link, or enter the
+                  code below.
+                </p>
+                <form className="space-y-4" onSubmit={handleVerifyCode}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="Enter code"
+                    className={`${inputClass} text-center tracking-[0.3em]`}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                  {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
+                  <Button
+                    type="primary"
+                    size="medium"
+                    block
+                    htmlType="submit"
+                    disabled={submitting || code.trim().length === 0}
+                  >
+                    {submitting ? 'Verifying…' : 'Verify code'}
+                  </Button>
+                </form>
+              </div>
             ) : (
-              <form className="space-y-5" onSubmit={handleSubmit}>
+              <form className="space-y-5" onSubmit={handleSend}>
                 <div>
                   <label
                     htmlFor="email"
@@ -97,7 +134,7 @@ export default function ResetPasswordPage() {
                   onExpire={() => setCaptchaToken(null)}
                 />
 
-                {error && <p className="text-sm text-destructive-600">{error}</p>}
+                {error && <p className="text-sm text-destructive-600 text-center">{error}</p>}
 
                 <Button
                   type="primary"
@@ -112,6 +149,15 @@ export default function ResetPasswordPage() {
             )}
           </CardContent>
         </Card>
+
+        <div className="mt-5 flex justify-center">
+          <Link
+            href="/login"
+            className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+          >
+            Back to log in
+          </Link>
+        </div>
       </div>
     </div>
   );

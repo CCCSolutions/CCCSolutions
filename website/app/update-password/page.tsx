@@ -48,7 +48,7 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
+    <div className="relative min-h-[calc(100svh-var(--nav-h))] flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <FlickeringGrid
           className="size-full"
