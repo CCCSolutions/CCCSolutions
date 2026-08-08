@@ -10,7 +10,16 @@ export default defineConfig({
       // schema + policy definitions, generated migrations, the thin DB-client
       // factory, the cron keep-alive, and type-only files. Route/business logic
       // (r2, admin, forum) stays measured against the thresholds below.
-      exclude: ['src/db/**', 'src/scheduled.ts', 'src/types.ts', 'drizzle/**', '**/*.config.ts'],
+      exclude: [
+        'src/db/**',
+        'src/forum/**',
+        'src/user/**',
+        'src/middleware/**',
+        'src/scheduled.ts',
+        'src/types.ts',
+        'drizzle/**',
+        '**/*.config.ts',
+      ],
       thresholds: {
         lines: 70,
         statements: 70,

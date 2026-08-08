@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { Bindings } from './types';
-import r2 from './r2/routes';
 import admin from './admin/routes';
+import forum from './forum/routes';
+import r2 from './r2/routes';
+import user from './user/routes';
 import { scheduled } from './scheduled';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -34,8 +36,10 @@ app.get('/health', (c) => {
   // TODO: deeper checks — R2, DB, downstream services (not just liveness)
 });
 
-app.route('/contests', r2);
 app.route('/admin', admin);
+app.route('/forum', forum);
+app.route('/user', user);
+app.route('/contests', r2);
 
 // `app` is exported by name for tests (Hono's app.request/app.fetch helpers);
 // the default export is the Worker's runtime handler (HTTP + cron).
