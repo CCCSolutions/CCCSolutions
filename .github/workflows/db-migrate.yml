@@ -37,6 +37,8 @@ jobs:
         with:
           version: latest
       - run: bun install --frozen-lockfile
+      - name: Generate local JWT signing key (gitignored; config.toml's signing_keys_path requires it)
+        run: supabase gen signing-key --algorithm ES256 | node -e "const fs=require('fs');let s='';process.stdin.on('data',d=>s+=d).on('end',()=>fs.writeFileSync('supabase/signing_keys.json',JSON.stringify([JSON.parse(s)])))"
       - name: Start local Supabase (Postgres + auth schema)
         run: supabase start
       - name: Apply migrations to the fresh database
