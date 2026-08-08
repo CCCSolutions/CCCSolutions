@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 declare global {
   interface Window {
@@ -13,7 +13,7 @@ declare global {
           callback: (token: string) => void;
           'expired-callback'?: () => void;
           'error-callback'?: () => void;
-        },
+        }
       ) => string;
       reset: (widgetId?: string) => void;
       remove: (widgetId: string) => void;
@@ -49,7 +49,6 @@ type Props = {
 export function TurnstileWidget({ onVerify, onExpire, theme = 'auto' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
-  const [failed, setFailed] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -65,10 +64,12 @@ export function TurnstileWidget({ onVerify, onExpire, theme = 'auto' }: Props) {
           theme,
           callback: onVerify,
           'expired-callback': onExpire,
-          'error-callback': () => setFailed(true),
+          // Let Turnstile render its own error state (invalid domain, network, …)
+          // instead of hiding the widget; just clear any token so the form stays gated.
+          'error-callback': () => onExpire?.(),
         });
       })
-      .catch(() => setFailed(true));
+      .catch(() => onExpire?.());
 
     return () => {
       cancelled = true;
@@ -79,7 +80,7 @@ export function TurnstileWidget({ onVerify, onExpire, theme = 'auto' }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteKey, theme]);
 
-  if (!siteKey || failed) return null;
+  if (!siteKey) return null;
 
   return <div ref={containerRef} className="flex justify-center" />;
 }

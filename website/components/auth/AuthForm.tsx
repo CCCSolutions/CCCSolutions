@@ -47,7 +47,10 @@ export default function AuthForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [checkEmail, setCheckEmail] = useState(false);
   const submittingRef = useRef(false);
+
+  const captchaRequired = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const { push } = useRouter();
 
@@ -69,7 +72,7 @@ export default function AuthForm() {
         toast.success('Signed in.');
         push('/forum');
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -78,8 +81,17 @@ export default function AuthForm() {
           },
         });
         if (signUpError) throw signUpError;
-        toast.success('Account created.');
-        push('/forum');
+        // With email confirmation on, signUp returns no session until the link is
+        // clicked. (A session-less user is also returned for an already-registered
+        // email, so this same path avoids leaking whether the account exists.)
+        if (!data.session) {
+          setCheckEmail(true);
+          setSubmitting(false);
+          submittingRef.current = false;
+        } else {
+          toast.success('Account created.');
+          push('/forum');
+        }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong.';
@@ -118,109 +130,147 @@ export default function AuthForm() {
 
       <div className="relative z-10 w-full max-w-md">
         <h2 className="text-3xl font-semibold tracking-tight text-foreground text-center mb-6">
-          {mode === 'signin' ? 'Sign in to your account' : 'Create a new account'}
+          {checkEmail
+            ? 'Confirm your email'
+            : mode === 'signin'
+              ? 'Sign in to your account'
+              : 'Create a new account'}
         </h2>
 
         <Card>
           <CardContent className="py-8 px-6 border-none">
-            <button
-              type="button"
-              onClick={handleGoogle}
-              className="w-full h-10 flex items-center justify-center gap-2.5 rounded-md border border-border-strong bg-surface-100 text-sm font-medium text-foreground hover:brightness-110 transition-all"
-            >
-              <GoogleIcon />
-              Continue with Google
-            </button>
-
-            <div className="my-5 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border-default" />
-              <span className="text-xs text-foreground-lighter">or</span>
-              <div className="h-px flex-1 bg-border-default" />
-            </div>
-
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              {mode === 'signup' && (
-                <div>
-                  <label htmlFor="username" className={labelClass}>
-                    Username
-                  </label>
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    required
-                    minLength={2}
-                    maxLength={24}
-                    className={inputClass}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="email" className={labelClass}>
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className={inputClass}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+            {checkEmail ? (
+              <div className="text-center space-y-4">
+                <p className="text-sm text-foreground-light">
+                  We sent a confirmation link to <span className="text-foreground">{email}</span>.
+                  Click it to finish creating your account, then sign in.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCheckEmail(false);
+                    setMode('signin');
+                    setPassword('');
+                  }}
+                  className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+                >
+                  Back to sign in
+                </button>
               </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleGoogle}
+                  className="w-full h-10 flex items-center justify-center gap-2.5 rounded-md border border-border-strong bg-surface-100 text-sm font-medium text-foreground hover:brightness-110 transition-all"
+                >
+                  <GoogleIcon />
+                  Continue with Google
+                </button>
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="password" className="text-sm font-medium text-foreground-light">
-                    Password
-                  </label>
-                  {mode === 'signin' && (
-                    <Link
-                      href="/reset-password"
-                      className="text-xs text-foreground-lighter hover:text-foreground transition-colors"
-                    >
-                      Forgot password?
-                    </Link>
+                <div className="my-5 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border-default" />
+                  <span className="text-xs text-foreground-lighter">or</span>
+                  <div className="h-px flex-1 bg-border-default" />
+                </div>
+
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                  {mode === 'signup' && (
+                    <div>
+                      <label htmlFor="username" className={labelClass}>
+                        Username
+                      </label>
+                      <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        required
+                        minLength={2}
+                        maxLength={24}
+                        className={inputClass}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </div>
                   )}
+
+                  <div>
+                    <label htmlFor="email" className={labelClass}>
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className={inputClass}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label
+                        htmlFor="password"
+                        className="text-sm font-medium text-foreground-light"
+                      >
+                        Password
+                      </label>
+                      {mode === 'signin' && (
+                        <Link
+                          href="/reset-password"
+                          className="text-xs text-foreground-lighter hover:text-foreground transition-colors"
+                        >
+                          Forgot password?
+                        </Link>
+                      )}
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      minLength={6}
+                      autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                      className={inputClass}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+
+                  <TurnstileWidget
+                    onVerify={setCaptchaToken}
+                    onExpire={() => setCaptchaToken(null)}
+                  />
+
+                  {error && <p className="text-sm text-destructive-600">{error}</p>}
+
+                  <Button
+                    type="primary"
+                    size="medium"
+                    block
+                    htmlType="submit"
+                    disabled={submitting || (captchaRequired && !captchaToken)}
+                  >
+                    {submitting ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}
+                  </Button>
+                </form>
+
+                <div className="mt-5 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode(mode === 'signin' ? 'signup' : 'signin');
+                      setError(null);
+                    }}
+                    className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+                  >
+                    {mode === 'signin' ? 'Need to create an account?' : 'Already have an account?'}
+                  </button>
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                  className={inputClass}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <TurnstileWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
-
-              {error && <p className="text-sm text-destructive-600">{error}</p>}
-
-              <Button type="primary" size="medium" block htmlType="submit" disabled={submitting}>
-                {submitting ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}
-              </Button>
-            </form>
-
-            <div className="mt-5 flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode(mode === 'signin' ? 'signup' : 'signin');
-                  setError(null);
-                }}
-                className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
-              >
-                {mode === 'signin' ? 'Need to create an account?' : 'Already have an account?'}
-              </button>
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
