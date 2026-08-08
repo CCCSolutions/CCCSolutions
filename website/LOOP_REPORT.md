@@ -129,6 +129,16 @@ useful):
   build without either deploying (against constraints) or running
   `next build` (would collide with your running `next dev`).
 
+## Housekeeping note
+
+`feat/auth-oauth` had an uncommitted change to `backend/src/db/index.ts` when
+I started (`export function withUser` → `xport function withUser` — a typo
+that breaks compilation). I stashed it rather than discard or carry it into
+new branches: `git stash list` on that branch shows `WIP uncommitted typo on
+feat/auth-oauth (xport bug) - stashed before overnight frontend migration
+task`. It's still there if it was mid-edit and you want to finish it;
+otherwise it's safe to drop.
+
 ## Not attempted / explicitly out of scope
 
 - Backend endpoint tests (per brief).
