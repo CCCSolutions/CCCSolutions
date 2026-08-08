@@ -1,16 +1,28 @@
 import type { Metadata } from 'next';
-import { cache } from 'react';
-import PocketBase from 'pocketbase';
 import PostPageClient from './PostPageClient';
 
-const getPost = cache(async (id: string) => {
-  const pb = new PocketBase('https://mmhs.pockethost.io');
+type ApiPost = {
+  title: string;
+  content: string;
+  createdAt: string;
+  author: { username: string | null };
+};
+
+// GET /forum/posts/:id is public, so metadata generation can hit it directly
+// with plain fetch — no JWT needed, and apiFetch only works client-side anyway
+// (it reads the session from the browser's local storage).
+const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
+
+async function getPost(id: string): Promise<ApiPost | null> {
   try {
-    return await pb.collection('posts').getOne(id, { expand: 'author' });
+    const res = await fetch(`${apiBase}/forum/posts/${id}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const { post } = (await res.json()) as { post: ApiPost };
+    return post;
   } catch {
     return null;
   }
-});
+}
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -24,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Post Not Found | CCC Forum' };
   }
 
-  const authorName = post.expand?.author?.username || 'Unknown';
-  const plainBody = (post.body || '').replace(/<[^>]*>/g, '').trim();
+  const authorName = post.author?.username ?? 'Unknown';
+  const plainBody = (post.content || '').replace(/<[^>]*>/g, '').trim();
   const description =
     plainBody.length > 155
       ? plainBody.slice(0, 155) + '…'
@@ -44,8 +56,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: `https://cccsolutions.ca/forum/${id}`,
       type: 'article',
-      authors: post.expand?.author?.username ? [post.expand.author.username] : undefined,
-      publishedTime: post.created,
+      authors: post.author?.username ? [post.author.username] : undefined,
+      publishedTime: post.createdAt,
     },
     twitter: {
       card: 'summary_large_image',
@@ -57,7 +69,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { id } = await params;
-  const post = await getPost(id);
-
-  return <PostPageClient id={id} initialPost={post} />;
+  return <PostPageClient id={id} />;
 }

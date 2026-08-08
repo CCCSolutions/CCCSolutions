@@ -2,88 +2,145 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import PocketBase, { RecordModel } from 'pocketbase';
 import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import { toast } from 'sonner';
-import { isPostCommitHookBug } from '../../../lib/pocketbase-bug';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
+import { supabase, apiFetch } from '../../../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 import 'react-quill-new/dist/quill.bubble.css';
 
-const pb = new PocketBase('https://mmhs.pockethost.io');
+type PostDetail = {
+  id: string;
+  title: string;
+  content: string;
+  score: number;
+  createdAt: string;
+  author: { username: string | null };
+};
+
+type CommentRow = {
+  id: string;
+  content: string;
+  score: number;
+  createdAt: string;
+  author: { username: string | null };
+};
 
 type Props = {
   id: string;
-  initialPost: RecordModel | null;
 };
 
-export default function PostPageClient({ id, initialPost }: Props) {
-  const [post, setPost] = useState<RecordModel | null>(initialPost);
-  const [comments, setComments] = useState<RecordModel[]>([]);
+export default function PostPageClient({ id }: Props) {
+  const [post, setPost] = useState<PostDetail | null>(null);
+  const [comments, setComments] = useState<CommentRow[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [postVote, setPostVote] = useState<1 | -1 | 0>(0);
+  const [commentVotes, setCommentVotes] = useState<Record<string, 1 | -1 | 0>>({});
   const [submitting, setSubmitting] = useState(false);
   // The guard has to be a ref, not the state above: setSubmitting doesn't apply
   // until the next render, so back-to-back clicks in one frame would all read
   // submitting === false and each fire a create(). A ref writes synchronously.
   const submittingRef = useRef(false);
 
+  const isLoggedIn = !!session;
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
   const fetchPost = useCallback(async () => {
     try {
-      const record = await pb.collection('posts').getOne(id, {
-        expand: 'author',
-        requestKey: `post_${id}`,
-      });
-      setPost(record);
+      const res = await apiFetch(`/forum/posts/${id}`);
+      if (!res.ok) return;
+      const { post: p, comments: c } = (await res.json()) as {
+        post: PostDetail;
+        comments: CommentRow[];
+      };
+      setPost(p);
+      setComments(c);
     } catch (error) {
-      const err = error as { isAbort?: boolean };
-      if (!err.isAbort) console.error('Error fetching post:', error);
-    }
-  }, [id]);
-
-  const fetchComments = useCallback(async () => {
-    try {
-      const resultList = await pb.collection('comments').getList(1, 50, {
-        filter: `post="${id}"`,
-        sort: '-created',
-        expand: 'author',
-        requestKey: `comments_${id}`,
-      });
-      setComments(resultList.items);
-    } catch (error) {
-      const err = error as { isAbort?: boolean };
-      if (!err.isAbort) console.error('Error fetching comments:', error);
+      console.error('Error fetching post:', error);
     }
   }, [id]);
 
   useEffect(() => {
-    setIsLoggedIn(pb.authStore.isValid);
     fetchPost();
-    fetchComments();
-  }, [id, fetchPost, fetchComments]);
+  }, [id, fetchPost]);
 
-  // NOTE: remove the old `document.title` effect — the server now
-  // sets the real <title> via generateMetadata, and manually
-  // overwriting it client-side would fight with that.
-
-  const handleVote = async (voteType: 'upvote' | 'downvote') => {
+  const handlePostVote = async (value: 1 | -1) => {
     if (!isLoggedIn) {
       toast.warning('Please log in to vote.');
       return;
     }
     if (!post) return;
 
+    const cancelling = postVote === value;
+    const delta = cancelling ? -value : value - postVote;
+    const prevVote = postVote;
+
+    setPost((p) => (p ? { ...p, score: p.score + delta } : null));
+    setPostVote(cancelling ? 0 : value);
+
     try {
-      const updatedVotes = post.upvotes + (voteType === 'upvote' ? 1 : -1);
-      await pb.collection('posts').update(id, { upvotes: updatedVotes });
-      setPost((prev) => (prev ? { ...prev, upvotes: updatedVotes } : null));
+      const res = cancelling
+        ? await apiFetch('/forum/vote', {
+            method: 'DELETE',
+            body: JSON.stringify({ votableType: 'post', votableId: id }),
+          })
+        : await apiFetch('/forum/vote', {
+            method: 'POST',
+            body: JSON.stringify({ votableType: 'post', votableId: id, value }),
+          });
+      if (!res.ok) throw new Error(`Vote failed (${res.status})`);
     } catch (error) {
       console.error('Error voting on post:', error);
       toast.error('Could not register your vote.');
+      setPost((p) => (p ? { ...p, score: p.score - delta } : null));
+      setPostVote(prevVote);
+    }
+  };
+
+  const handleCommentVote = async (commentId: string, value: 1 | -1) => {
+    if (!isLoggedIn) {
+      toast.warning('Please log in to vote.');
+      return;
+    }
+
+    const current = commentVotes[commentId] ?? 0;
+    const cancelling = current === value;
+    const delta = cancelling ? -value : value - current;
+
+    setComments((prev) =>
+      prev.map((c) => (c.id === commentId ? { ...c, score: c.score + delta } : c)),
+    );
+    setCommentVotes((prev) => ({ ...prev, [commentId]: cancelling ? 0 : value }));
+
+    try {
+      const res = cancelling
+        ? await apiFetch('/forum/vote', {
+            method: 'DELETE',
+            body: JSON.stringify({ votableType: 'comment', votableId: commentId }),
+          })
+        : await apiFetch('/forum/vote', {
+            method: 'POST',
+            body: JSON.stringify({ votableType: 'comment', votableId: commentId, value }),
+          });
+      if (!res.ok) throw new Error(`Vote failed (${res.status})`);
+    } catch (error) {
+      console.error('Error voting on comment:', error);
+      toast.error('Could not register your vote.');
+      setComments((prev) =>
+        prev.map((c) => (c.id === commentId ? { ...c, score: c.score - delta } : c)),
+      );
+      setCommentVotes((prev) => ({ ...prev, [commentId]: current }));
     }
   };
 
@@ -95,39 +152,23 @@ export default function PostPageClient({ id, initialPost }: Props) {
     }
     if (submittingRef.current) return;
 
-    if (!pb.authStore.model) {
-      toast.warning('Session expired. Please log in again.');
-      return;
-    }
-
     submittingRef.current = true;
     setSubmitting(true);
 
-    // Only the create() decides success. Anything after it (refetching the list)
-    // must not be able to trigger the failure toast: that's how a comment could
-    // post fine and still report "Could not post your comment".
     let created = false;
     try {
-      // requestKey: null opts out of PocketBase's auto-cancellation, which aborts
-      // a duplicate in-flight request client-side while the server still commits it.
-      await pb.collection('comments').create(
-        {
-          body: newComment,
-          post: id,
-          author: pb.authStore.model.id,
-        },
-        { requestKey: null }
-      );
+      const res = await apiFetch(`/forum/posts/${id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ content: newComment }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error ?? `Failed to post comment (${res.status})`);
+      }
       created = true;
     } catch (error) {
-      const err = error as { isAbort?: boolean };
-      // The comment actually posted; PocketHost's broken hook just reports 400. See lib/pocketbase-bug.ts.
-      if (isPostCommitHookBug(error)) {
-        created = true;
-      } else if (!err.isAbort) {
-        console.error('Error adding comment:', error);
-        toast.error('Could not post your comment.');
-      }
+      console.error('Error adding comment:', error);
+      toast.error('Could not post your comment.');
     } finally {
       submittingRef.current = false;
       setSubmitting(false);
@@ -136,7 +177,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
     if (created) {
       setNewComment('');
       toast.success('Comment posted.');
-      fetchComments(); // handles its own errors; must not affect the toast above
+      fetchPost(); // handles its own errors; must not affect the toast above
     }
   };
 
@@ -168,7 +209,7 @@ export default function PostPageClient({ id, initialPost }: Props) {
             </h1>
 
             <ReactQuill
-              value={post.body}
+              value={post.content}
               readOnly
               theme="bubble"
               className="text-foreground-light leading-relaxed mb-4"
@@ -178,26 +219,34 @@ export default function PostPageClient({ id, initialPost }: Props) {
               <span className="text-sm text-foreground-lighter">
                 By{' '}
                 <span className="font-semibold text-foreground-light">
-                  {post.expand?.author?.username || 'Unknown'}
+                  {post.author?.username ?? 'Unknown'}
                 </span>{' '}
-                on {new Date(post.created).toISOString().split('T')[0]}
+                on {new Date(post.createdAt).toISOString().split('T')[0]}
               </span>
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleVote('upvote')}
+                  onClick={() => handlePostVote(1)}
                   disabled={!isLoggedIn}
                   aria-label="Upvote"
-                  className="text-foreground-lighter hover:text-brand disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    postVote === 1
+                      ? 'text-brand font-bold'
+                      : 'text-foreground-lighter hover:text-brand'
+                  }`}
                 >
                   <ArrowUpIcon width="16" height="16" />
                 </button>
-                <span className="font-semibold text-foreground">{post.upvotes}</span>
+                <span className="font-semibold text-foreground">{post.score}</span>
                 <button
-                  onClick={() => handleVote('downvote')}
+                  onClick={() => handlePostVote(-1)}
                   disabled={!isLoggedIn}
                   aria-label="Downvote"
-                  className="text-foreground-lighter hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    postVote === -1
+                      ? 'text-destructive font-bold'
+                      : 'text-foreground-lighter hover:text-destructive'
+                  }`}
                 >
                   <ArrowDownIcon width="16" height="16" />
                 </button>
@@ -214,20 +263,54 @@ export default function PostPageClient({ id, initialPost }: Props) {
           {comments.length === 0 ? (
             <p className="text-sm text-foreground-lighter italic">No comments yet.</p>
           ) : (
-            comments.map((comment) => (
-              <Card key={comment.id}>
-                <CardContent className="p-5 border-none">
-                  <p className="text-foreground-light whitespace-pre-wrap">{comment.body}</p>
-                  <p className="mt-3 text-xs text-foreground-lighter">
-                    By{' '}
-                    <span className="font-medium text-foreground-light">
-                      {comment.expand?.author?.username || 'Unknown'}
-                    </span>{' '}
-                    on {new Date(comment.created).toISOString().split('T')[0]}
-                  </p>
-                </CardContent>
-              </Card>
-            ))
+            comments.map((comment) => {
+              const userVote = commentVotes[comment.id] ?? 0;
+              return (
+                <Card key={comment.id}>
+                  <CardContent className="p-5 border-none">
+                    <p className="text-foreground-light whitespace-pre-wrap">{comment.content}</p>
+                    <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
+                      <p className="text-xs text-foreground-lighter">
+                        By{' '}
+                        <span className="font-medium text-foreground-light">
+                          {comment.author?.username ?? 'Unknown'}
+                        </span>{' '}
+                        on {new Date(comment.createdAt).toISOString().split('T')[0]}
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleCommentVote(comment.id, 1)}
+                          disabled={!isLoggedIn}
+                          aria-label="Upvote comment"
+                          className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                            userVote === 1
+                              ? 'text-brand font-bold'
+                              : 'text-foreground-lighter hover:text-brand'
+                          }`}
+                        >
+                          <ArrowUpIcon width="12" height="12" />
+                        </button>
+                        <span className="text-xs font-semibold text-foreground">
+                          {comment.score}
+                        </span>
+                        <button
+                          onClick={() => handleCommentVote(comment.id, -1)}
+                          disabled={!isLoggedIn}
+                          aria-label="Downvote comment"
+                          className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                            userVote === -1
+                              ? 'text-destructive font-bold'
+                              : 'text-foreground-lighter hover:text-destructive'
+                          }`}
+                        >
+                          <ArrowDownIcon width="12" height="12" />
+                        </button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
         </div>
 
