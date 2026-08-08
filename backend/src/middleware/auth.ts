@@ -20,14 +20,16 @@ async function getOrCreateProfile(env: Bindings, authUserId: string, claims: JWT
   const found = await db.select().from(profiles).where(eq(profiles.authUserId, authUserId)).limit(1);
   if (found[0]) return found[0];
 
-  const email = typeof claims.email === 'string' ? claims.email : '';
-  const base =
-    email
-      .split('@')[0]
+  const meta = claims.user_metadata as { avatar_url?: string; username?: string } | undefined;
+  const sanitize = (s: string) =>
+    s
       .toLowerCase()
       .replace(/[^a-z0-9_]/g, '_')
-      .slice(0, 24) || 'user';
-  const avatarUrl = (claims.user_metadata as { avatar_url?: string } | undefined)?.avatar_url ?? null;
+      .slice(0, 24);
+  const chosen = typeof meta?.username === 'string' ? sanitize(meta.username) : '';
+  const email = typeof claims.email === 'string' ? claims.email : '';
+  const base = chosen || sanitize(email.split('@')[0]) || 'user';
+  const avatarUrl = meta?.avatar_url ?? null;
 
   for (let i = 0; i < 10; i++) {
     try {

@@ -26,6 +26,9 @@ pnpm-lock.yaml
 .env.production
 .dev.vars
 
+# local Supabase JWT signing key (asymmetric ES256 private key — never commit)
+supabase/signing_keys.json
+
 # logs
 logs/
 *.log
