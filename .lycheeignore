@@ -1,2 +1,6 @@
 # Cloudflare's community forum 403s all bots/crawlers, so valid links there fail the check.
 community.cloudflare.com
+
+# Local dev URLs in README examples aren't reachable from CI.
+localhost
+127.0.0.1

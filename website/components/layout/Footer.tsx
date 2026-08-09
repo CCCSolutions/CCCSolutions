@@ -59,6 +59,11 @@ const Footer = () => {
                 </a>
               </li>
               <li>
+                <Link href="/privacy" className="hover:text-foreground hover:underline">
+                  Privacy
+                </Link>
+              </li>
+              <li>
                 <a
                   href="mailto:willi64645@gmail.com"
                   className="hover:text-foreground hover:underline"
