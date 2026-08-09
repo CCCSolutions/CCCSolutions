@@ -15,6 +15,13 @@
       "when": 1785733404353,
       "tag": "0001_handy_phil_sheldon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786289856669,
+      "tag": "0002_grant_authenticated",
+      "breakpoints": true
     }
   ]
 }
