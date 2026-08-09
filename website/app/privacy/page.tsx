@@ -119,46 +119,46 @@ export default function PrivacyPage() {
           </ul>
         </Section>
 
-        <Section title="Cookies we use">
+        <Section title="Cookies">
+          <p>The site uses a few cookies:</p>
           <ul className="list-disc space-y-2 pl-6">
             <li>
-              <span className="font-medium text-foreground">Essential cookies</span> to keep you
-              signed in.
+              <span className="font-medium text-foreground">Essential:</span> Cloudflare sets a
+              clearance cookie so its bot protection works and you can reach the site.
             </li>
             <li>
-              <span className="font-medium text-foreground">Analytics cookies</span> from Google
-              Analytics, so we can see how the site is used.
+              <span className="font-medium text-foreground">Analytics:</span> Google Analytics and
+              Cloudflare Insights set cookies that show us how the site is used.
             </li>
           </ul>
         </Section>
 
         <Section title="Data retention">
           <p>
-            We keep your account and the posts you make for as long as your account exists. Ask us
-            to delete them and we will. Analytics data is held by Google under its own retention
-            settings.
+            We keep your account and your posts for as long as your account is active, or until you
+            ask us to remove them. Analytics data stays with Google and Cloudflare under their own
+            retention periods.
           </p>
         </Section>
 
         <Section title="Your choices">
           <p>
-            Want to see or remove your data? Just email us and we&apos;ll take care of it. You can
-            also opt out of analytics by blocking cookies in your browser.
+            You can ask to see or delete your data any time by emailing us. To opt out of analytics,
+            block cookies in your browser.
           </p>
         </Section>
 
         <Section title="Children">
           <p>
-            CCCSolutions is built for students and teachers. We only collect the account and forum
-            details covered above, and if you&apos;re a younger student, we&apos;d suggest using the
-            site with a parent or teacher.
+            CCCSolutions is built for students and teachers, and we only collect the account and
+            forum details described above. If you&apos;re a younger student, we&apos;d recommend
+            using the site with a parent or teacher.
           </p>
         </Section>
 
         <Section title="Changes">
           <p>
-            We&apos;ll update this page if things change, and the date at the top always shows the
-            latest version.
+            If we change how we handle data, we&apos;ll update this page and the date at the top.
           </p>
         </Section>
 
