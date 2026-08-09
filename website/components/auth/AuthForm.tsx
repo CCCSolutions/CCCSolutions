@@ -99,7 +99,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           email,
           password,
           options: {
-            data: { username },
+            data: { username, display_name: username },
             ...(captchaToken ? { captchaToken } : {}),
           },
         });
