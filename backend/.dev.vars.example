@@ -29,3 +29,7 @@ ADMIN_TOKEN=
 # (db.<ref>.supabase.co): Transaction pooler -> DATABASE_URL, Session pooler -> DIRECT.
 DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+# Supabase API URL, used to verify auth JWTs. Prod value is in wrangler.jsonc;
+# set the local stack here.
+SUPABASE_URL=http://127.0.0.1:54321

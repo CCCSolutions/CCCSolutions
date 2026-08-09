@@ -9,8 +9,8 @@ import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
-import { supabase, apiFetch } from '../../lib/supabase';
-import type { Session } from '@supabase/supabase-js';
+import { apiFetch } from '../../lib/supabase';
+import { useAuth } from '../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -33,15 +33,10 @@ export default function ForumPage() {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
   const [voteMap, setVoteMap] = useState<VoteMap>({});
-  const [session, setSession] = useState<Session | null>(null);
 
+  const { state, profile, logout } = useAuth();
+  const session = state === 'in';
   const { push } = useRouter();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
-    return () => listener.subscription.unsubscribe();
-  }, []);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -94,10 +89,6 @@ export default function ForumPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
-
   return (
     <div className="bg-background text-foreground">
       {/* Header — same colors as the primary Button in dark mode: brand-500 fill,
@@ -130,11 +121,12 @@ export default function ForumPage() {
         <div className="flex justify-end text-sm text-foreground-light">
           {session ? (
             <span>
-              Logged in
+              Logged in as{' '}
+              <span className="font-semibold text-foreground">{profile?.username ?? '…'}</span>
               {' · '}
               <button
                 className="cursor-pointer underline hover:text-foreground"
-                onClick={handleLogout}
+                onClick={() => logout()}
               >
                 Logout
               </button>

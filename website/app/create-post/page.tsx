@@ -7,8 +7,8 @@ import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { SectionContainer } from '../../components/ui/section-container';
-import { supabase, apiFetch } from '../../lib/supabase';
-import type { Session } from '@supabase/supabase-js';
+import { apiFetch } from '../../lib/supabase';
+import { useAuth } from '../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
@@ -18,25 +18,16 @@ export default function CreatePost() {
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostBody, setNewPostBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-  const [checkedSession, setCheckedSession] = useState(false);
   // Ref, not state: setSubmitting only lands on the next render, so rapid clicks
   // would all read submitting === false and each fire a create().
   const submittingRef = useRef(false);
   const { push } = useRouter();
+  const { state } = useAuth();
+  const session = state === 'in';
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setCheckedSession(true);
-      if (!data.session) push('/login');
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      if (!s) push('/login');
-    });
-    return () => listener.subscription.unsubscribe();
-  }, [push]);
+    if (state === 'out') push('/login');
+  }, [state, push]);
 
   const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,7 +86,7 @@ export default function CreatePost() {
     'code-block',
   ];
 
-  if (checkedSession && !session) {
+  if (state !== 'in') {
     return null;
   }
 

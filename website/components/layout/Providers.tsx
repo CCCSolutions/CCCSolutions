@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 import { Toaster } from 'sonner';
+import { SupabaseAuthProvider } from '../auth/SupabaseAuthProvider';
 
 // Sonner reads its own theme prop, so sync it to next-themes rather than letting
 // it fall back to prefers-color-scheme (which ignores the in-app theme toggle).
@@ -28,8 +29,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
-      <ThemedToaster />
+      <SupabaseAuthProvider>
+        {children}
+        <ThemedToaster />
+      </SupabaseAuthProvider>
     </NextThemesProvider>
   );
 }
