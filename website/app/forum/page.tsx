@@ -228,7 +228,8 @@ export default function ForumPage() {
 
       {/* Posts */}
       <SectionContainer size="large" className="pb-20">
-        {loading ? (
+        {/* Only blank the list on the first load; keep posts visible while paginating. */}
+        {loading && posts.length === 0 ? (
           <div className="text-center text-foreground-light py-12">Loading posts…</div>
         ) : error ? (
           <div className="text-center py-12">
