@@ -41,7 +41,7 @@ const Navbar = () => {
             <Link href="/" className="flex items-center">
               <Image
                 src="/images/mmhs_logo_transparent.png"
-                alt="MMHS Logo"
+                alt="CCCSolutions"
                 width={40}
                 height={40}
                 className="h-10 w-auto"
