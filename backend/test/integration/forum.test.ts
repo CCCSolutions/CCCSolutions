@@ -30,12 +30,34 @@ describe.skipIf(!dbUp)('forum routes (integration, local Supabase)', () => {
     postId = post.id;
   });
 
-  it('GET /forum/posts returns an array, default and sort=new and sort=top', async () => {
+  it('GET /forum/posts returns { posts, total }, default and sort=new and sort=top', async () => {
     for (const qs of ['', '?sort=new', '?sort=top']) {
       const res = await app.request(`/forum/posts${qs}`, {}, env);
       expect(res.status).toBe(200);
-      expect(Array.isArray(await res.json())).toBe(true);
+      const body = (await res.json()) as { posts: unknown[]; total: number };
+      expect(Array.isArray(body.posts)).toBe(true);
+      expect(typeof body.total).toBe('number');
     }
+  });
+
+  it('GET /forum/posts?limit=5 caps the page at exactly 5 when more posts exist', async () => {
+    // Seed past the page size so the cap is actually exercised (not trivially true).
+    for (let i = 0; i < 6; i++) {
+      await app.request(
+        '/forum/posts',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader(userA.accessToken) },
+          body: JSON.stringify({ title: `page test ${i} ${Date.now()}`, content: 'x' }),
+        },
+        env,
+      );
+    }
+    const res = await app.request('/forum/posts?limit=5', {}, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { posts: unknown[]; total: number };
+    expect(body.posts.length).toBe(5);
+    expect(body.total).toBeGreaterThanOrEqual(6);
   });
 
   it('GET /forum/posts/:id returns a known post', async () => {
