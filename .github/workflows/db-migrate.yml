@@ -35,7 +35,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned: `latest` resolves via the GitHub API and flakes on rate limits.
+          version: 2.58.5
       - run: bun install --frozen-lockfile
       - name: Generate local JWT signing key (config.toml's signing_keys_path needs a file present)
         # NOT `supabase gen signing-key`: once signing_keys_path is set, every supabase
