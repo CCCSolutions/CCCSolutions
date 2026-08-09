@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import PocketBase, { RecordModel, AuthModel } from 'pocketbase';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
@@ -10,74 +9,93 @@ import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
+import { supabase, apiFetch } from '../../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 import 'react-quill-new/dist/quill.bubble.css';
 
-const pb = new PocketBase('https://mmhs.pockethost.io');
+type PostRow = {
+  id: string;
+  title: string;
+  content: string;
+  score: number;
+  createdAt: string;
+  author: { username: string | null };
+};
+
+// Tracks the current user's vote on each post so the arrows reflect their state.
+type VoteMap = Record<string, 1 | -1 | 0>;
 
 export default function ForumPage() {
-  const [posts, setPosts] = useState<RecordModel[]>([]);
+  const [posts, setPosts] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
-  const [user, setUser] = useState<AuthModel | null>(null);
+  const [voteMap, setVoteMap] = useState<VoteMap>({});
+  const [session, setSession] = useState<Session | null>(null);
 
   const { push } = useRouter();
 
   useEffect(() => {
-    setUser(pb.authStore.model);
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const sortField = sortBy === 'new' ? '-created' : '-upvotes';
-        const resultList = await pb.collection('posts').getList(1, 50, {
-          sort: sortField,
-          expand: 'author',
-          requestKey: `posts_${sortField}`,
-        });
-        setPosts(resultList.items);
-      } catch (error: unknown) {
-        const err = error as { isAbort?: boolean };
-        if (!err.isAbort) {
-          console.error('Error fetching posts:', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
+  const fetchPosts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await apiFetch(`/forum/posts?sort=${sortBy}`);
+      if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
+      const data = (await res.json()) as PostRow[];
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast.error('Could not load posts.');
+    } finally {
+      setLoading(false);
+    }
   }, [sortBy]);
 
-  const handleVote = async (postId: string, voteType: 'upvote' | 'downvote') => {
-    if (!user) {
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleVote = async (postId: string, value: 1 | -1) => {
+    if (!session) {
       toast.warning('Please log in to vote.');
       return;
     }
+
+    const current = voteMap[postId] ?? 0;
+    const cancelling = current === value;
+    const delta = cancelling ? -value : value - current;
+
+    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, score: p.score + delta } : p)));
+    setVoteMap((prev) => ({ ...prev, [postId]: cancelling ? 0 : value }));
+
     try {
-      const post = posts.find((p) => p.id === postId);
-      if (!post) return;
-      const updatedVotes = voteType === 'upvote' ? post.upvotes + 1 : post.upvotes - 1;
-      await pb.collection('posts').update(postId, { upvotes: updatedVotes });
-      setPosts((prev) => {
-        const next = prev.map((p) => (p.id === postId ? { ...p, upvotes: updatedVotes } : p));
-        if (sortBy === 'top') {
-          next.sort((a, b) => b.upvotes - a.upvotes);
-        }
-        return next;
-      });
+      const res = cancelling
+        ? await apiFetch('/forum/vote', {
+            method: 'DELETE',
+            body: JSON.stringify({ votableType: 'post', votableId: postId }),
+          })
+        : await apiFetch('/forum/vote', {
+            method: 'POST',
+            body: JSON.stringify({ votableType: 'post', votableId: postId, value }),
+          });
+      if (!res.ok) throw new Error(`Vote failed (${res.status})`);
     } catch (error) {
       console.error('Error voting on post:', error);
       toast.error('Could not register your vote.');
+      setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, score: p.score - delta } : p)));
+      setVoteMap((prev) => ({ ...prev, [postId]: current }));
     }
   };
 
-  const handleLogout = () => {
-    pb.authStore.clear();
-    setUser(null);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
@@ -110,9 +128,9 @@ export default function ForumPage() {
       {/* Login status — moved below the hero, right-aligned */}
       <SectionContainer size="large" className="pt-4">
         <div className="flex justify-end text-sm text-foreground-light">
-          {user ? (
+          {session ? (
             <span>
-              Logged in as <span className="font-semibold text-foreground">{user.username}</span>
+              Logged in
               {' · '}
               <button
                 className="cursor-pointer underline hover:text-foreground"
@@ -175,49 +193,62 @@ export default function ForumPage() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {posts.map((post) => (
-              <Card key={post.id} className="hover:bg-surface-200/40 transition-colors">
-                <div className="flex gap-4 px-5 py-4">
-                  <div className="flex flex-col items-center justify-start gap-1 pt-1 shrink-0 w-10">
-                    <button
-                      onClick={() => handleVote(post.id, 'upvote')}
-                      disabled={!user}
-                      aria-label="Upvote"
-                      className="text-foreground-lighter hover:text-brand disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ArrowUpIcon width="16" height="16" />
-                    </button>
-                    <span className="text-sm font-semibold text-foreground">{post.upvotes}</span>
-                    <button
-                      onClick={() => handleVote(post.id, 'downvote')}
-                      disabled={!user}
-                      aria-label="Downvote"
-                      className="text-foreground-lighter hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ArrowDownIcon width="16" height="16" />
-                    </button>
-                  </div>
+            {posts.map((post) => {
+              const userVote = voteMap[post.id] ?? 0;
+              return (
+                <Card key={post.id} className="hover:bg-surface-200/40 transition-colors">
+                  <div className="flex gap-4 px-5 py-4">
+                    <div className="flex flex-col items-center justify-start gap-1 pt-1 shrink-0 w-10">
+                      <button
+                        onClick={() => handleVote(post.id, 1)}
+                        disabled={!session}
+                        aria-label="Upvote"
+                        className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          userVote === 1
+                            ? 'text-brand font-bold'
+                            : 'text-foreground-lighter hover:text-brand'
+                        }`}
+                      >
+                        <ArrowUpIcon width="16" height="16" />
+                      </button>
+                      <span className="text-sm font-semibold text-foreground">{post.score}</span>
+                      <button
+                        onClick={() => handleVote(post.id, -1)}
+                        disabled={!session}
+                        aria-label="Downvote"
+                        className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          userVote === -1
+                            ? 'text-destructive font-bold'
+                            : 'text-foreground-lighter hover:text-destructive'
+                        }`}
+                      >
+                        <ArrowDownIcon width="16" height="16" />
+                      </button>
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-semibold text-foreground hover:text-brand transition-colors mb-1">
-                      <Link href={`/forum/${post.id}`}>{post.title}</Link>
-                    </h2>
-                    <ReactQuill
-                      value={
-                        post.body.length > 200 ? post.body.substring(0, 200) + '...' : post.body
-                      }
-                      readOnly
-                      theme="bubble"
-                      className="text-foreground-light max-h-24 overflow-hidden"
-                    />
-                    <div className="mt-2 text-xs text-foreground-lighter">
-                      By {post.expand?.author?.username || 'Unknown'} ·{' '}
-                      {new Date(post.created).toLocaleDateString()}
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-lg font-semibold text-foreground hover:text-brand transition-colors mb-1">
+                        <Link href={`/forum/${post.id}`}>{post.title}</Link>
+                      </h2>
+                      <ReactQuill
+                        value={
+                          post.content.length > 200
+                            ? post.content.substring(0, 200) + '...'
+                            : post.content
+                        }
+                        readOnly
+                        theme="bubble"
+                        className="text-foreground-light max-h-24 overflow-hidden"
+                      />
+                      <div className="mt-2 text-xs text-foreground-lighter">
+                        By {post.author?.username ?? 'Unknown'} ·{' '}
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </SectionContainer>
