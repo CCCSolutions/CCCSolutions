@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { supabase } from '../../lib/supabase';
+import { supabase, apiFetch } from '../../lib/supabase';
 import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -88,6 +88,13 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         toast.success('Logged in.');
         push('/forum');
       } else {
+        const avail = await apiFetch(`/user/username-available?u=${encodeURIComponent(username)}`);
+        if (!(await avail.json()).available) {
+          errorToast('That username is already taken.');
+          setSubmitting(false);
+          submittingRef.current = false;
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,

@@ -1,6 +1,6 @@
 import type { Context, Next } from 'hono';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { Bindings } from '../types';
 import { profiles } from '../db/schema';
 import { getDb } from '../db';
@@ -30,6 +30,20 @@ async function getOrCreateProfile(env: Bindings, authUserId: string, claims: JWT
   const email = typeof claims.email === 'string' ? claims.email : '';
   const base = chosen || sanitize(email.split('@')[0]) || 'user';
   const avatarUrl = meta?.avatar_url ?? null;
+
+  // FIXME(migration-reclaim): delete by ~2026-09-09; auto-off after RECLAIM_UNTIL anyway.
+  // Lets a returning PocketBase user reclaim their old username by taking over the
+  // unclaimed migrated profile. Protected names stay attribution-only. No ownership check.
+  const RECLAIM_UNTIL = Date.parse('2026-09-09T00:00:00Z');
+  const RECLAIM_BLOCKED = ['admin', 'mmhs_admin', 'tankman6', 'tankman613'];
+  if (Date.now() < RECLAIM_UNTIL && chosen && !RECLAIM_BLOCKED.includes(chosen)) {
+    const claimed = await db
+      .update(profiles)
+      .set({ authUserId })
+      .where(and(sql`lower(${profiles.username}) = ${chosen}`, isNull(profiles.authUserId)))
+      .returning();
+    if (claimed[0]) return claimed[0];
+  }
 
   for (let i = 0; i < 10; i++) {
     try {
