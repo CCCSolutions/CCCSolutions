@@ -65,7 +65,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:willi64645@gmail.com"
+                  href="mailto:william@cccsolutions.ca"
                   className="hover:text-foreground hover:underline"
                 >
                   Contact
