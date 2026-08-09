@@ -93,7 +93,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const value = useMemo<AuthContextValue>(
     () => ({ state, session, profile, logout, refreshProfile }),
-    [state, session, profile],
+    [state, session, profile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

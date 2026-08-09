@@ -122,9 +122,7 @@ export default function ForumPage() {
           {session ? (
             <span>
               Logged in as{' '}
-              <span className="font-semibold text-foreground">
-                {profile?.username ?? '…'}
-              </span>
+              <span className="font-semibold text-foreground">{profile?.username ?? '…'}</span>
               {' · '}
               <button
                 className="cursor-pointer underline hover:text-foreground"
