@@ -119,7 +119,7 @@ export default function PostPageClient({ id }: Props) {
     const delta = cancelling ? -value : value - current;
 
     setComments((prev) =>
-      prev.map((c) => (c.id === commentId ? { ...c, score: c.score + delta } : c)),
+      prev.map((c) => (c.id === commentId ? { ...c, score: c.score + delta } : c))
     );
     setCommentVotes((prev) => ({ ...prev, [commentId]: cancelling ? 0 : value }));
 
@@ -138,7 +138,7 @@ export default function PostPageClient({ id }: Props) {
       console.error('Error voting on comment:', error);
       toast.error('Could not register your vote.');
       setComments((prev) =>
-        prev.map((c) => (c.id === commentId ? { ...c, score: c.score - delta } : c)),
+        prev.map((c) => (c.id === commentId ? { ...c, score: c.score - delta } : c))
       );
       setCommentVotes((prev) => ({ ...prev, [commentId]: current }));
     }
