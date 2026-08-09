@@ -28,33 +28,44 @@ type PostRow = {
 // Tracks the current user's vote on each post so the arrows reflect their state.
 type VoteMap = Record<string, 1 | -1 | 0>;
 
+const PAGE_SIZE = 20;
+
 export default function ForumPage() {
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
   const [voteMap, setVoteMap] = useState<VoteMap>({});
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
 
   const { state, profile, logout } = useAuth();
   const session = state === 'in';
   const { push } = useRouter();
 
-  const fetchPosts = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await apiFetch(`/forum/posts?sort=${sortBy}`);
-      if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
-      const data = (await res.json()) as PostRow[];
-      setPosts(data);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      toast.error('Could not load posts.');
-    } finally {
-      setLoading(false);
-    }
-  }, [sortBy]);
+  const fetchPosts = useCallback(
+    async (offset = 0) => {
+      const append = offset > 0;
+      try {
+        if (append) setLoadingMore(true);
+        else setLoading(true);
+        const res = await apiFetch(`/forum/posts?sort=${sortBy}&offset=${offset}`);
+        if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
+        const data = (await res.json()) as PostRow[];
+        setPosts((prev) => (append ? [...prev, ...data] : data));
+        setHasMore(data.length === PAGE_SIZE);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        toast.error('Could not load posts.');
+      } finally {
+        if (append) setLoadingMore(false);
+        else setLoading(false);
+      }
+    },
+    [sortBy]
+  );
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(0);
   }, [fetchPosts]);
 
   const handleVote = async (postId: string, value: 1 | -1) => {
@@ -241,6 +252,18 @@ export default function ForumPage() {
                 </Card>
               );
             })}
+          </div>
+        )}
+        {hasMore && !loading && (
+          <div className="mt-6 flex justify-center">
+            <Button
+              type="default"
+              size="small"
+              onClick={() => fetchPosts(posts.length)}
+              disabled={loadingMore}
+            >
+              {loadingMore ? 'Loading…' : 'Load more'}
+            </Button>
           </div>
         )}
       </SectionContainer>

@@ -25,8 +25,11 @@ function purgeForum(c: Context<{ Bindings: Bindings; Variables: AuthVars }>): vo
   ctx.waitUntil(ctx.cache.purge({ tags: ['forum-posts'] }));
 }
 
+const PAGE_SIZE = 20;
+
 forum.get('/posts', async (c) => {
   const sort = c.req.query('sort') === 'top' ? 'top' : 'new';
+  const offset = Math.max(0, Number.parseInt(c.req.query('offset') ?? '0', 10) || 0);
   const db = getDb(c.env);
   const res = await db
     .select({
@@ -40,7 +43,8 @@ forum.get('/posts', async (c) => {
     .from(posts)
     .leftJoin(profiles, eq(profiles.id, posts.profileId))
     .orderBy(sort === 'top' ? desc(postScore) : desc(posts.createdAt))
-    .limit(20);
+    .limit(PAGE_SIZE)
+    .offset(offset);
   c.header('Cache-Control', FORUM_CACHE);
   c.header('Cache-Tag', 'forum-posts');
   return c.json(res);
