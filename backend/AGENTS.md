@@ -14,6 +14,26 @@ There is no in-Worker Cloudflare Access validation. A Worker has no origin IP, s
 - The public custom domains (`api.cccsolutions.ca`, `v2.cccsolutions.ca`) are intentionally public, protected by **WAF rate-limiting rules** (per-IP ceilings).
 - Anything needing real auth (admin R2 upload, user accounts) uses app-level auth — an admin secret via `wrangler secret`, or Supabase RLS — never Cloudflare Access JWTs.
 
+## RULE: Workers Cache is ON — every route must decide its cacheability
+
+`wrangler.jsonc` enables Workers Cache, a per-Worker edge cache driven **only** by
+the `Cache-Control` headers we set (no zone Cache Rule or cache-level applies). The
+trap: **a response with no `Cache-Control` is still cached**, using an RFC 9111
+heuristic TTL — that is how the forum list silently went stale for over an hour.
+
+So every GET must decide, explicitly:
+
+- **Opt in:** set `Cache-Control` + a `Cache-Tag`, AND purge that tag on every write
+  that changes what it returns (see the R2 rule below, and `purgeForum()` in
+  `src/forum/routes.ts`). No purge, no cache.
+- **Opt out:** set `Cache-Control: no-store`. **Per-user responses MUST be `no-store`**
+  — a shared cache would serve one user's data to another. (This is why the future
+  `GET /forum/votes/mine` must be `no-store`.)
+
+Forum reads are tagged `forum-posts`; every forum write purges it. Any new
+forum-mutating route (post/comment edit or delete, moderation, a profile edit that
+changes the `author` fields) MUST purge `forum-posts` too.
+
 ## RULE: every R2 write MUST purge the contest cache tag
 
 `/list` and `/preview` are served with `Cache-Tag: contest:<year>:<code>` and an
@@ -41,4 +61,5 @@ App data (forum, users) lives in **Supabase Postgres**, accessed with **Drizzle 
 - **RLS is currently inert.** The Worker connects as a privileged pooler role, so `auth.uid()` is NULL and `pgPolicy` rules are bypassed — authorization is enforced in the API layer. Defined policies are defense-in-depth until we set `request.jwt.claims` per request (planned; see `../docs/Roadmap40.md`).
 
 ## Migration / deploy notes
+
 Wrangler hardening, R2 serving pattern, and the Pages migration plan live in the repo-root `DEPLOYMENT_NOTES.local.md` (gitignored).
