@@ -5,6 +5,7 @@ import { getDb, withUser } from '../db';
 import { posts, comments, profiles, votes } from '../db/schema';
 import { requireAuth, type AuthVars } from '../middleware/auth';
 import { createPostSchema, createCommentSchema, voteSchema, unvoteSchema } from './validation';
+import { resolvePageSize, resolveOffset } from './pagination';
 
 const forum = new Hono<{ Bindings: Bindings; Variables: AuthVars }>();
 
@@ -15,7 +16,7 @@ const commentScore = sql<number>`coalesce((select sum(${votes.value})::int from 
 // cached (RFC 9111 heuristic TTL). Reads opt into a short TTL under one tag and every
 // write purges it, so posts/comments/votes show up at once, not after the TTL.
 // REMINDER: any new forum-mutating route MUST call purgeForum(c). And a per-user read
-// (e.g. a future GET /votes/mine for the upvote fix) MUST set Cache-Control: no-store —
+// (e.g. a future GET /votes/mine for the upvote fix) MUST set Cache-Control: no-store;
 // never cache per-user data behind a shared cache. See the cache rule in AGENTS.md.
 const FORUM_CACHE = 'public, max-age=30, stale-while-revalidate=600';
 
@@ -25,14 +26,10 @@ function purgeForum(c: Context<{ Bindings: Bindings; Variables: AuthVars }>): vo
   ctx.waitUntil(ctx.cache.purge({ tags: ['forum-posts'] }));
 }
 
-const DEFAULT_PAGE_SIZE = 20;
-const PAGE_SIZES = [20, 30, 50];
-
 forum.get('/posts', async (c) => {
   const sort = c.req.query('sort') === 'top' ? 'top' : 'new';
-  const requested = Number.parseInt(c.req.query('limit') ?? '', 10);
-  const limit = PAGE_SIZES.includes(requested) ? requested : DEFAULT_PAGE_SIZE;
-  const offset = Math.max(0, Number.parseInt(c.req.query('offset') ?? '0', 10) || 0);
+  const limit = resolvePageSize(c.req.query('limit'));
+  const offset = resolveOffset(c.req.query('offset'));
   const db = getDb(c.env);
   const rows = await db
     .select({
@@ -48,7 +45,7 @@ forum.get('/posts', async (c) => {
     .orderBy(sort === 'top' ? desc(postScore) : desc(posts.createdAt))
     .limit(limit)
     .offset(offset);
-  const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(posts);
+  const total = await db.$count(posts);
   c.header('Cache-Control', FORUM_CACHE);
   c.header('Cache-Tag', 'forum-posts');
   return c.json({ posts: rows, total });

@@ -55,8 +55,8 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       canvas.style.height = `${height}px`;
       // ceil, not floor: draw the partial cells at the right/bottom edge too, so the
       // grid always covers its full container. floor left an unfilled strip whose height
-      // varied with each section's exact pixel size — that's why the gap differed between
-      // home (viewport − nav − announcement) and login/signup/404 (viewport − nav).
+      // varied with each section's exact pixel size, so the gap differed between home
+      // (viewport minus nav minus announcement) and login/signup/404 (viewport minus nav).
       const cell = squareSize + gridGap;
       const cols = Math.ceil(width / cell);
       const rows = Math.ceil(height / cell);

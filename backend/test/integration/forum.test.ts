@@ -40,11 +40,24 @@ describe.skipIf(!dbUp)('forum routes (integration, local Supabase)', () => {
     }
   });
 
-  it('GET /forum/posts?limit=30 respects the page size', async () => {
-    const res = await app.request('/forum/posts?limit=30', {}, env);
+  it('GET /forum/posts?limit=5 caps the page at exactly 5 when more posts exist', async () => {
+    // Seed past the page size so the cap is actually exercised (not trivially true).
+    for (let i = 0; i < 6; i++) {
+      await app.request(
+        '/forum/posts',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeader(userA.accessToken) },
+          body: JSON.stringify({ title: `page test ${i} ${Date.now()}`, content: 'x' }),
+        },
+        env,
+      );
+    }
+    const res = await app.request('/forum/posts?limit=5', {}, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { posts: unknown[] };
-    expect(body.posts.length).toBeLessThanOrEqual(30);
+    const body = (await res.json()) as { posts: unknown[]; total: number };
+    expect(body.posts.length).toBe(5);
+    expect(body.total).toBeGreaterThanOrEqual(6);
   });
 
   it('GET /forum/posts/:id returns a known post', async () => {

@@ -28,7 +28,7 @@ type PostRow = {
 // Tracks the current user's vote on each post so the arrows reflect their state.
 type VoteMap = Record<string, 1 | -1 | 0>;
 
-const PAGE_SIZES = [20, 30, 50];
+const PAGE_SIZES = [5, 10, 20, 30, 50];
 const DEFAULT_PAGE_SIZE = 20;
 
 // Windowed page list with ellipses, e.g. [1, 'gap', 4, 5, 6, 'gap', 98].
@@ -52,6 +52,7 @@ export default function ForumPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [total, setTotal] = useState(0);
+  const [error, setError] = useState(false);
 
   const { state, profile, logout } = useAuth();
   const session = state === 'in';
@@ -60,14 +61,19 @@ export default function ForumPage() {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
+      setError(false);
       const offset = (page - 1) * perPage;
       const res = await apiFetch(`/forum/posts?sort=${sortBy}&limit=${perPage}&offset=${offset}`);
       if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
-      const data = (await res.json()) as { posts: PostRow[]; total: number };
-      setPosts(data.posts);
-      setTotal(data.total);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
+      const data = await res.json();
+      // Tolerate an unexpected/old shape: Workers Cache can serve a pre-deploy array
+      // response for up to its TTL, and a malformed body must never crash the page.
+      const list: PostRow[] = Array.isArray(data) ? data : (data?.posts ?? []);
+      setPosts(list);
+      setTotal(Array.isArray(data) ? list.length : (data?.total ?? list.length));
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setError(true);
       toast.error('Could not load posts.');
     } finally {
       setLoading(false);
@@ -122,7 +128,7 @@ export default function ForumPage() {
 
   return (
     <div className="bg-background text-foreground">
-      {/* Header — same colors as the primary Button in dark mode: brand-500 fill,
+      {/* Header: same colors as the primary Button in dark mode: brand-500 fill,
           brand-highlight for the flickering grid (its border color). */}
       <div
         data-theme="dark"
@@ -147,7 +153,7 @@ export default function ForumPage() {
         </SectionContainer>
       </div>
 
-      {/* Login status — moved below the hero, right-aligned */}
+      {/* Login status, moved below the hero, right-aligned */}
       <SectionContainer size="large" className="pt-4">
         <div className="flex justify-end text-sm text-foreground-light">
           {session ? (
@@ -180,19 +186,37 @@ export default function ForumPage() {
       {/* Sort + new post row */}
       <SectionContainer size="large" className="pt-5 pb-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-foreground-lighter">Sort by</span>
-            <div className="flex gap-1.5">
-              {(['new', 'top'] as const).map((option) => (
-                <Button
-                  key={option}
-                  type={sortBy === option ? 'primary' : 'default'}
-                  size="tiny"
-                  onClick={() => changeSort(option)}
-                >
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
-                </Button>
-              ))}
+          <div className="flex items-center flex-wrap gap-x-6 gap-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-foreground-lighter">Sort by</span>
+              <div className="flex gap-1.5">
+                {(['new', 'top'] as const).map((option) => (
+                  <Button
+                    key={option}
+                    type={sortBy === option ? 'primary' : 'default'}
+                    size="tiny"
+                    onClick={() => changeSort(option)}
+                  >
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-foreground-lighter">Show</span>
+              <div className="flex gap-1.5">
+                {PAGE_SIZES.map((n) => (
+                  <Button
+                    key={n}
+                    type={perPage === n ? 'primary' : 'default'}
+                    size="tiny"
+                    onClick={() => changePerPage(n)}
+                  >
+                    {n}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -206,6 +230,13 @@ export default function ForumPage() {
       <SectionContainer size="large" className="pb-20">
         {loading ? (
           <div className="text-center text-foreground-light py-12">Loading posts…</div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-foreground-light">Couldn&apos;t load posts.</p>
+            <Button className="mt-4" type="default" size="small" onClick={() => fetchPosts()}>
+              Retry
+            </Button>
+          </div>
         ) : posts.length === 0 ? (
           <div className="text-center text-foreground-light py-12">
             No posts yet. Be the first to{' '}
@@ -274,56 +305,40 @@ export default function ForumPage() {
             })}
           </div>
         )}
-        {!loading && total > 0 && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
-              <Button
-                type="default"
-                size="tiny"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                Prev
-              </Button>
-              {pageItems(page, totalPages).map((item, i) =>
-                item === 'gap' ? (
-                  <span key={`gap-${i}`} className="px-1 text-foreground-lighter">
-                    …
-                  </span>
-                ) : (
-                  <Button
-                    key={item}
-                    type={item === page ? 'primary' : 'default'}
-                    size="tiny"
-                    onClick={() => setPage(item)}
-                  >
-                    {item}
-                  </Button>
-                )
-              )}
-              <Button
-                type="default"
-                size="tiny"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                Next
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              {PAGE_SIZES.map((n) => (
+        {!loading && !error && totalPages > 1 && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-1.5">
+            <Button
+              type="default"
+              size="tiny"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </Button>
+            {pageItems(page, totalPages).map((item, i) =>
+              item === 'gap' ? (
+                <span key={`gap-${i}`} className="px-1 text-foreground-lighter">
+                  …
+                </span>
+              ) : (
                 <Button
-                  key={n}
-                  type={perPage === n ? 'primary' : 'default'}
+                  key={item}
+                  type={item === page ? 'primary' : 'default'}
                   size="tiny"
-                  onClick={() => changePerPage(n)}
+                  onClick={() => setPage(item)}
                 >
-                  {n}
+                  {item}
                 </Button>
-              ))}
-              <span className="ml-1 text-sm text-foreground-lighter">per page</span>
-            </div>
+              )
+            )}
+            <Button
+              type="default"
+              size="tiny"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Next
+            </Button>
           </div>
         )}
       </SectionContainer>
