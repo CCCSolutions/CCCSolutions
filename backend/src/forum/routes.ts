@@ -25,13 +25,16 @@ function purgeForum(c: Context<{ Bindings: Bindings; Variables: AuthVars }>): vo
   ctx.waitUntil(ctx.cache.purge({ tags: ['forum-posts'] }));
 }
 
-const PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 20;
+const PAGE_SIZES = [20, 30, 50];
 
 forum.get('/posts', async (c) => {
   const sort = c.req.query('sort') === 'top' ? 'top' : 'new';
+  const requested = Number.parseInt(c.req.query('limit') ?? '', 10);
+  const limit = PAGE_SIZES.includes(requested) ? requested : DEFAULT_PAGE_SIZE;
   const offset = Math.max(0, Number.parseInt(c.req.query('offset') ?? '0', 10) || 0);
   const db = getDb(c.env);
-  const res = await db
+  const rows = await db
     .select({
       id: posts.id,
       title: posts.title,
@@ -43,11 +46,12 @@ forum.get('/posts', async (c) => {
     .from(posts)
     .leftJoin(profiles, eq(profiles.id, posts.profileId))
     .orderBy(sort === 'top' ? desc(postScore) : desc(posts.createdAt))
-    .limit(PAGE_SIZE)
+    .limit(limit)
     .offset(offset);
+  const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(posts);
   c.header('Cache-Control', FORUM_CACHE);
   c.header('Cache-Tag', 'forum-posts');
-  return c.json(res);
+  return c.json({ posts: rows, total });
 });
 
 forum.get('/posts/:id', async (c) => {

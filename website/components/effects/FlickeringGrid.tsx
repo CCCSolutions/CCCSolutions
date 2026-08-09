@@ -53,8 +53,13 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      const cols = Math.floor(width / (squareSize + gridGap));
-      const rows = Math.floor(height / (squareSize + gridGap));
+      // ceil, not floor: draw the partial cells at the right/bottom edge too, so the
+      // grid always covers its full container. floor left an unfilled strip whose height
+      // varied with each section's exact pixel size — that's why the gap differed between
+      // home (viewport − nav − announcement) and login/signup/404 (viewport − nav).
+      const cell = squareSize + gridGap;
+      const cols = Math.ceil(width / cell);
+      const rows = Math.ceil(height / cell);
 
       const squares = new Float32Array(cols * rows);
       for (let i = 0; i < squares.length; i++) {
@@ -177,7 +182,7 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
     <div ref={containerRef} className={`h-full w-full ${className ?? ''}`} {...props}>
       <canvas
         ref={canvasRef}
-        className="pointer-events-none"
+        className="pointer-events-none block"
         style={{
           width: canvasSize.width,
           height: canvasSize.height,

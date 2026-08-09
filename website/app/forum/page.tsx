@@ -28,45 +28,65 @@ type PostRow = {
 // Tracks the current user's vote on each post so the arrows reflect their state.
 type VoteMap = Record<string, 1 | -1 | 0>;
 
-const PAGE_SIZE = 20;
+const PAGE_SIZES = [20, 30, 50];
+const DEFAULT_PAGE_SIZE = 20;
+
+// Windowed page list with ellipses, e.g. [1, 'gap', 4, 5, 6, 'gap', 98].
+function pageItems(current: number, totalPages: number): (number | 'gap')[] {
+  const items: (number | 'gap')[] = [];
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || (p >= current - 1 && p <= current + 1)) {
+      items.push(p);
+    } else if (items[items.length - 1] !== 'gap') {
+      items.push('gap');
+    }
+  }
+  return items;
+}
 
 export default function ForumPage() {
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'new' | 'top'>('new');
   const [voteMap, setVoteMap] = useState<VoteMap>({});
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(DEFAULT_PAGE_SIZE);
+  const [total, setTotal] = useState(0);
 
   const { state, profile, logout } = useAuth();
   const session = state === 'in';
   const { push } = useRouter();
 
-  const fetchPosts = useCallback(
-    async (offset = 0) => {
-      const append = offset > 0;
-      try {
-        if (append) setLoadingMore(true);
-        else setLoading(true);
-        const res = await apiFetch(`/forum/posts?sort=${sortBy}&offset=${offset}`);
-        if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
-        const data = (await res.json()) as PostRow[];
-        setPosts((prev) => (append ? [...prev, ...data] : data));
-        setHasMore(data.length === PAGE_SIZE);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-        toast.error('Could not load posts.');
-      } finally {
-        if (append) setLoadingMore(false);
-        else setLoading(false);
-      }
-    },
-    [sortBy]
-  );
+  const fetchPosts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const offset = (page - 1) * perPage;
+      const res = await apiFetch(`/forum/posts?sort=${sortBy}&limit=${perPage}&offset=${offset}`);
+      if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
+      const data = (await res.json()) as { posts: PostRow[]; total: number };
+      setPosts(data.posts);
+      setTotal(data.total);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast.error('Could not load posts.');
+    } finally {
+      setLoading(false);
+    }
+  }, [sortBy, page, perPage]);
 
   useEffect(() => {
-    fetchPosts(0);
+    fetchPosts();
   }, [fetchPosts]);
+
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const changeSort = (option: 'new' | 'top') => {
+    setSortBy(option);
+    setPage(1);
+  };
+  const changePerPage = (n: number) => {
+    setPerPage(n);
+    setPage(1);
+  };
 
   const handleVote = async (postId: string, value: 1 | -1) => {
     if (!session) {
@@ -168,7 +188,7 @@ export default function ForumPage() {
                   key={option}
                   type={sortBy === option ? 'primary' : 'default'}
                   size="tiny"
-                  onClick={() => setSortBy(option)}
+                  onClick={() => changeSort(option)}
                 >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
                 </Button>
@@ -254,16 +274,56 @@ export default function ForumPage() {
             })}
           </div>
         )}
-        {hasMore && !loading && (
-          <div className="mt-6 flex justify-center">
-            <Button
-              type="default"
-              size="small"
-              onClick={() => fetchPosts(posts.length)}
-              disabled={loadingMore}
-            >
-              {loadingMore ? 'Loading…' : 'Load more'}
-            </Button>
+        {!loading && total > 0 && (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="default"
+                size="tiny"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Prev
+              </Button>
+              {pageItems(page, totalPages).map((item, i) =>
+                item === 'gap' ? (
+                  <span key={`gap-${i}`} className="px-1 text-foreground-lighter">
+                    …
+                  </span>
+                ) : (
+                  <Button
+                    key={item}
+                    type={item === page ? 'primary' : 'default'}
+                    size="tiny"
+                    onClick={() => setPage(item)}
+                  >
+                    {item}
+                  </Button>
+                )
+              )}
+              <Button
+                type="default"
+                size="tiny"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {PAGE_SIZES.map((n) => (
+                <Button
+                  key={n}
+                  type={perPage === n ? 'primary' : 'default'}
+                  size="tiny"
+                  onClick={() => changePerPage(n)}
+                >
+                  {n}
+                </Button>
+              ))}
+              <span className="ml-1 text-sm text-foreground-lighter">per page</span>
+            </div>
           </div>
         )}
       </SectionContainer>

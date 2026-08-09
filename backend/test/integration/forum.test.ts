@@ -30,12 +30,21 @@ describe.skipIf(!dbUp)('forum routes (integration, local Supabase)', () => {
     postId = post.id;
   });
 
-  it('GET /forum/posts returns an array, default and sort=new and sort=top', async () => {
+  it('GET /forum/posts returns { posts, total }, default and sort=new and sort=top', async () => {
     for (const qs of ['', '?sort=new', '?sort=top']) {
       const res = await app.request(`/forum/posts${qs}`, {}, env);
       expect(res.status).toBe(200);
-      expect(Array.isArray(await res.json())).toBe(true);
+      const body = (await res.json()) as { posts: unknown[]; total: number };
+      expect(Array.isArray(body.posts)).toBe(true);
+      expect(typeof body.total).toBe('number');
     }
+  });
+
+  it('GET /forum/posts?limit=30 respects the page size', async () => {
+    const res = await app.request('/forum/posts?limit=30', {}, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { posts: unknown[] };
+    expect(body.posts.length).toBeLessThanOrEqual(30);
   });
 
   it('GET /forum/posts/:id returns a known post', async () => {
