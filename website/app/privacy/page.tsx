@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SectionContainer } from '../../components/ui/section-container';
 import { GraphPattern } from '../../components/effects/GraphPattern';
@@ -9,17 +8,25 @@ export const metadata: Metadata = {
   description: 'What data CCCSolutions collects, why, and the third-party services involved.',
 };
 
-const CONTACT_EMAIL = 'willi64645@gmail.com';
+const CONTACT_EMAIL = 'william@cccsolutions.ca';
 const EFFECTIVE_DATE = 'August 9, 2026';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-10 first:mt-0">
       <h2 className="text-xl font-semibold tracking-tight text-foreground">{title}</h2>
-      <div className="mt-3 space-y-3 text-sm md:text-base leading-relaxed text-foreground-light">
+      <div className="mt-3 space-y-3 text-sm leading-relaxed text-foreground-light md:text-base">
         {children}
       </div>
     </section>
+  );
+}
+
+function ExtLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">
+      {children}
+    </a>
   );
 }
 
@@ -47,140 +54,122 @@ export default function PrivacyPage() {
           <GraphPattern className="h-full w-full text-white opacity-80" />
         </div>
 
-        <SectionContainer size="large" className="relative z-10 pt-16 pb-10">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">
+        <SectionContainer size="large" className="relative z-10 pb-10 pt-16">
+          <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
             Privacy Policy
           </h1>
-          <p className="mt-4 text-base md:text-lg text-white/85 max-w-2xl">
-            CCCSolutions is a free, open-source, community-run archive. This page explains what data
-            the site collects, why, and which third-party services are involved.
-          </p>
-          <p className="mt-3 text-sm text-white/70">Last updated: {EFFECTIVE_DATE}</p>
+          <p className="mt-4 text-sm text-white/70">Last updated: {EFFECTIVE_DATE}</p>
         </SectionContainer>
       </div>
 
       <SectionContainer size="small" className="py-14">
         <Section title="Who we are">
           <p>
-            CCCSolutions is a volunteer, non-commercial project that publishes solutions to the
-            Canadian Computing Competition and hosts a community forum. We do not sell data or run
-            advertising. The site&apos;s source code is public on{' '}
-            <a
-              href="https://github.com/CCCSolutions/CCCSolutions"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand hover:underline"
-            >
-              GitHub
-            </a>
-            .
+            CCCSolutions is a volunteer, non-commercial project. We do not sell your data or run
+            ads, and the site&apos;s source code is public on{' '}
+            <ExtLink href="https://github.com/CCCSolutions/CCCSolutions">GitHub</ExtLink>.
           </p>
         </Section>
 
         <Section title="What we collect">
-          <p>We only collect what the site needs to function:</p>
           <ul className="list-disc space-y-2 pl-6">
             <li>
-              <span className="font-medium text-foreground">Account details.</span> When you sign
-              up, we store your email address and the username you choose. If you sign in with
-              Google, we also receive your name and profile picture from Google.
+              <span className="font-medium text-foreground">Account details:</span> your email
+              address and the username you choose. If you sign in with Google, we also receive your
+              name and profile picture.
             </li>
             <li>
-              <span className="font-medium text-foreground">Content you post.</span> The threads,
-              comments, and votes you create in the forum are stored and shown publicly next to your
-              username.
+              <span className="font-medium text-foreground">Content you post:</span> the threads,
+              comments, and votes you create, shown publicly next to your username.
             </li>
             <li>
-              <span className="font-medium text-foreground">Usage analytics.</span> We use Google
-              Analytics to understand aggregate traffic (pages visited, device and browser type,
-              approximate region from IP address). This is used in aggregate, not to identify you.
+              <span className="font-medium text-foreground">Usage analytics:</span> Google Analytics
+              records aggregate traffic such as pages visited, device and browser type, and
+              approximate region from your IP address.
             </li>
             <li>
-              <span className="font-medium text-foreground">Security signals.</span> Sign-up and
-              sign-in are protected by Cloudflare Turnstile, which processes a challenge token and
-              your IP address to tell humans from bots.
+              <span className="font-medium text-foreground">Security signals:</span> Cloudflare
+              Turnstile processes a challenge token and your IP address to block bots at sign-up and
+              sign-in.
             </li>
             <li>
-              <span className="font-medium text-foreground">Technical logs.</span> As with any
-              website, our host receives standard request data such as your IP address and browser
-              user-agent to serve pages and keep the site secure.
+              <span className="font-medium text-foreground">Technical logs:</span> our host receives
+              standard request data such as your IP address and browser user-agent.
             </li>
           </ul>
         </Section>
 
-        <Section title="Third-party services we rely on">
-          <p>Your data is handled by a small number of providers, each for a specific purpose:</p>
+        <Section title="Third-party services">
           <ul className="list-disc space-y-2 pl-6">
             <li>
-              <span className="font-medium text-foreground">Supabase</span> — authentication and the
-              database that stores your account and forum content.
+              <span className="font-medium text-foreground">Supabase:</span> authentication and the
+              database that stores your account and forum content.{' '}
+              <ExtLink href="https://supabase.com/privacy">Privacy policy</ExtLink>.
             </li>
             <li>
-              <span className="font-medium text-foreground">Google</span> — optional Google sign-in
-              (OAuth) and Google Analytics for usage statistics.
+              <span className="font-medium text-foreground">Google:</span> optional Google sign-in
+              and Google Analytics.{' '}
+              <ExtLink href="https://policies.google.com/privacy">Privacy policy</ExtLink>.
             </li>
             <li>
-              <span className="font-medium text-foreground">Cloudflare</span> — hosting and content
-              delivery, plus Turnstile bot protection.
+              <span className="font-medium text-foreground">Cloudflare:</span> hosting, content
+              delivery, and Turnstile bot protection.{' '}
+              <ExtLink href="https://www.cloudflare.com/en-ca/turnstile-privacy-policy/">
+                Turnstile privacy policy
+              </ExtLink>
+              .
             </li>
           </ul>
-          <p>
-            Each provider processes data under its own privacy policy. We share only what those
-            services need to do their job, and never sell your information.
-          </p>
         </Section>
 
-        <Section title="Cookies">
-          <p>
-            We use cookies for two things: keeping you signed in (a session cookie set by Supabase)
-            and Google Analytics (which sets its own analytics cookies). You can block or clear
-            cookies in your browser; blocking the session cookie will sign you out, and blocking
-            analytics cookies has no effect on using the site.
-          </p>
+        <Section title="Cookies we use">
+          <ul className="list-disc space-y-2 pl-6">
+            <li>
+              <span className="font-medium text-foreground">Essential cookies:</span> keep you
+              signed in. Blocking them signs you out.
+            </li>
+            <li>
+              <span className="font-medium text-foreground">Analytics cookies:</span> set by Google
+              Analytics. Blocking them does not affect using the site.
+            </li>
+          </ul>
         </Section>
 
-        <Section title="How long we keep it">
+        <Section title="Data retention">
           <p>
-            Your account and the content you post remain until you ask us to delete them. Analytics
-            data is retained according to Google&apos;s standard retention settings. If you delete
-            your account, your posts and comments may be retained in anonymized form to keep
-            existing discussions readable.
+            We keep your account and the content you post until you ask us to delete it. Google
+            Analytics data follows Google&apos;s default retention period.
           </p>
         </Section>
 
         <Section title="Your choices">
           <p>
-            You can edit your profile at any time, and you can request deletion of your account and
-            associated data by emailing us. To opt out of analytics, block analytics cookies in your
-            browser or use a tracker-blocking extension.
+            To delete your account and its data, email us. You can opt out of analytics by blocking
+            cookies in your browser.
           </p>
         </Section>
 
         <Section title="Children">
           <p>
-            CCCSolutions is aimed at students and educators. We do not knowingly collect more than
-            the account and forum information described above from anyone, and we ask that younger
-            students use the site with a parent or teacher&apos;s awareness.
+            CCCSolutions is used by students and educators. We only collect the account and forum
+            data described above. Younger students should use the site with a parent or
+            teacher&apos;s awareness.
           </p>
         </Section>
 
-        <Section title="Changes to this policy">
+        <Section title="Changes">
           <p>
-            We may update this policy as the site evolves. When we do, we&apos;ll change the
-            &quot;last updated&quot; date above. Material changes will be noted on the site.
+            We may update this policy as the site changes. The date above reflects the latest
+            version.
           </p>
         </Section>
 
         <Section title="Contact">
           <p>
-            Questions, or want your data removed? Email{' '}
+            Questions, or want your data deleted? Email{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-brand hover:underline">
               {CONTACT_EMAIL}
             </a>
-            . You can also reach the project through{' '}
-            <Link href="/about" className="text-brand hover:underline">
-              the About page
-            </Link>
             .
           </p>
         </Section>
