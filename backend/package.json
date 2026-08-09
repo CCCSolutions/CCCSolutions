@@ -11,6 +11,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"vitest.config.ts\"",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "typecheck": "tsc --noEmit",
     "db:pull": "drizzle-kit pull",
     "db:generate": "drizzle-kit generate",

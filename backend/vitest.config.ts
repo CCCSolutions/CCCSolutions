@@ -1,8 +1,12 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, configDefaults } from 'vitest/config';
 
 export default defineConfig({
   test: {
     include: ['test/**/*.test.ts'],
+    // Integration tests hit a local Supabase stack and have their own runner
+    // (`bun run test:integration`, see vitest.integration.config.ts) — CI has no
+    // DB, so they must never run under the default `test` script.
+    exclude: [...configDefaults.exclude, 'test/integration/**'],
     environment: 'node',
     coverage: {
       provider: 'v8',
