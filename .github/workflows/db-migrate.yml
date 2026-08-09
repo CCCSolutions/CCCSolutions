@@ -37,6 +37,20 @@ jobs:
         with:
           version: latest
       - run: bun install --frozen-lockfile
+      - name: Generate local JWT signing key (config.toml's signing_keys_path needs a file present)
+        # NOT `supabase gen signing-key`: once signing_keys_path is set, every supabase
+        # CLI call tries to READ that (missing-in-CI) file first and errors. Generate the
+        # ES256 JWK directly with jose (already a dep) so the file exists before start.
+        run: |
+          bun -e '
+            import { generateKeyPair, exportJWK } from "jose";
+            import { writeFileSync } from "node:fs";
+            import { randomUUID } from "node:crypto";
+            const { privateKey } = await generateKeyPair("ES256", { extractable: true });
+            const jwk = await exportJWK(privateKey);
+            Object.assign(jwk, { kid: randomUUID(), use: "sig", alg: "ES256", key_ops: ["sign"], ext: true });
+            writeFileSync("supabase/signing_keys.json", JSON.stringify([jwk]));
+          '
       - name: Start local Supabase (Postgres + auth schema)
         run: supabase start
       - name: Apply migrations to the fresh database
