@@ -122,48 +122,49 @@ export default function PrivacyPage() {
         <Section title="Cookies we use">
           <ul className="list-disc space-y-2 pl-6">
             <li>
-              <span className="font-medium text-foreground">Essential cookies:</span> keep you
-              signed in. Blocking them signs you out.
+              <span className="font-medium text-foreground">Essential cookies</span> to keep you
+              signed in.
             </li>
             <li>
-              <span className="font-medium text-foreground">Analytics cookies:</span> set by Google
-              Analytics. Blocking them does not affect using the site.
+              <span className="font-medium text-foreground">Analytics cookies</span> from Google
+              Analytics, so we can see how the site is used.
             </li>
           </ul>
         </Section>
 
         <Section title="Data retention">
           <p>
-            We keep your account and the content you post until you ask us to delete it. Google
-            Analytics data follows Google&apos;s default retention period.
+            We keep your account and the posts you make for as long as your account exists. Ask us
+            to delete them and we will. Analytics data is held by Google under its own retention
+            settings.
           </p>
         </Section>
 
         <Section title="Your choices">
           <p>
-            To delete your account and its data, email us. You can opt out of analytics by blocking
-            cookies in your browser.
+            Want to see or remove your data? Just email us and we&apos;ll take care of it. You can
+            also opt out of analytics by blocking cookies in your browser.
           </p>
         </Section>
 
         <Section title="Children">
           <p>
-            CCCSolutions is used by students and educators. We only collect the account and forum
-            data described above. Younger students should use the site with a parent or
-            teacher&apos;s awareness.
+            CCCSolutions is built for students and teachers. We only collect the account and forum
+            details covered above, and if you&apos;re a younger student, we&apos;d suggest using the
+            site with a parent or teacher.
           </p>
         </Section>
 
         <Section title="Changes">
           <p>
-            We may update this policy as the site changes. The date above reflects the latest
-            version.
+            We&apos;ll update this page if things change, and the date at the top always shows the
+            latest version.
           </p>
         </Section>
 
         <Section title="Contact">
           <p>
-            Questions, or want your data deleted? Email{' '}
+            Questions about any of this? Email{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-brand hover:underline">
               {CONTACT_EMAIL}
             </a>
