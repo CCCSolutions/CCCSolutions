@@ -114,10 +114,7 @@ export default function PrivacyPage() {
             <li>
               <span className="font-medium text-foreground">Cloudflare:</span> hosting, content
               delivery, and Turnstile bot protection.{' '}
-              <ExtLink href="https://www.cloudflare.com/en-ca/turnstile-privacy-policy/">
-                Turnstile privacy policy
-              </ExtLink>
-              .
+              <ExtLink href="https://www.cloudflare.com/privacypolicy/">Privacy policy</ExtLink>.
             </li>
           </ul>
         </Section>
