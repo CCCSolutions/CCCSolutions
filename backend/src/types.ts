@@ -22,4 +22,12 @@ export type Bindings = {
   // SUPABASE_URL: project API URL — a non-secret var, set in wrangler.jsonc.
   DATABASE_URL: string;
   SUPABASE_URL: string;
+
+  // Origin of the Next.js frontend — the mirror of the frontend's NEXT_PUBLIC_API_URL.
+  // Used to link notifications back into the forum. Non-secret var in wrangler.jsonc.
+  FRONTEND_URL: string;
+
+  // Discord webhook for forum activity pings. A bearer credential — anyone holding
+  // it can post to the channel — so `wrangler secret put`. Unset = notifications off.
+  DISCORD_WEBHOOK_URL: string;
 };

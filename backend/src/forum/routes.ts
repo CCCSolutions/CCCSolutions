@@ -6,6 +6,7 @@ import { posts, comments, profiles, votes } from '../db/schema';
 import { requireAuth, type AuthVars } from '../middleware/auth';
 import { createPostSchema, createCommentSchema, voteSchema, unvoteSchema } from './validation';
 import { resolvePageSize, resolveOffset } from './pagination';
+import { notify } from '../notify';
 
 const forum = new Hono<{ Bindings: Bindings; Variables: AuthVars }>();
 
@@ -15,7 +16,8 @@ const commentScore = sql<number>`coalesce((select sum(${votes.value})::int from 
 // Workers Cache is on (wrangler.jsonc): a response with NO Cache-Control is still
 // cached (RFC 9111 heuristic TTL). Reads opt into a short TTL under one tag and every
 // write purges it, so posts/comments/votes show up at once, not after the TTL.
-// REMINDER: any new forum-mutating route MUST call purgeForum(c). And a per-user read
+// REMINDER: any new forum-mutating route MUST call purgeForum(c) and notify(c, ...).
+// And a per-user read
 // (e.g. a future GET /votes/mine for the upvote fix) MUST set Cache-Control: no-store;
 // never cache per-user data behind a shared cache. See the cache rule in AGENTS.md.
 const FORUM_CACHE = 'public, max-age=30, stale-while-revalidate=600';
@@ -100,6 +102,13 @@ forum.post('/posts', requireAuth, async (c) => {
       .returning(),
   );
   purgeForum(c);
+  notify(c, {
+    kind: 'post',
+    title: post.title,
+    description: post.content,
+    actor: profile.username,
+    path: `/forum/${post.id}`,
+  });
   return c.json(post, 201);
 });
 
@@ -114,6 +123,13 @@ forum.post('/posts/:id/comments', requireAuth, async (c) => {
       .returning(),
   );
   purgeForum(c);
+  notify(c, {
+    kind: 'comment',
+    title: 'New comment',
+    description: comment.content,
+    actor: profile.username,
+    path: `/forum/${c.req.param('id')}`,
+  });
   return c.json(comment, 201);
 });
 
