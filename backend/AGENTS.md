@@ -51,6 +51,24 @@ c.executionCtx.waitUntil(c.executionCtx.cache.purge({ tags: [`contest:${year}:${
 The admin router (`src/admin/routes.ts`) does this in `purgeContest()`. New write
 paths must call the same helper (or an equivalent purge). No purge, no merge.
 
+## RULE: every forum write MUST notify Discord
+
+Forum activity is announced to a Discord webhook (`src/notify.ts`), because nobody
+watches the site all day. **Any new forum-mutating route must call `notify(c, ...)`
+alongside `purgeForum(c)`** — the two live together in `src/forum/routes.ts`.
+
+Two constraints that are not negotiable:
+
+- **User-supplied text goes in the embed, never in `content`.** Only `content` parses
+  mentions, so a post body saying `@everyone` in an embed pings nobody. The `@everyone`
+  we do send is text we author.
+- **Sending must not be able to break a write.** `fetch` resolves on 4xx/5xx, so the
+  status is checked explicitly and failures are logged, never thrown; dispatch is
+  `waitUntil` so no user waits on Discord.
+
+`DISCORD_WEBHOOK_URL` is a **secret** (`wrangler secret put`) — it is a bearer
+credential. Unset = notifications off, which is the local-dev default.
+
 ## Database — Supabase + Drizzle
 
 App data (forum, users) lives in **Supabase Postgres**, accessed with **Drizzle ORM**. Full workflow in `docs/DATABASE.md`. The load-bearing rules:

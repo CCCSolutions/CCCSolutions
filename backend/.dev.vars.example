@@ -33,3 +33,11 @@ DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 # Supabase API URL, used to verify auth JWTs. Prod value is in wrangler.jsonc;
 # set the local stack here.
 SUPABASE_URL=http://127.0.0.1:54321
+
+# ---------------------------------------------------------------------------
+# Discord
+# ---------------------------------------------------------------------------
+# Webhook posted to on every forum write. In prod it's a Worker secret
+# (`wrangler secret put DISCORD_WEBHOOK_URL`). Leave EMPTY locally unless you
+# want `wrangler dev` writes pinging the real channel — unset disables sending.
+DISCORD_WEBHOOK_URL=
