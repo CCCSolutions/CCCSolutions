@@ -14,23 +14,19 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
-          days-before-stale: 60
-          days-before-close: 14
-          exempt-issue-labels: pinned,security,good first issue
+          # PRs only. An idle PR really is abandoned, but the issue tracker here is a
+          # long-lived roadmap: phase-3 work isn't stale, it just isn't due yet. -1
+          # disables both marking and closing for issues, so nothing auto-closes.
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          days-before-pr-stale: 60
+          days-before-pr-close: 14
           exempt-pr-labels: pinned,security,good first issue
-          stale-issue-label: stale
           stale-pr-label: stale
-          stale-issue-message: >-
-            Hi! This issue has been quiet for a while, so we've marked it stale.
-            No rush — just comment if it's still relevant and we'll keep it open.
-            Otherwise it'll close in 14 days.
           stale-pr-message: >-
             Hi! This PR has been quiet for a while, so we've marked it stale.
             Push a commit or leave a comment when you're ready and we'll pick it
             back up. Otherwise it'll close in 14 days.
-          close-issue-message: >-
-            Closing this for now since it's been inactive. Feel free to reopen
-            anytime — no hard feelings!
           close-pr-message: >-
             Closing this for now since it's been inactive. Reopen whenever you'd
             like to continue. Thanks for contributing!
