@@ -9,6 +9,7 @@ import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { TurnstileWidget, type TurnstileHandle } from './TurnstileWidget';
+import { useAuth } from './SupabaseAuthProvider';
 
 const inputClass =
   'w-full h-10 px-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight';
@@ -67,6 +68,12 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   };
 
   const { push } = useRouter();
+  const { state } = useAuth();
+
+  // Already signed in? The login/signup pages shouldn't be usable — bounce to the forum.
+  useEffect(() => {
+    if (state === 'in') push('/forum');
+  }, [state, push]);
 
   // Surface OAuth-callback failures (which redirect here as ?error=...) as a toast.
   useEffect(() => {
@@ -174,6 +181,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     });
     if (error) errorToast(error.message);
   };
+
+  // Don't flash the form to an already-signed-in user while the redirect above runs.
+  if (state === 'in') return null;
 
   return (
     <div className="relative min-h-[calc(100svh-var(--nav-h))] flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
