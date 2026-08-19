@@ -7,12 +7,10 @@ import { problemParamsSchema, fileSchema } from './validation';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
 
-// Cached a full week: this is safe because every R2 write (admin upload/delete)
-// purges the contest's cache tag via Workers Cache (GA), please see the rule in AGENTS.md.
-// Cache-Tag lets that purge target only this contest's entries; Cloudflare strips
-// Cache-Tag before it reaches the client.
+// Edge-cached a week. R2 writes purge the Cache-Tag, but a purge only clears the shared
+// edge, so use s-maxage (not max-age) or browsers keep a stale list/preview. See AGENTS.md.
 function setContestCache(c: Context, year: string, code: string): void {
-  c.header('Cache-Control', 'public, max-age=604800, stale-while-revalidate=2592000');
+  c.header('Cache-Control', 'public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000');
   c.header('Cache-Tag', `contest:${year}:${code}`);
 }
 

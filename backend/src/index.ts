@@ -26,12 +26,15 @@ function isAllowedOrigin(origin: string): boolean {
 
 app.use('*', cors({ origin: (origin) => (origin && isAllowedOrigin(origin) ? origin : undefined) }));
 
+// no-store: with no header, Workers Cache serves a stale snapshot (see AGENTS.md).
 app.get('/', (c) => {
+  c.header('Cache-Control', 'no-store');
   return c.json({ name: 'cccsolutions-api', version: 'v1' });
   // TODO: expand with available endpoints / links / more API info
 });
 
 app.get('/health', (c) => {
+  c.header('Cache-Control', 'no-store');
   return c.json({ status: 'ok' });
   // TODO: deeper checks — R2, DB, downstream services (not just liveness)
 });
