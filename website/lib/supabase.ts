@@ -17,6 +17,15 @@ if (!supabaseUrl || !supabasePublishableKey) {
   );
 }
 
+// supabase-js (detectSessionInUrl, on by default) consumes and clears the URL hash on
+// init — including error params like #error=otp_expired — before any React effect runs.
+// Capture it here, synchronously and ahead of createClient, so AuthHashErrorHandler can
+// still surface it instead of the user silently landing on a clean page.
+export const initialAuthErrorHash =
+  typeof window !== 'undefined' && window.location.hash.includes('error=')
+    ? window.location.hash.slice(1)
+    : '';
+
 export const supabase = createClient(supabaseUrl, supabasePublishableKey);
 
 /** Returns the current session's access_token (JWT) or null if not logged in. */
