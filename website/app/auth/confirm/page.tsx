@@ -19,7 +19,14 @@ const DEST: Partial<Record<EmailOtpType, string>> = {
   recovery: '/update-password',
 };
 
-const VALID_TYPES: EmailOtpType[] = ['signup', 'recovery', 'email', 'email_change', 'invite', 'magiclink'];
+const VALID_TYPES: EmailOtpType[] = [
+  'signup',
+  'recovery',
+  'email',
+  'email_change',
+  'invite',
+  'magiclink',
+];
 
 function Centered({ children }: { children: React.ReactNode }) {
   return (
@@ -76,9 +83,9 @@ function ConfirmHandler() {
     <Centered>
       <h1 className="text-2xl font-semibold tracking-tight mb-3">This link didn&apos;t work</h1>
       <p className="text-foreground-light mb-6">
-        It may have expired, already been used, or been pre-scanned by your email provider.
-        Enter the <span className="text-foreground font-medium">6-digit code</span> from the same
-        email instead, or request a new one.
+        It may have expired, already been used, or been pre-scanned by your email provider. Enter
+        the <span className="text-foreground font-medium">6-digit code</span> from the same email
+        instead, or request a new one.
       </p>
       <div className="flex justify-center gap-3">
         <Button asChild type="primary" size="medium">
