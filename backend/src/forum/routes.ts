@@ -21,10 +21,8 @@ const commentScore = sql<number>`coalesce((select sum(${votes.value})::int from 
 // (e.g. a future GET /votes/mine for the upvote fix) MUST set Cache-Control: no-store;
 // never cache per-user data behind a shared cache. See the cache rule in AGENTS.md.
 //
-// s-maxage (edge), not max-age (every cache incl. the browser): a purge only clears the
-// shared edge cache, so max-age would let a client's own browser pin a stale copy (e.g.
-// score 0 right after they voted) for the whole SWR window. max-age=0 makes browsers
-// revalidate; s-maxage keeps the edge cache + purge-on-write.
+// s-maxage caches at the edge only; max-age=0 stops a browser pinning a stale copy the
+// purge can't reach (e.g. their own vote still showing score 0).
 const FORUM_CACHE = 'public, max-age=0, s-maxage=30, stale-while-revalidate=600';
 
 function purgeForum(c: Context<{ Bindings: Bindings; Variables: AuthVars }>): void {

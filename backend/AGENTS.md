@@ -33,8 +33,8 @@ So every GET must decide, explicitly:
 - **Opt out:** set `Cache-Control: no-store`. **Per-user responses MUST be `no-store`**
   — a shared cache would serve one user's data to another. (This is why the future
   `GET /forum/votes/mine` must be `no-store`.) This also covers real-time checks like
-  `GET /user/username-available` and liveness like `GET /health` — heuristic caching
-  would serve a stale answer.
+  `GET /user/username-available` and liveness like `GET /health`, where heuristic
+  caching would serve a stale answer.
 
 Forum reads are tagged `forum-posts`; every forum write purges it. Any new
 forum-mutating route (post/comment edit or delete, moderation, a profile edit that
@@ -43,8 +43,8 @@ changes the `author` fields) MUST purge `forum-posts` too.
 ## RULE: every R2 write MUST purge the contest cache tag
 
 `/list` and `/preview` are served with `Cache-Tag: contest:<year>:<code>` and an
-aggressive `s-maxage` (edge-only; see the `s-maxage` rule above — a week-long `max-age`
-would trap the stale list in every browser the purge can't reach). **Any endpoint that
+aggressive `s-maxage` (edge-only; see the `s-maxage` rule above: a week-long `max-age`
+would trap the stale list in browsers the purge can't reach). **Any endpoint that
 writes to R2 (upload, delete, overwrite) MUST purge that contest's cache tag**, or the
 cached `/list` + `/preview` go stale and a freshly staged/removed file stays invisible
 until the TTL expires.
