@@ -25,10 +25,16 @@ So every GET must decide, explicitly:
 
 - **Opt in:** set `Cache-Control` + a `Cache-Tag`, AND purge that tag on every write
   that changes what it returns (see the R2 rule below, and `purgeForum()` in
-  `src/forum/routes.ts`). No purge, no cache.
+  `src/forum/routes.ts`). No purge, no cache. **Use `s-maxage` (+ `max-age=0`), never a
+  bare `max-age`.** A tag purge clears the shared **edge** cache only; `max-age` is
+  obeyed by every client's browser too, so it would pin a stale copy the purge can't
+  reach (e.g. a user's own vote showing score 0 for the whole SWR window). `s-maxage`
+  scopes the TTL to the edge; `max-age=0` makes browsers revalidate every load.
 - **Opt out:** set `Cache-Control: no-store`. **Per-user responses MUST be `no-store`**
   — a shared cache would serve one user's data to another. (This is why the future
-  `GET /forum/votes/mine` must be `no-store`.)
+  `GET /forum/votes/mine` must be `no-store`.) This also covers real-time checks like
+  `GET /user/username-available` and liveness like `GET /health` — heuristic caching
+  would serve a stale answer.
 
 Forum reads are tagged `forum-posts`; every forum write purges it. Any new
 forum-mutating route (post/comment edit or delete, moderation, a profile edit that
@@ -37,11 +43,13 @@ changes the `author` fields) MUST purge `forum-posts` too.
 ## RULE: every R2 write MUST purge the contest cache tag
 
 `/list` and `/preview` are served with `Cache-Tag: contest:<year>:<code>` and an
-aggressive `max-age`. **Any endpoint that writes to R2 (upload, delete, overwrite)
-MUST purge that contest's cache tag**, or the cached `/list` + `/preview` go stale
-and a freshly staged/removed file stays invisible until the max-age expires.
+aggressive `s-maxage` (edge-only; see the `s-maxage` rule above — a week-long `max-age`
+would trap the stale list in every browser the purge can't reach). **Any endpoint that
+writes to R2 (upload, delete, overwrite) MUST purge that contest's cache tag**, or the
+cached `/list` + `/preview` go stale and a freshly staged/removed file stays invisible
+until the TTL expires.
 
-This purge is exactly what makes the aggressive caching safe. It is not optional.
+This purge is exactly what makes the aggressive caching safe (at the edge). It is not optional.
 Use the Workers Cache tag-purge (GA 2026-07-06), fired via `waitUntil`:
 
 ```ts
@@ -76,7 +84,7 @@ App data (forum, users) lives in **Supabase Postgres**, accessed with **Drizzle 
 - **Migrations run only in CI** (`.github/workflows/db-migrate.yml`): applied to a throwaway Supabase on PRs, to prod on merge to main. Never hand-edit the DB, never `db:push`. Drizzle owns the `public` schema only — Supabase owns `auth`/`storage`.
 - **Two connection strings.** `DATABASE_URL` = transaction pooler (6543), for the Worker at runtime — construct clients as `postgres(url, { max: 1, prepare: false })` (transaction pooling breaks server-side prepared statements). `DIRECT_DATABASE_URL` = session mode (5432), for migrations only, and it lives **only** as a CI secret so prod can't be migrated by hand.
 - **Keys:** use `SUPABASE_SECRET_KEY` (server) and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (browser) — the old `service_role`/`anon` keys are deprecated. Verify JWTs via JWKS off `SUPABASE_URL` (no `SUPABASE_JWT_SECRET`). `SUPABASE_URL` is a non-secret var in `wrangler.jsonc`, not a secret.
-- **RLS is currently inert.** The Worker connects as a privileged pooler role, so `auth.uid()` is NULL and `pgPolicy` rules are bypassed — authorization is enforced in the API layer. Defined policies are defense-in-depth until we set `request.jwt.claims` per request (planned; see `../docs/Roadmap40.md`).
+- **RLS is live on writes.** Writes go through `withUser()`, which sets `request.jwt.claims` + `role authenticated` per transaction (transaction-local, because the transaction pooler can hand a different backend connection to each statement), so `auth.uid()` resolves and `pgPolicy` rules apply. Reads run as the privileged pooler role and bypass RLS by design (public data); the API is the gatekeeper there. Policies also require table `GRANT`s to the `authenticated` role, or writes fail with `42P01` (see the grants migration).
 
 ## Migration / deploy notes
 

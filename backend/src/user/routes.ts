@@ -7,11 +7,19 @@ import { requireAuth, type AuthVars } from '../middleware/auth';
 
 const user = new Hono<{ Bindings: Bindings; Variables: AuthVars }>();
 
-user.get('/me', requireAuth, (c) => c.json(c.get('profile')));
+// no-store: per-user data. Without it Workers Cache could heuristically cache one
+// user's profile and serve it to another (see the cache rule in AGENTS.md).
+user.get('/me', requireAuth, (c) => {
+  c.header('Cache-Control', 'no-store');
+  return c.json(c.get('profile'));
+});
 
 // Public. Taken only if a CLAIMED profile holds the name; unclaimed migrated profiles
 // are reclaimable (see getOrCreateProfile), so they still count as available.
+// no-store: a real-time availability check must not be cached, or a name taken seconds
+// ago still reports available for the heuristic TTL.
 user.get('/username-available', async (c) => {
+  c.header('Cache-Control', 'no-store');
   const username = (c.req.query('u') ?? '').toLowerCase();
   if (!/^[a-z0-9_]{2,24}$/.test(username)) return c.json({ available: false });
   const db = getDb(c.env);
