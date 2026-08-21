@@ -76,25 +76,19 @@ function ConfirmHandler() {
     );
   }
 
-  // The link expired, was already used, or was consumed by an email scanner. Point the
-  // user at the 6-digit code, which never has this problem.
-  const codeHref = type === 'recovery' ? '/reset-password' : '/signup';
+  // The link expired, was already used, or was opened by an email scanner. Send the user
+  // back to log in; the 6-digit code from the same email still works if they need it.
   return (
     <Centered>
       <h1 className="text-2xl font-semibold tracking-tight mb-3">This link didn&apos;t work</h1>
       <p className="text-foreground-light mb-6">
-        It may have expired, already been used, or been pre-scanned by your email provider. Enter
-        the <span className="text-foreground font-medium">6-digit code</span> from the same email
-        instead, or request a new one.
+        It may have expired, already been used, or been opened by your email&apos;s security
+        scanner. Request a new email, or use the{' '}
+        <span className="text-foreground font-medium">6-digit code</span> from it.
       </p>
-      <div className="flex justify-center gap-3">
-        <Button asChild type="primary" size="medium">
-          <Link href={codeHref}>Enter the code</Link>
-        </Button>
-        <Button asChild type="default" size="medium">
-          <Link href="/login">Back to login</Link>
-        </Button>
-      </div>
+      <Button asChild type="primary" size="medium">
+        <Link href="/login">Back to login</Link>
+      </Button>
     </Centered>
   );
 }
