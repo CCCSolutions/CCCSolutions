@@ -20,28 +20,23 @@ import { stats } from '../constants';
 import { kFormatter } from '../lib/utils';
 import { SolutionPreview } from '../components/solutions/SolutionPreview';
 
-// Shown if the build-time fetch is unavailable; bump when the real count moves a lot.
-const FALLBACK_GITHUB_STARS = 9;
-
-async function getGithubStars(): Promise<number> {
+async function getGithubStars(): Promise<number | null> {
   try {
     const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
-      // Bake at build time (force-cache), not per-request. GitHub's unauthenticated API is
-      // 60/hr *per IP*, and both hosts share egress IPs (Workers especially), so a runtime
-      // fetch gets throttled — and that failure would blank the count (v2) or freeze the
-      // last cached value forever (Netlify). Fetching once per build sidesteps the shared-IP
-      // throttle; the number refreshes on every deploy, and the fallback means it never
-      // blanks even if the build fetch itself is throttled.
+      // Baked at build time (force-cache), not per-request. GitHub's unauthenticated API is
+      // 60/hr *per IP* and both hosts share egress IPs (Workers especially), so a runtime
+      // fetch gets throttled — which froze the last cached value (Netlify) or blanked it (v2).
+      // Fetching once per build sidesteps the shared-IP throttle and refreshes on deploy. If
+      // the build fetch is itself throttled, return null and hide the count (never fake it) —
+      // see the tracking issue; the real fix is an authenticated + cached backend route.
       cache: 'force-cache',
       headers: { Accept: 'application/vnd.github+json' },
     });
-    if (!res.ok) return FALLBACK_GITHUB_STARS;
+    if (!res.ok) return null;
     const data = await res.json();
-    return typeof data.stargazers_count === 'number'
-      ? data.stargazers_count
-      : FALLBACK_GITHUB_STARS;
+    return typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
   } catch {
-    return FALLBACK_GITHUB_STARS;
+    return null;
   }
 }
 
@@ -250,8 +245,12 @@ const Home = async () => {
                 >
                   <GitHubLogoIcon width="18" height="18" />
                   <span>cccsolutions</span>
-                  <span className="text-foreground-muted px-1">|</span>
-                  <span>{kFormatter(githubStars)}</span>
+                  {githubStars !== null && (
+                    <>
+                      <span className="text-foreground-muted px-1">|</span>
+                      <span>{kFormatter(githubStars)}</span>
+                    </>
+                  )}
                 </a>
               </Button>
             </div>
