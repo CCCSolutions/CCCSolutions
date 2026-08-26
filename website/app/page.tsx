@@ -23,17 +23,23 @@ import { SolutionPreview } from '../components/solutions/SolutionPreview';
 async function getGithubStars(): Promise<number | null> {
   try {
     const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
-      // Baked at build time (force-cache) rather than per-request. GitHub's unauthenticated API is too low and both hosts 
-      // share egress IPs so a runtime fetch gets throttled. Fetching once per build sidesteps the shared-IP throttle and 
+      // Baked at build time (force-cache) rather than per-request. GitHub's unauthenticated API is too low and both hosts
+      // share egress IPs so a runtime fetch gets throttled. Fetching once per build sidesteps the shared-IP throttle and
       // refreshes on deploy. If the build fetch is itself throttled/fails, return null and hide the count
-      // TODO: see the tracking issue and fix it with an authenticated endpoint 
+      // TODO: see the tracking issue and fix it with an authenticated endpoint
       cache: 'force-cache',
       headers: { Accept: 'application/vnd.github+json' },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Logged so the build output shows the real cause (e.g. 403 rate-limit) instead of
+      // silently baking a blank count. See the tracking issue.
+      console.warn(`[github-stars] fetch failed: ${res.status} ${res.statusText}`);
+      return null;
+    }
     const data = await res.json();
     return typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
-  } catch {
+  } catch (err) {
+    console.warn('[github-stars] fetch threw:', err);
     return null;
   }
 }
