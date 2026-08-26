@@ -23,12 +23,10 @@ import { SolutionPreview } from '../components/solutions/SolutionPreview';
 async function getGithubStars(): Promise<number | null> {
   try {
     const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
-      // Baked at build time (force-cache), not per-request. GitHub's unauthenticated API is
-      // 60/hr *per IP* and both hosts share egress IPs (Workers especially), so a runtime
-      // fetch gets throttled — which froze the last cached value (Netlify) or blanked it (v2).
-      // Fetching once per build sidesteps the shared-IP throttle and refreshes on deploy. If
-      // the build fetch is itself throttled, return null and hide the count (never fake it) —
-      // see the tracking issue; the real fix is an authenticated + cached backend route.
+      // Baked at build time (force-cache) rather than per-request. GitHub's unauthenticated API is too low and both hosts 
+      // share egress IPs so a runtime fetch gets throttled. Fetching once per build sidesteps the shared-IP throttle and 
+      // refreshes on deploy. If the build fetch is itself throttled/fails, return null and hide the count
+      // TODO: see the tracking issue and fix it with an authenticated endpoint 
       cache: 'force-cache',
       headers: { Accept: 'application/vnd.github+json' },
     });
