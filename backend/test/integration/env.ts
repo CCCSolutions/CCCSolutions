@@ -2,7 +2,9 @@
 // Run with: supabase start && bun run db:migrate && bun run test:integration
 import { config } from 'dotenv';
 import { execSync } from 'node:child_process';
+import type { ExecutionContext as HonoExecutionContext } from 'hono';
 import postgres from 'postgres';
+import { app } from '../../src/index';
 
 config({ path: '.dev.vars' });
 
@@ -10,6 +12,48 @@ export const env = {
   DATABASE_URL: process.env.DATABASE_URL ?? '',
   SUPABASE_URL: process.env.SUPABASE_URL ?? '',
 };
+
+type TestExecutionContext = HonoExecutionContext & {
+  cache: {
+    purge(options: { tags?: string[] }): Promise<{ success: boolean; errors: never[] }>;
+  };
+};
+
+// app.request() runs in Node rather than workerd, so Cloudflare does not supply
+// the third fetch-handler argument. Give each request a minimal context and wait
+// for the background work it registers, just as a Workers test harness would.
+function createExecutionContext(): {
+  ctx: TestExecutionContext;
+  waitForBackgroundTasks: () => Promise<void>;
+} {
+  const backgroundTasks: Promise<unknown>[] = [];
+  const ctx: TestExecutionContext = {
+    waitUntil(promise) {
+      backgroundTasks.push(promise);
+    },
+    passThroughOnException() {},
+    props: {},
+    cache: {
+      async purge() {
+        return { success: true, errors: [] };
+      },
+    },
+  };
+
+  return {
+    ctx,
+    async waitForBackgroundTasks() {
+      await Promise.all(backgroundTasks);
+    },
+  };
+}
+
+export async function appRequest(input: Request | string | URL, init: RequestInit = {}): Promise<Response> {
+  const { ctx, waitForBackgroundTasks } = createExecutionContext();
+  const response = await app.request(input, init, env, ctx);
+  await waitForBackgroundTasks();
+  return response;
+}
 
 export async function isDbReachable(): Promise<boolean> {
   if (!env.DATABASE_URL) return false;
