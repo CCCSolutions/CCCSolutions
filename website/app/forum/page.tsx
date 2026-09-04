@@ -95,6 +95,30 @@ export default function ForumPage() {
     return () => controller.abort();
   }, [fetchPosts]);
 
+  // Seed the arrows from the server: which of the posts on screen has THIS user voted on.
+  // Per-user data, so it can't ride the shared/cached /posts response. The endpoint returns
+  // [{ votableId, value }], which we fold into a { id: value } map. Cleared when logged out.
+  // Keyed on the id string (not `posts`) so it only re-seeds when the set of posts changes
+  // (load / sort / paginate), NOT when an optimistic vote mutates a score — otherwise it
+  // would re-fetch and clobber the vote the user just cast.
+  const postIdsKey = posts.map((p) => p.id).join(',');
+  useEffect(() => {
+    if (!session || postIdsKey === '') {
+      setVoteMap({});
+      return;
+    }
+    const controller = new AbortController();
+    apiFetch(`/forum/votes/mine?type=post&ids=${postIdsKey}`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows: { votableId: string; value: 1 | -1 }[]) => {
+        setVoteMap(Object.fromEntries(rows.map((r) => [r.votableId, r.value])));
+      })
+      .catch(() => {
+        /* superseded/aborted or offline: leave arrows unseeded, non-critical */
+      });
+    return () => controller.abort();
+  }, [postIdsKey, session]);
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const changeSort = (option: 'new' | 'top') => {
     setSortBy(option);
@@ -271,8 +295,8 @@ export default function ForumPage() {
                         aria-label="Upvote"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           userVote === 1
-                            ? 'text-brand font-bold'
-                            : 'text-foreground-lighter hover:text-brand'
+                            ? 'text-orange-500 font-bold'
+                            : 'text-foreground-lighter hover:text-orange-500'
                         }`}
                       >
                         <ArrowUpIcon width="16" height="16" />
@@ -284,8 +308,8 @@ export default function ForumPage() {
                         aria-label="Downvote"
                         className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           userVote === -1
-                            ? 'text-destructive font-bold'
-                            : 'text-foreground-lighter hover:text-destructive'
+                            ? 'text-blue-500 font-bold'
+                            : 'text-foreground-lighter hover:text-blue-500'
                         }`}
                       >
                         <ArrowDownIcon width="16" height="16" />

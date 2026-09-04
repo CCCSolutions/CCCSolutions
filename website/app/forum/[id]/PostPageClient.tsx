@@ -73,6 +73,39 @@ export default function PostPageClient({ id }: Props) {
     fetchPost();
   }, [id, fetchPost]);
 
+  // Seed this user's own vote on the post + its comments from the server (per-user data,
+  // can't ride the cached post response). Keyed on the post id + comment-id string so it
+  // seeds on load, not on every optimistic score mutation. Cleared when logged out.
+  const commentIdsKey = comments.map((comment) => comment.id).join(',');
+  useEffect(() => {
+    if (!isLoggedIn || !post) {
+      setPostVote(0);
+      setCommentVotes({});
+      return;
+    }
+    const postId = post.id;
+    const controller = new AbortController();
+    apiFetch(`/forum/votes/mine?type=post&ids=${postId}`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows: { votableId: string; value: 1 | -1 }[]) => {
+        const mine = rows.find((r) => r.votableId === postId);
+        setPostVote(mine ? mine.value : 0);
+      })
+      .catch(() => {});
+    if (commentIdsKey !== '') {
+      apiFetch(`/forum/votes/mine?type=comment&ids=${commentIdsKey}`, {
+        signal: controller.signal,
+      })
+        .then((res) => (res.ok ? res.json() : []))
+        .then((rows: { votableId: string; value: 1 | -1 }[]) => {
+          setCommentVotes(Object.fromEntries(rows.map((r) => [r.votableId, r.value])));
+        })
+        .catch(() => {});
+    }
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post?.id, commentIdsKey, isLoggedIn]);
+
   const handlePostVote = async (value: 1 | -1) => {
     if (!isLoggedIn) {
       toast.warning('Please log in to vote.');
@@ -246,8 +279,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Upvote"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === 1
-                      ? 'text-brand font-bold'
-                      : 'text-foreground-lighter hover:text-brand'
+                      ? 'text-orange-500 font-bold'
+                      : 'text-foreground-lighter hover:text-orange-500'
                   }`}
                 >
                   <ArrowUpIcon width="16" height="16" />
@@ -259,8 +292,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Downvote"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === -1
-                      ? 'text-destructive font-bold'
-                      : 'text-foreground-lighter hover:text-destructive'
+                      ? 'text-blue-500 font-bold'
+                      : 'text-foreground-lighter hover:text-blue-500'
                   }`}
                 >
                   <ArrowDownIcon width="16" height="16" />
@@ -299,8 +332,8 @@ export default function PostPageClient({ id }: Props) {
                           aria-label="Upvote comment"
                           className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                             userVote === 1
-                              ? 'text-brand font-bold'
-                              : 'text-foreground-lighter hover:text-brand'
+                              ? 'text-orange-500 font-bold'
+                              : 'text-foreground-lighter hover:text-orange-500'
                           }`}
                         >
                           <ArrowUpIcon width="12" height="12" />
@@ -314,8 +347,8 @@ export default function PostPageClient({ id }: Props) {
                           aria-label="Downvote comment"
                           className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                             userVote === -1
-                              ? 'text-destructive font-bold'
-                              : 'text-foreground-lighter hover:text-destructive'
+                              ? 'text-blue-500 font-bold'
+                              : 'text-foreground-lighter hover:text-blue-500'
                           }`}
                         >
                           <ArrowDownIcon width="12" height="12" />
