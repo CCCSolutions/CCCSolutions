@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 declare global {
   interface Window {
@@ -38,6 +38,8 @@ function loadTurnstileScript(): Promise<void> {
   return scriptLoadPromise;
 }
 
+export type TurnstileHandle = { reset: () => void };
+
 type Props = {
   onVerify: (token: string) => void;
   onExpire?: () => void;
@@ -46,11 +48,25 @@ type Props = {
 
 // Cloudflare Turnstile widget. Renders nothing (and reports no token) if the
 // site key isn't configured, so auth still works locally without it wired up.
-export function TurnstileWidget({ onVerify, onExpire, theme = 'auto' }: Props) {
+// Exposes reset() via ref: a Turnstile token is single-use, so after a failed
+// submit the form must reset the widget for a fresh token — reusing the spent one
+// makes the next attempt fail with "timeout-or-duplicate".
+export const TurnstileWidget = forwardRef<TurnstileHandle, Props>(function TurnstileWidget(
+  { onVerify, onExpire, theme = 'auto' },
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
+    },
+  }));
 
   useEffect(() => {
     if (!siteKey || !containerRef.current) return;
@@ -83,4 +99,4 @@ export function TurnstileWidget({ onVerify, onExpire, theme = 'auto' }: Props) {
   if (!siteKey) return null;
 
   return <div ref={containerRef} className="flex justify-center" />;
-}
+});

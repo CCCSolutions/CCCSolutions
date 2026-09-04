@@ -58,30 +58,41 @@ export default function ForumPage() {
   const session = state === 'in';
   const { push } = useRouter();
 
-  const fetchPosts = useCallback(async () => {
-    try {
+  const fetchPosts = useCallback(
+    async (signal?: AbortSignal) => {
       setLoading(true);
       setError(false);
-      const offset = (page - 1) * perPage;
-      const res = await apiFetch(`/forum/posts?sort=${sortBy}&limit=${perPage}&offset=${offset}`);
-      if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
-      const data = await res.json();
-      // Tolerate an unexpected/old shape: Workers Cache can serve a pre-deploy array
-      // response for up to its TTL, and a malformed body must never crash the page.
-      const list: PostRow[] = Array.isArray(data) ? data : (data?.posts ?? []);
-      setPosts(list);
-      setTotal(Array.isArray(data) ? list.length : (data?.total ?? list.length));
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-      setError(true);
-      toast.error('Could not load posts.');
-    } finally {
-      setLoading(false);
-    }
-  }, [sortBy, page, perPage]);
+      try {
+        const offset = (page - 1) * perPage;
+        const res = await apiFetch(
+          `/forum/posts?sort=${sortBy}&limit=${perPage}&offset=${offset}`,
+          { signal }
+        );
+        if (!res.ok) throw new Error(`Failed to load posts (${res.status})`);
+        const data = await res.json();
+        // Tolerate an unexpected/old shape: Workers Cache can serve a pre-deploy array
+        // response for up to its TTL, and a malformed body must never crash the page.
+        const list: PostRow[] = Array.isArray(data) ? data : (data?.posts ?? []);
+        setPosts(list);
+        setTotal(Array.isArray(data) ? list.length : (data?.total ?? list.length));
+        setLoading(false);
+      } catch (err) {
+        // A superseded fetch (deps changed / unmount) aborts on purpose — the new
+        // fetch owns the loading + error state, so don't touch it here.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        console.error('Error fetching posts:', err);
+        setError(true);
+        setLoading(false);
+        toast.error('Could not load posts.');
+      }
+    },
+    [sortBy, page, perPage]
+  );
 
   useEffect(() => {
-    fetchPosts();
+    const controller = new AbortController();
+    fetchPosts(controller.signal);
+    return () => controller.abort();
   }, [fetchPosts]);
 
   const totalPages = Math.max(1, Math.ceil(total / perPage));

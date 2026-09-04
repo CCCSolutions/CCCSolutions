@@ -8,7 +8,8 @@ import { supabase, apiFetch } from '../../lib/supabase';
 import { FlickeringGrid } from '../effects/FlickeringGrid';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { TurnstileWidget } from './TurnstileWidget';
+import { TurnstileWidget, type TurnstileHandle } from './TurnstileWidget';
+import { useAuth } from './SupabaseAuthProvider';
 
 const inputClass =
   'w-full h-10 px-3 rounded-md border border-border-strong bg-surface-100 text-sm text-foreground placeholder:text-foreground-lighter focus:outline-none focus:border-brand-highlight';
@@ -53,10 +54,26 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [checkEmail, setCheckEmail] = useState(false);
   const [code, setCode] = useState('');
   const submittingRef = useRef(false);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   const captchaRequired = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
+  // A Turnstile token is single-use; after a completed submit, reset the widget so the
+  // next attempt gets a fresh token instead of the spent one (which Supabase rejects as
+  // "timeout-or-duplicate"). Clearing the token also re-gates the submit button until
+  // the fresh one arrives.
+  const resetCaptcha = () => {
+    turnstileRef.current?.reset();
+    setCaptchaToken(null);
+  };
+
   const { push } = useRouter();
+  const { state } = useAuth();
+
+  // Already signed in? The login/signup pages shouldn't be usable — bounce to the forum.
+  useEffect(() => {
+    if (state === 'in') push('/forum');
+  }, [state, push]);
 
   // Surface OAuth-callback failures (which redirect here as ?error=...) as a toast.
   useEffect(() => {
@@ -104,10 +121,22 @@ export default function AuthForm({ mode }: { mode: Mode }) {
           },
         });
         if (error) throw error;
+
+        // Anti-enumeration: for an already-registered email Supabase returns a
+        // session-less user with an EMPTY identities array (and sends no email).
+        // Without this check we'd wrongly show the "check your email" screen for an
+        // account that already exists.
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          errorToast('An account with this email already exists — try logging in instead.');
+          resetCaptcha();
+          setSubmitting(false);
+          submittingRef.current = false;
+          return;
+        }
+
         toast.dismiss('auth-error');
         // With email confirmation on, signUp returns no session until the email is
-        // verified (via the link or the code below). A session-less user is also
-        // returned for an already-registered email, avoiding account enumeration.
+        // verified (via the link or the code below).
         if (!data.session) {
           setCheckEmail(true);
           setSubmitting(false);
@@ -119,6 +148,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       }
     } catch (err) {
       errorToast(err instanceof Error ? err.message : 'Something went wrong.');
+      resetCaptcha();
       submittingRef.current = false;
       setSubmitting(false);
     }
@@ -151,6 +181,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     });
     if (error) errorToast(error.message);
   };
+
+  // Don't flash the form to an already-signed-in user while the redirect above runs.
+  if (state === 'in') return null;
 
   return (
     <div className="relative min-h-[calc(100svh-var(--nav-h))] flex flex-col justify-center items-center px-4 bg-background overflow-hidden">
@@ -301,6 +334,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
                   </div>
 
                   <TurnstileWidget
+                    ref={turnstileRef}
                     onVerify={setCaptchaToken}
                     onExpire={() => setCaptchaToken(null)}
                   />

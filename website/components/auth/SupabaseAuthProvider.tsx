@@ -49,32 +49,30 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     let active = true;
+    let currentUserId: string | null = null;
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!active) return;
-      setSession(data.session);
-      if (data.session) {
-        const p = await fetchProfile();
-        if (!active) return;
-        setProfile(p);
-        setState('in');
-      } else {
-        setState('out');
-      }
-    });
-
+    // onAuthStateChange emits INITIAL_SESSION on subscribe, so it covers the initial
+    // load too — a separate getSession() fetch would just fire /user/me a second time.
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, s) => {
       if (!active) return;
       setSession(s);
-      if (s) {
-        const p = await fetchProfile();
-        if (!active) return;
-        setProfile(p);
-        setState('in');
-      } else {
+
+      if (!s) {
+        currentUserId = null;
         setProfile(null);
         setState('out');
+        return;
       }
+
+      // The listener also fires on token refresh; only refetch the profile when the
+      // signed-in user actually changes, so /user/me runs once per login, not per event.
+      if (s.user.id === currentUserId) return;
+      currentUserId = s.user.id;
+
+      const p = await fetchProfile();
+      if (!active) return;
+      setProfile(p);
+      setState('in');
     });
 
     return () => {

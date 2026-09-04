@@ -205,7 +205,7 @@ describe('GET /contests/:year/:code/list', () => {
 });
 
 describe('Workers Cache headers', () => {
-  const CACHE_CONTROL = 'public, max-age=604800, stale-while-revalidate=2592000';
+  const CACHE_CONTROL = 'public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000';
 
   it('/list is cacheable and tagged by contest', async () => {
     const bucket = bucketListing([['contests/2024/s1/tests/1.in', 100]]);
