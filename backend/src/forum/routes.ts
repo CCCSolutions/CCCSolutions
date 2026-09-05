@@ -1,5 +1,5 @@
 import { Hono, type Context } from 'hono';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql, inArray } from 'drizzle-orm';
 import type { Bindings } from '../types';
 import { getDb, withUser } from '../db';
 import { posts, comments, profiles, votes } from '../db/schema';
@@ -7,6 +7,7 @@ import { requireAuth, type AuthVars } from '../middleware/auth';
 import { createPostSchema, createCommentSchema, voteSchema, unvoteSchema, pinSchema } from './validation';
 import { resolvePageSize, resolveOffset } from './pagination';
 import { notify } from '../notify';
+import { purgeCacheTags } from '../cache';
 
 const forum = new Hono<{ Bindings: Bindings; Variables: AuthVars }>();
 
@@ -30,9 +31,7 @@ const commentScore = sql<number>`coalesce((select sum(${votes.value})::int from 
 const FORUM_CACHE = 'public, max-age=0, s-maxage=30';
 
 function purgeForum(c: Context<{ Bindings: Bindings; Variables: AuthVars }>): void {
-  const ctx = c.executionCtx as unknown as ExecutionContext;
-  if (!ctx.cache) return;
-  ctx.waitUntil(ctx.cache.purge({ tags: ['forum-posts'] }));
+  purgeCacheTags(c, ['forum-posts'], 'forum');
 }
 
 forum.get('/posts', async (c) => {
@@ -186,6 +185,29 @@ forum.delete('/vote', requireAuth, async (c) => {
   );
   purgeForum(c);
   return c.json({ ok: true });
+});
+
+forum.get('/votes/mine', requireAuth, async (c) => {
+  c.header('Cache-Control', 'no-store');
+  const voteType = c.req.query('type');
+  if (!voteType || (voteType != 'post' && voteType != 'comment')) {
+    return c.json({ error: 'invalid or missing vote type' }, 400);
+  }
+  // we filter here to remove degenerate IDs like "" when request is ,,
+  const ids =
+    c.req
+      .query('ids')
+      ?.split(',')
+      .filter((id) => id) ?? [];
+  const db = getDb(c.env);
+  const data = await db
+    .select({ votableId: votes.votableId, value: votes.value })
+    .from(votes)
+    .where(
+      and(eq(votes.profileId, c.get('profile').id), eq(votes.votableType, voteType), inArray(votes.votableId, ids)),
+    );
+
+  return c.json(data, 200);
 });
 
 export default forum;

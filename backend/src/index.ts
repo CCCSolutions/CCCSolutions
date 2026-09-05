@@ -16,8 +16,11 @@ const ALLOWED_ORIGINS = ['http://localhost:3000', 'https://cccsolutions.ca', 'ht
 const ALLOWED_HOST_SUFFIXES = ['.pages.dev', '.workers.dev', '.netlify.app'];
 
 function isAllowedOrigin(origin: string): boolean {
+  // return early if its guaranteed in a list of allowed origins
   if (ALLOWED_ORIGINS.includes(origin)) return true;
   try {
+    // we do this to check if there's a prefix attached to certain links
+    // so we dont get cors errors on deployment previews etc.
     return ALLOWED_HOST_SUFFIXES.some((suffix) => new URL(origin).hostname.endsWith(suffix));
   } catch {
     return false;

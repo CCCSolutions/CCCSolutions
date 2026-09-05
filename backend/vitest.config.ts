@@ -10,10 +10,14 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      // Exclude declarative / infra code with no meaningful unit-test surface —
-      // schema + policy definitions, generated migrations, the thin DB-client
-      // factory, the cron keep-alive, and type-only files. Route/business logic
-      // (r2, admin, forum) stays measured against the thresholds below.
+      // Two groups are excluded. (1) Declarative / infra code with no meaningful
+      // unit-test surface: schema + policy definitions, generated migrations, the thin
+      // DB-client factory, the cron keep-alive, and type-only files. (2) Auth + DB-gated
+      // logic (forum, user, middleware): it only runs behind a real JWT and a live
+      // Supabase, so it is exercised only by the integration suite, which does not run
+      // under this script (see the test exclude above; CI has no DB). Measuring it here
+      // would show ~0% and blow the thresholds. What stays measured is the route logic
+      // that is unit-testable without a DB: r2 (fake bucket) and admin (shared token).
       exclude: [
         'src/db/**',
         'src/forum/**',
