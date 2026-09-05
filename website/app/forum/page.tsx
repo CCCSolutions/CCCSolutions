@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { AdminBadge } from './AdminBadge';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
@@ -23,7 +24,7 @@ type PostRow = {
   content: string;
   score: number;
   createdAt: string;
-  author: { username: string | null };
+  author: { username: string | null; role: string | null };
 };
 
 // Tracks the current user's vote on each post so the arrows reflect their state.
@@ -327,7 +328,8 @@ export default function ForumPage() {
                         className="text-foreground-light max-h-24 overflow-hidden"
                       />
                       <div className="mt-2 text-xs text-foreground-lighter">
-                        By {post.author?.username ?? 'Unknown'} ·{' '}
+                        By {post.author?.username ?? 'Unknown'}
+                        {post.author?.role === 'admin' && <AdminBadge />} ·{' '}
                         {new Date(post.createdAt).toLocaleDateString()}
                       </div>
                     </div>
