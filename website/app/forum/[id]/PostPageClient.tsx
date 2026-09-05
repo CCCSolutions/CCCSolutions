@@ -8,6 +8,7 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
 import { apiFetch } from '../../../lib/supabase';
+import { getMyVotes } from '../../../lib/votes';
 import { useAuth } from '../../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
@@ -72,6 +73,30 @@ export default function PostPageClient({ id }: Props) {
   useEffect(() => {
     fetchPost();
   }, [id, fetchPost]);
+
+  // Seed this user's own vote on the post + its comments from the server (per-user data,
+  // can't ride the cached post response). Keyed on the post id + comment-id string so it
+  // seeds on load, not on every optimistic score mutation. Cleared when logged out.
+  const commentIdsKey = comments.map((comment) => comment.id).join(',');
+  useEffect(() => {
+    if (!isLoggedIn || !post) {
+      setPostVote(0);
+      setCommentVotes({});
+      return;
+    }
+    const postId = post.id;
+    const controller = new AbortController();
+    void Promise.all([
+      getMyVotes('post', [postId], controller.signal),
+      getMyVotes('comment', commentIdsKey.split(',').filter(Boolean), controller.signal),
+    ]).then(([postVotes, commentVoteMap]) => {
+      if (controller.signal.aborted) return;
+      setPostVote(postVotes[postId] ?? 0);
+      setCommentVotes(commentVoteMap);
+    });
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post?.id, commentIdsKey, isLoggedIn]);
 
   const handlePostVote = async (value: 1 | -1) => {
     if (!isLoggedIn) {
@@ -246,8 +271,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Upvote"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === 1
-                      ? 'text-brand font-bold'
-                      : 'text-foreground-lighter hover:text-brand'
+                      ? 'text-orange-500 font-bold'
+                      : 'text-foreground-lighter hover:text-orange-500'
                   }`}
                 >
                   <ArrowUpIcon width="16" height="16" />
@@ -259,8 +284,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Downvote"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === -1
-                      ? 'text-destructive font-bold'
-                      : 'text-foreground-lighter hover:text-destructive'
+                      ? 'text-brand font-bold'
+                      : 'text-foreground-lighter hover:text-brand'
                   }`}
                 >
                   <ArrowDownIcon width="16" height="16" />
@@ -299,8 +324,8 @@ export default function PostPageClient({ id }: Props) {
                           aria-label="Upvote comment"
                           className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                             userVote === 1
-                              ? 'text-brand font-bold'
-                              : 'text-foreground-lighter hover:text-brand'
+                              ? 'text-orange-500 font-bold'
+                              : 'text-foreground-lighter hover:text-orange-500'
                           }`}
                         >
                           <ArrowUpIcon width="12" height="12" />
@@ -314,8 +339,8 @@ export default function PostPageClient({ id }: Props) {
                           aria-label="Downvote comment"
                           className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                             userVote === -1
-                              ? 'text-destructive font-bold'
-                              : 'text-foreground-lighter hover:text-destructive'
+                              ? 'text-brand font-bold'
+                              : 'text-foreground-lighter hover:text-brand'
                           }`}
                         >
                           <ArrowDownIcon width="12" height="12" />
