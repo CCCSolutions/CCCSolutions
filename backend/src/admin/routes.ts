@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Bindings } from '../types';
 import { problemParamsSchema, fileSchema } from '../r2/validation';
+import { purgeCacheTags } from '../cache';
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -30,10 +31,7 @@ admin.use('*', async (c, next) => {
 // cached /list + /preview go stale. Workers Cache tag-purge (GA 2026-07-06),
 // fire-and-forget via waitUntil.
 function purgeContest(c: Context<{ Bindings: Bindings }>, year: string, code: string): void {
-  // Cast to the Cloudflare runtime shape; Hono's ExecutionContext type lacks .cache.
-  const ctx = c.executionCtx as unknown as ExecutionContext;
-  if (!ctx.cache) return;
-  ctx.waitUntil(ctx.cache.purge({ tags: [`contest:${year}:${code}`] }));
+  purgeCacheTags(c, [`contest:${year}:${code}`], `contest ${year}/${code}`);
 }
 
 admin.post('/contests/:year/:code/upload', async (c) => {

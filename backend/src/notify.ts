@@ -3,7 +3,7 @@
 import type { Context } from 'hono';
 import type { Bindings } from './types';
 
-const COLORS = { post: 0x5865f2, comment: 0x57f287, digest: 0x9b59b6 } as const;
+const COLORS = { post: 0x5865f2, comment: 0x57f287, digest: 0x9b59b6, alert: 0xed4245 } as const;
 
 export type NotifyEvent = {
   kind: keyof typeof COLORS;
