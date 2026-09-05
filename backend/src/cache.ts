@@ -19,8 +19,8 @@ async function reportPurgeFailure(env: Bindings, scope: string, tags: string[], 
 // so Cloudflare keeps the invocation alive for the Discord alert too.
 export function purgeCacheTags<E extends { Bindings: Bindings }>(c: Context<E>, tags: string[], scope: string): void {
   // Hono's ExecutionContext type has not added Workers Cache's .cache yet.
-  const ctx = c.executionCtx as CacheExecutionContext;
-  const cache = ctx.cache;
+  const executionCtx = c.executionCtx as CacheExecutionContext;
+  const cache = executionCtx.cache;
   if (!cache) return;
 
   const purgeAndReport = (async () => {
@@ -38,5 +38,5 @@ export function purgeCacheTags<E extends { Bindings: Bindings }>(c: Context<E>, 
     }
   })();
 
-  ctx.waitUntil(purgeAndReport);
+  executionCtx.waitUntil(purgeAndReport);
 }
