@@ -8,6 +8,7 @@ import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
 import { apiFetch } from '../../../lib/supabase';
+import { getMyVotes } from '../../../lib/votes';
 import { useAuth } from '../../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
@@ -85,23 +86,14 @@ export default function PostPageClient({ id }: Props) {
     }
     const postId = post.id;
     const controller = new AbortController();
-    apiFetch(`/forum/votes/mine?type=post&ids=${postId}`, { signal: controller.signal })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((rows: { votableId: string; value: 1 | -1 }[]) => {
-        const mine = rows.find((r) => r.votableId === postId);
-        setPostVote(mine ? mine.value : 0);
-      })
-      .catch(() => {});
-    if (commentIdsKey !== '') {
-      apiFetch(`/forum/votes/mine?type=comment&ids=${commentIdsKey}`, {
-        signal: controller.signal,
-      })
-        .then((res) => (res.ok ? res.json() : []))
-        .then((rows: { votableId: string; value: 1 | -1 }[]) => {
-          setCommentVotes(Object.fromEntries(rows.map((r) => [r.votableId, r.value])));
-        })
-        .catch(() => {});
-    }
+    void Promise.all([
+      getMyVotes('post', [postId], controller.signal),
+      getMyVotes('comment', commentIdsKey.split(',').filter(Boolean), controller.signal),
+    ]).then(([postVotes, commentVoteMap]) => {
+      if (controller.signal.aborted) return;
+      setPostVote(postVotes[postId] ?? 0);
+      setCommentVotes(commentVoteMap);
+    });
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post?.id, commentIdsKey, isLoggedIn]);

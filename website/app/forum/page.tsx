@@ -10,6 +10,7 @@ import { Card } from '../../components/ui/card';
 import { SectionContainer } from '../../components/ui/section-container';
 import { FlickeringGrid } from '../../components/effects/FlickeringGrid';
 import { apiFetch } from '../../lib/supabase';
+import { getMyVotes } from '../../lib/votes';
 import { useAuth } from '../../components/auth/SupabaseAuthProvider';
 import dynamic from 'next/dynamic';
 
@@ -108,14 +109,9 @@ export default function ForumPage() {
       return;
     }
     const controller = new AbortController();
-    apiFetch(`/forum/votes/mine?type=post&ids=${postIdsKey}`, { signal: controller.signal })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((rows: { votableId: string; value: 1 | -1 }[]) => {
-        setVoteMap(Object.fromEntries(rows.map((r) => [r.votableId, r.value])));
-      })
-      .catch(() => {
-        /* superseded/aborted or offline: leave arrows unseeded, non-critical */
-      });
+    void getMyVotes('post', postIdsKey.split(','), controller.signal).then((votes) => {
+      if (!controller.signal.aborted) setVoteMap(votes);
+    });
     return () => controller.abort();
   }, [postIdsKey, session]);
 
