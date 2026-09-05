@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import { ArrowUpIcon, ArrowDownIcon, DrawingPinFilledIcon } from '@radix-ui/react-icons';
 import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
@@ -23,6 +23,7 @@ type PostRow = {
   content: string;
   score: number;
   createdAt: string;
+  isPinned: boolean;
   author: { username: string | null };
 };
 
@@ -313,6 +314,11 @@ export default function ForumPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
+                      {post.isPinned && (
+                        <span className="mb-1 inline-flex items-center gap-1 text-xs font-semibold text-brand">
+                          <DrawingPinFilledIcon width="11" height="11" /> Pinned
+                        </span>
+                      )}
                       <h2 className="text-lg font-semibold text-foreground hover:text-brand transition-colors mb-1">
                         <Link href={`/forum/${post.id}`}>{post.title}</Link>
                       </h2>

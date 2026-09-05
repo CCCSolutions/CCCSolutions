@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeftIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import {
+  ArrowLeftIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  DrawingPinFilledIcon,
+} from '@radix-ui/react-icons';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -21,6 +26,7 @@ type PostDetail = {
   content: string;
   score: number;
   createdAt: string;
+  isPinned: boolean;
   author: { username: string | null };
 };
 
@@ -244,6 +250,11 @@ export default function PostPageClient({ id }: Props) {
 
         <Card className="mb-8">
           <CardContent className="py-8 px-6 border-none">
+            {post.isPinned && (
+              <span className="mb-2 inline-flex items-center gap-1 text-xs font-semibold text-brand">
+                <DrawingPinFilledIcon width="12" height="12" /> Pinned
+              </span>
+            )}
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
               {post.title}
             </h1>
