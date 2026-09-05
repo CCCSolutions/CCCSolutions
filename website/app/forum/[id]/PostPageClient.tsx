@@ -284,8 +284,8 @@ export default function PostPageClient({ id }: Props) {
                   aria-label="Downvote"
                   className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     postVote === -1
-                      ? 'text-blue-500 font-bold'
-                      : 'text-foreground-lighter hover:text-blue-500'
+                      ? 'text-brand font-bold'
+                      : 'text-foreground-lighter hover:text-brand'
                   }`}
                 >
                   <ArrowDownIcon width="16" height="16" />
@@ -339,8 +339,8 @@ export default function PostPageClient({ id }: Props) {
                           aria-label="Downvote comment"
                           className={`transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                             userVote === -1
-                              ? 'text-blue-500 font-bold'
-                              : 'text-foreground-lighter hover:text-blue-500'
+                              ? 'text-brand font-bold'
+                              : 'text-foreground-lighter hover:text-brand'
                           }`}
                         >
                           <ArrowDownIcon width="12" height="12" />
