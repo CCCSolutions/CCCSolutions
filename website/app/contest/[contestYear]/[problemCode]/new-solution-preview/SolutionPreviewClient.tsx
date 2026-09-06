@@ -16,6 +16,7 @@ import {
   ExitFullScreenIcon,
   FileTextIcon,
   InfoCircledIcon,
+  PlusIcon,
   ReaderIcon,
   ResetIcon,
 } from '@radix-ui/react-icons';
@@ -234,6 +235,7 @@ function WorkspaceView({
   const [testState, setTestState] = useState<LoadState>('idle');
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(true);
+  const [commentComposerRequest, setCommentComposerRequest] = useState(0);
   const [minimized, setMinimized] = useState<MinimizedState>(DEFAULT_MINIMIZED);
   const [fullscreen, setFullscreen] = useState<PanelName | null>(null);
   const [leftSize, setLeftSize] = useState(DEFAULT_LEFT_SIZE);
@@ -471,6 +473,11 @@ function WorkspaceView({
     window.addEventListener('pointerup', stop);
   };
 
+  const startComment = () => {
+    setCommentsVisible(true);
+    setCommentComposerRequest((current) => current + 1);
+  };
+
   const editorialPanel = (
     <EditorialPanel
       problemInfo={problemInfo}
@@ -498,6 +505,8 @@ function WorkspaceView({
       problemCode={problemCode}
       commentsVisible={commentsVisible}
       onToggleComments={() => setCommentsVisible((current) => !current)}
+      onStartComment={startComment}
+      composerRequest={commentComposerRequest}
       commentSize={commentSize}
       onCommentSizeChange={setCommentSize}
       minimized={fullscreen === 'solution' ? false : minimized.solution}
@@ -652,6 +661,8 @@ function WorkspaceView({
               problemCode={problemCode}
               commentsVisible={commentsVisible}
               onToggleComments={() => setCommentsVisible((current) => !current)}
+              onStartComment={startComment}
+              composerRequest={commentComposerRequest}
               commentSize={commentSize}
               onCommentSizeChange={setCommentSize}
               minimized={false}
@@ -917,6 +928,8 @@ function SolutionPanel({
   problemCode,
   commentsVisible,
   onToggleComments,
+  onStartComment,
+  composerRequest,
   commentSize,
   onCommentSizeChange,
   minimized,
@@ -935,6 +948,8 @@ function SolutionPanel({
   problemCode: string;
   commentsVisible: boolean;
   onToggleComments: () => void;
+  onStartComment: () => void;
+  composerRequest: number;
   commentSize: number;
   onCommentSizeChange: (size: number) => void;
   minimized: boolean;
@@ -977,6 +992,16 @@ function SolutionPanel({
         >
           Comments
         </Button>
+        <button
+          type="button"
+          onClick={onStartComment}
+          disabled={!solution}
+          className="rounded border border-border-strong bg-surface-100 p-1.5 text-foreground-light transition-colors hover:bg-surface-300 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="Add comment"
+          title="Add comment"
+        >
+          <PlusIcon width="13" height="13" />
+        </button>
         {solution && (
           <a
             href={contestDownloadUrl(
@@ -1009,6 +1034,7 @@ function SolutionPanel({
               code={solution.code}
               language={solution.language}
               commentsVisible={commentsVisible}
+              composerRequest={composerRequest}
               onCloseComments={onToggleComments}
               railWidth={commentSize}
               onRailWidthChange={onCommentSizeChange}

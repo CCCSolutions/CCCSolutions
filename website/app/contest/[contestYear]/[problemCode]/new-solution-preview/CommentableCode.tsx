@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
-import { ChevronRightIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+import { ChevronRightIcon, Cross2Icon } from '@radix-ui/react-icons';
+import ReactMarkdown from 'react-markdown';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '../../../../../components/ui/button';
 
@@ -15,12 +16,12 @@ const SyntaxHighlighter = dynamic(
   }
 );
 
-type LineRange = {
+type TextRange = {
   start: number;
   end: number;
 };
 
-type MockComment = LineRange & {
+type MockComment = TextRange & {
   id: number;
   author: string;
   body: string;
@@ -28,45 +29,155 @@ type MockComment = LineRange & {
   replies: string[];
 };
 
-const INITIAL_COMMENTS: MockComment[] = [
-  {
-    id: 1,
-    start: 6,
-    end: 6,
-    author: 'mnop',
-    body: 'Could we mention why this comparison is sufficient? It took me a second to connect it to the problem statement.',
-    when: '8 min ago',
-    replies: [],
-  },
-  {
-    id: 2,
-    start: 7,
-    end: 7,
-    author: 'william',
-    body: 'It may help to name this value as the number of tickets left after both deductions.',
-    when: '3 min ago',
-    replies: [],
-  },
-];
-
-function lineFromNode(node: Node | null): number | null {
-  const element = node instanceof Element ? node : node?.parentElement;
-  const line = element?.closest('[data-code-line]')?.getAttribute('data-code-line');
-  if (!line) return null;
-  const parsed = Number(line);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function lineLabel(range: LineRange): string {
-  return range.start === range.end ? `Line ${range.start}` : `Lines ${range.start}–${range.end}`;
-}
-
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+function lineStarts(code: string): number[] {
+  const starts = [0];
+  for (let index = 0; index < code.length; index += 1) {
+    if (code[index] === '\n') starts.push(index + 1);
+  }
+  return starts;
+}
+
+function lineForOffset(starts: number[], offset: number): number {
+  let line = 0;
+  while (line + 1 < starts.length && starts[line + 1] <= offset) line += 1;
+  return line;
+}
+
+function rangeLabel(code: string, range: TextRange): string {
+  const starts = lineStarts(code);
+  const first = lineForOffset(starts, range.start) + 1;
+  const last = lineForOffset(starts, Math.max(range.start, range.end - 1)) + 1;
+  return first === last ? `Line ${first}` : `Lines ${first}–${last}`;
+}
+
+function fallbackRange(code: string, preferredLine: number): TextRange {
+  const lines = code.split('\n');
+  const lineIndex = clamp(preferredLine - 1, 0, Math.max(0, lines.length - 1));
+  const starts = lineStarts(code);
+  const line = lines[lineIndex] ?? '';
+  const firstCharacter = line.search(/\S/);
+  const start = starts[lineIndex] + Math.max(0, firstCharacter);
+  const available = Math.max(1, line.trimStart().length);
+  return { start, end: Math.min(code.length, start + Math.min(available, 12)) };
+}
+
+function findRange(code: string, patterns: RegExp[], fallbackLine: number): TextRange {
+  for (const pattern of patterns) {
+    const match = pattern.exec(code);
+    if (match?.index !== undefined) {
+      return { start: match.index, end: match.index + match[0].length };
+    }
+  }
+  return fallbackRange(code, fallbackLine);
+}
+
+function findLastRange(code: string, patterns: RegExp[], fallbackLine: number): TextRange {
+  for (const pattern of patterns) {
+    const matches = Array.from(code.matchAll(new RegExp(pattern.source, `${pattern.flags}g`)));
+    const match = matches.at(-1);
+    if (match?.index !== undefined) {
+      return { start: match.index, end: match.index + match[0].length };
+    }
+  }
+  return fallbackRange(code, fallbackLine);
+}
+
+function initialComments(code: string): MockComment[] {
+  return [
+    {
+      id: 1,
+      ...findRange(code, [/t\s*-\s*p\s*<\s*b/i, /\(?T\s*-\s*P\s*-\s*B\)?\s*>=\s*0/i], 6),
+      author: 'mnop',
+      body: 'Could we mention why **this comparison** is sufficient? It took me a second to connect it to the problem statement.',
+      when: '8 min ago',
+      replies: [],
+    },
+    {
+      id: 2,
+      ...findLastRange(code, [/t\s*-\s*p\s*-\s*b/i, /T\s*-\s*P\s*-\s*B/i], 7),
+      author: 'william',
+      body: 'It may help to name this value as the number of tickets left after both deductions.',
+      when: '3 min ago',
+      replies: [],
+    },
+  ];
+}
+
+function codeTextNodes(line: Element): Text[] {
+  const nodes: Text[] = [];
+  const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node) {
+    const text = node as Text;
+    if (!text.parentElement?.closest('.react-syntax-highlighter-line-number')) nodes.push(text);
+    node = walker.nextNode();
+  }
+  return nodes;
+}
+
+function sourceOffsetFromDom(code: string, node: Node, offset: number): number | null {
+  const element = node instanceof Element ? node : node.parentElement;
+  const line = element?.closest('[data-code-line]');
+  const lineNumber = Number(line?.getAttribute('data-code-line'));
+  if (!line || !Number.isFinite(lineNumber)) return null;
+
+  const starts = lineStarts(code);
+  const sourceLine = code.split('\n')[lineNumber - 1] ?? '';
+  const prefix = document.createRange();
+  prefix.selectNodeContents(line);
+  try {
+    prefix.setEnd(node, offset);
+  } catch {
+    return starts[lineNumber - 1] ?? null;
+  }
+  const numberLength = line.querySelector('.react-syntax-highlighter-line-number')?.textContent
+    ?.length;
+  const character = clamp(prefix.toString().length - (numberLength ?? 0), 0, sourceLine.length);
+  return (starts[lineNumber - 1] ?? 0) + character;
+}
+
+function domPointForOffset(root: HTMLElement, code: string, offset: number) {
+  const starts = lineStarts(code);
+  const safeOffset = clamp(offset, 0, code.length);
+  const lineIndex = lineForOffset(starts, safeOffset);
+  const line = root.querySelector(`[data-code-line="${lineIndex + 1}"]`);
+  if (!line) return null;
+
+  let remaining = safeOffset - starts[lineIndex];
+  const nodes = codeTextNodes(line);
+  for (const node of nodes) {
+    if (remaining <= node.data.length) return { node, offset: remaining };
+    remaining -= node.data.length;
+  }
+  const last = nodes.at(-1);
+  return last ? { node: last, offset: last.data.length } : null;
+}
+
+function domRangeForText(root: HTMLElement, code: string, range: TextRange): Range | null {
+  const start = domPointForOffset(root, code, range.start);
+  const end = domPointForOffset(root, code, range.end);
+  if (!start || !end) return null;
+  const domRange = document.createRange();
+  domRange.setStart(start.node, start.offset);
+  domRange.setEnd(end.node, end.offset);
+  return domRange;
+}
+
+function CommentMarkdown({ children }: { children: string }) {
+  return (
+    <div className="text-xs leading-relaxed text-foreground-light [&_a]:text-brand [&_a:hover]:underline [&_code]:rounded [&_code]:bg-surface-200 [&_code]:px-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:m-0 [&_pre]:overflow-x-auto [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-4">
+      <ReactMarkdown>{children}</ReactMarkdown>
+    </div>
+  );
+}
 
 export function CommentableCode({
   code,
   language,
   commentsVisible,
+  composerRequest,
   onCloseComments,
   railWidth,
   onRailWidthChange,
@@ -74,6 +185,7 @@ export function CommentableCode({
   code: string;
   language: string;
   commentsVisible: boolean;
+  composerRequest: number;
   onCloseComments: () => void;
   railWidth: number;
   onRailWidthChange: (width: number) => void;
@@ -81,86 +193,205 @@ export function CommentableCode({
   const { resolvedTheme } = useTheme();
   const workspaceRef = useRef<HTMLDivElement>(null);
   const codeAreaRef = useRef<HTMLDivElement>(null);
-  const [comments, setComments] = useState<MockComment[]>(INITIAL_COMMENTS);
-  const [selection, setSelection] = useState<LineRange | null>(null);
+  const handledComposerRequest = useRef(composerRequest);
+  const [comments, setComments] = useState<MockComment[]>(() => initialComments(code));
+  const [target, setTarget] = useState<TextRange>({ start: 0, end: 0 });
   const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
   const [composing, setComposing] = useState(false);
   const [draft, setDraft] = useState('');
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState('');
+  const [highlightRects, setHighlightRects] = useState<
+    Array<{
+      key: string;
+      left: number;
+      top: number;
+      width: number;
+      height: number;
+      active: boolean;
+    }>
+  >([]);
+  const [caretRect, setCaretRect] = useState<{
+    left: number;
+    top: number;
+    height: number;
+  } | null>(null);
 
-  const lineCount = useMemo(() => Math.max(1, code.split('\n').length), [code]);
   const codeStyle = resolvedTheme === 'dark' ? oneDark : oneLight;
 
   useEffect(() => {
     if (commentsVisible) return;
-    setSelection(null);
     setActiveCommentId(null);
     setComposing(false);
     setReplyingToId(null);
-    window.getSelection()?.removeAllRanges();
   }, [commentsVisible]);
 
-  const commentForLine = (line: number) =>
-    comments.find((comment) => line >= comment.start && line <= comment.end);
-
-  const lineBackground = (line: number) => {
-    if (selection && line >= selection.start && line <= selection.end) {
-      return 'hsl(var(--brand-300) / 0.72)';
-    }
-
-    const comment = commentForLine(line);
-    if (!commentsVisible || !comment) return 'transparent';
-    return comment.id === activeCommentId
-      ? 'hsl(var(--brand-300) / 0.72)'
-      : 'hsl(var(--brand-300) / 0.34)';
-  };
-
-  const handleSelection = () => {
-    if (!commentsVisible) return;
-    const browserSelection = window.getSelection();
-    if (
-      !browserSelection ||
-      browserSelection.isCollapsed ||
-      !browserSelection.anchorNode ||
-      !browserSelection.focusNode ||
-      !codeAreaRef.current?.contains(browserSelection.anchorNode) ||
-      !codeAreaRef.current.contains(browserSelection.focusNode)
-    ) {
-      return;
-    }
-
-    const anchorLine = lineFromNode(browserSelection.anchorNode);
-    const focusLine = lineFromNode(browserSelection.focusNode);
-    if (anchorLine === null || focusLine === null || !browserSelection.toString().trim()) return;
-
-    setSelection({
-      start: Math.min(anchorLine, focusLine),
-      end: Math.max(anchorLine, focusLine),
-    });
+  useEffect(() => {
+    if (composerRequest === handledComposerRequest.current) return;
+    handledComposerRequest.current = composerRequest;
     setActiveCommentId(null);
-    setComposing(false);
+    setReplyingToId(null);
+    setDraft('');
+    setComposing(true);
+  }, [composerRequest]);
+
+  useEffect(() => {
+    const root = codeAreaRef.current;
+    if (!root) return;
+    let frame = 0;
+
+    const measure = () => {
+      const rootRect = root.getBoundingClientRect();
+      const nextHighlights: typeof highlightRects = [];
+      const ranges: Array<{ key: string; range: TextRange; active: boolean }> = commentsVisible
+        ? comments.map((comment) => ({
+            key: `comment-${comment.id}`,
+            range: comment,
+            active: comment.id === activeCommentId,
+          }))
+        : [];
+
+      if (target.end > target.start && activeCommentId === null) {
+        ranges.push({ key: 'target', range: target, active: true });
+      }
+
+      ranges.forEach(({ key, range, active }) => {
+        const domRange = domRangeForText(root, code, range);
+        if (!domRange) return;
+        Array.from(domRange.getClientRects()).forEach((rect, index) => {
+          if (rect.width <= 0 || rect.height <= 0) return;
+          nextHighlights.push({
+            key: `${key}-${index}`,
+            left: rect.left - rootRect.left + root.scrollLeft,
+            top: rect.top - rootRect.top + root.scrollTop,
+            width: rect.width,
+            height: rect.height,
+            active,
+          });
+        });
+      });
+      setHighlightRects(nextHighlights);
+
+      const caretPoint = domPointForOffset(root, code, target.end);
+      if (!caretPoint) {
+        setCaretRect(null);
+        return;
+      }
+      const caretRange = document.createRange();
+      caretRange.setStart(caretPoint.node, caretPoint.offset);
+      caretRange.collapse(true);
+      let rect = caretRange.getBoundingClientRect();
+      let caretLeft = rect.left;
+
+      if (rect.height <= 0) {
+        const probeStart = target.end < code.length ? target.end : Math.max(0, target.end - 1);
+        const probeEnd = Math.min(code.length, probeStart + 1);
+        const probe = domRangeForText(root, code, { start: probeStart, end: probeEnd });
+        const probeRect = probe?.getClientRects()[0];
+        if (!probeRect) {
+          setCaretRect(null);
+          return;
+        }
+        rect = probeRect;
+        caretLeft = target.end < code.length ? rect.left : rect.right;
+      }
+
+      setCaretRect({
+        left: caretLeft - rootRect.left + root.scrollLeft,
+        top: rect.top - rootRect.top + root.scrollTop,
+        height: rect.height,
+      });
+    };
+
+    const scheduleMeasure = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(measure);
+    };
+    const resizeObserver = new ResizeObserver(scheduleMeasure);
+    const mutationObserver = new MutationObserver((mutations) => {
+      const codeChanged = mutations.some((mutation) =>
+        Array.from(mutation.addedNodes).some(
+          (node) =>
+            node instanceof Element &&
+            (node.matches('[data-code-line]') || node.querySelector('[data-code-line]'))
+        )
+      );
+      if (codeChanged) scheduleMeasure();
+    });
+    resizeObserver.observe(root);
+    mutationObserver.observe(root, { childList: true, subtree: true });
+    window.addEventListener('resize', scheduleMeasure);
+    scheduleMeasure();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener('resize', scheduleMeasure);
+    };
+  }, [activeCommentId, code, comments, commentsVisible, target]);
+
+  const handleSelection = (event: React.MouseEvent<HTMLDivElement>) => {
+    const browserSelection = window.getSelection();
+    const codeArea = codeAreaRef.current;
+    let nextTarget: TextRange | null = null;
+
+    if (browserSelection && !browserSelection.isCollapsed && codeArea) {
+      const nativeRange = browserSelection.getRangeAt(0);
+      if (
+        codeArea.contains(nativeRange.startContainer) &&
+        codeArea.contains(nativeRange.endContainer)
+      ) {
+        const start = sourceOffsetFromDom(
+          code,
+          nativeRange.startContainer,
+          nativeRange.startOffset
+        );
+        const end = sourceOffsetFromDom(code, nativeRange.endContainer, nativeRange.endOffset);
+        if (start !== null && end !== null && end > start) nextTarget = { start, end };
+      }
+    }
+
+    if (!nextTarget) {
+      const documentWithCaret = document as Document & {
+        caretPositionFromPoint?: (x: number, y: number) => CaretPosition | null;
+        caretRangeFromPoint?: (x: number, y: number) => Range | null;
+      };
+      const caretPosition = documentWithCaret.caretPositionFromPoint?.(
+        event.clientX,
+        event.clientY
+      );
+      const fallbackRange = documentWithCaret.caretRangeFromPoint?.(event.clientX, event.clientY);
+      const node = caretPosition?.offsetNode ?? fallbackRange?.startContainer;
+      const offset = caretPosition?.offset ?? fallbackRange?.startOffset;
+      if (node && offset !== undefined) {
+        const sourceOffset = sourceOffsetFromDom(code, node, offset);
+        if (sourceOffset !== null) nextTarget = { start: sourceOffset, end: sourceOffset };
+      }
+    }
+
+    if (!nextTarget) return;
+    setTarget(nextTarget);
+    const comment = comments.find(
+      (entry) => nextTarget.start >= entry.start && nextTarget.start <= entry.end
+    );
+    setActiveCommentId(commentsVisible ? (comment?.id ?? null) : null);
     setReplyingToId(null);
   };
 
   const activateComment = (id: number) => {
+    const comment = comments.find((entry) => entry.id === id);
+    if (comment) setTarget({ start: comment.start, end: comment.end });
     setActiveCommentId(id);
-    setSelection(null);
     setComposing(false);
     setReplyingToId(null);
     window.getSelection()?.removeAllRanges();
   };
 
-  const openComposer = () => {
-    setActiveCommentId(null);
-    setComposing(true);
-    setDraft('');
-  };
-
   const addComment = () => {
-    if (!selection || !draft.trim()) return;
+    if (!draft.trim()) return;
     const comment: MockComment = {
-      ...selection,
+      ...target,
       id: Date.now(),
       author: 'you',
       body: draft.trim(),
@@ -169,7 +400,6 @@ export function CommentableCode({
     };
     setComments((current) => [...current, comment]);
     setActiveCommentId(comment.id);
-    setSelection(null);
     setComposing(false);
     setDraft('');
     window.getSelection()?.removeAllRanges();
@@ -177,9 +407,7 @@ export function CommentableCode({
 
   const cancelComposer = () => {
     setComposing(false);
-    setSelection(null);
     setDraft('');
-    window.getSelection()?.removeAllRanges();
   };
 
   const addReply = (commentId: number) => {
@@ -222,8 +450,30 @@ export function CommentableCode({
       <div
         ref={codeAreaRef}
         onMouseUp={handleSelection}
-        className="relative min-w-0 flex-1 overflow-auto"
+        className="relative min-w-0 flex-1 cursor-text overflow-auto"
       >
+        <div className="pointer-events-none absolute inset-0 z-[2]" aria-hidden="true">
+          {highlightRects.map((rect) => (
+            <span
+              key={rect.key}
+              className={`absolute rounded-[2px] ${
+                rect.active ? 'bg-brand-400/50' : 'bg-brand-400/25'
+              }`}
+              style={{
+                left: rect.left,
+                top: rect.top,
+                width: rect.width,
+                height: rect.height,
+              }}
+            />
+          ))}
+          {caretRect && (
+            <span
+              className="absolute w-0.5 animate-pulse bg-brand-500"
+              style={{ left: caretRect.left, top: caretRect.top, height: caretRect.height }}
+            />
+          )}
+        </div>
         <SyntaxHighlighter
           language={language}
           style={codeStyle}
@@ -238,40 +488,21 @@ export function CommentableCode({
             fontSize: '13px',
             lineHeight: '20px',
             padding: '16px 48px 16px 16px',
+            position: 'relative',
+            zIndex: 1,
           }}
           codeTagProps={{ style: { background: 'transparent' } }}
           lineNumberStyle={{ minWidth: '2.75em', paddingRight: '1em', opacity: 0.45 }}
           lineProps={(lineNumber) => ({
             'data-code-line': lineNumber,
-            onClick: () => {
-              const browserSelection = window.getSelection();
-              if (browserSelection && !browserSelection.isCollapsed) return;
-              const comment = commentForLine(lineNumber);
-              if (commentsVisible && comment) activateComment(comment.id);
-            },
             style: {
               display: 'block',
               minWidth: 'max-content',
-              cursor: commentsVisible && commentForLine(lineNumber) ? 'pointer' : 'text',
-              background: lineBackground(lineNumber),
             },
           })}
         >
           {code || '// No solution code available'}
         </SyntaxHighlighter>
-
-        {commentsVisible && selection && !composing && (
-          <button
-            type="button"
-            onClick={openComposer}
-            className="absolute right-2 z-20 flex size-7 items-center justify-center rounded-full border border-brand-highlight bg-brand-500 text-white shadow-md hover:brightness-110"
-            style={{ top: `${16 + (Math.min(selection.start, lineCount) - 1) * 20}px` }}
-            aria-label={`Comment on ${lineLabel(selection).toLowerCase()}`}
-            title="Add comment"
-          >
-            <PlusIcon width="15" height="15" />
-          </button>
-        )}
       </div>
 
       {commentsVisible && (
@@ -314,6 +545,54 @@ export function CommentableCode({
                 <ChevronRightIcon width="14" height="14" />
               </button>
             </div>
+            {composing && (
+              <div className="shrink-0 border-b border-border-default p-2">
+                <article className="rounded-lg border border-brand-highlight bg-surface-100 p-3 shadow-sm">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-foreground">
+                      New comment · {rangeLabel(code, target)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={cancelComposer}
+                      className="rounded p-1 text-foreground-lighter hover:bg-surface-200 hover:text-foreground"
+                      aria-label="Cancel comment"
+                    >
+                      <Cross2Icon width="13" height="13" />
+                    </button>
+                  </div>
+                  {target.end > target.start && (
+                    <p className="mb-2 line-clamp-2 border-l-2 border-brand-400 pl-2 font-mono text-[10px] text-foreground-lighter">
+                      {code.slice(target.start, target.end)}
+                    </p>
+                  )}
+                  <textarea
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                    placeholder="Add a comment…"
+                    autoFocus
+                    rows={3}
+                    className="w-full resize-none rounded-md border border-border-strong bg-background px-2.5 py-2 text-xs text-foreground placeholder:text-foreground-lighter focus:border-brand-highlight focus:outline-none"
+                  />
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-foreground-lighter">Markdown supported</span>
+                    <div className="flex gap-2">
+                      <Button type="default" size="tiny" onClick={cancelComposer}>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        size="tiny"
+                        onClick={addComment}
+                        disabled={!draft.trim()}
+                      >
+                        Comment
+                      </Button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            )}
             <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-2">
               {comments.map((comment) => {
                 const active = comment.id === activeCommentId;
@@ -337,7 +616,7 @@ export function CommentableCode({
                         {comment.when}
                       </span>
                     </div>
-                    <p className="text-xs leading-relaxed text-foreground-light">{comment.body}</p>
+                    <CommentMarkdown>{comment.body}</CommentMarkdown>
 
                     {comment.replies.map((reply, index) => (
                       <div
@@ -345,9 +624,9 @@ export function CommentableCode({
                         className="mt-3 border-l-2 border-border-strong pl-2"
                       >
                         <span className="text-[11px] font-semibold text-foreground">@you</span>
-                        <p className="mt-0.5 text-xs leading-relaxed text-foreground-light">
-                          {reply}
-                        </p>
+                        <div className="mt-0.5">
+                          <CommentMarkdown>{reply}</CommentMarkdown>
+                        </div>
                       </div>
                     ))}
 
@@ -399,45 +678,6 @@ export function CommentableCode({
                   </article>
                 );
               })}
-
-              {composing && selection && (
-                <article className="rounded-lg border border-brand-highlight bg-surface-100 p-3 shadow-sm">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-foreground">
-                      New comment · {lineLabel(selection)}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={cancelComposer}
-                      className="rounded p-1 text-foreground-lighter hover:bg-surface-200 hover:text-foreground"
-                      aria-label="Cancel comment"
-                    >
-                      <Cross2Icon width="13" height="13" />
-                    </button>
-                  </div>
-                  <textarea
-                    value={draft}
-                    onChange={(event) => setDraft(event.target.value)}
-                    placeholder="Add a comment…"
-                    autoFocus
-                    rows={3}
-                    className="w-full resize-none rounded-md border border-border-strong bg-background px-2.5 py-2 text-xs text-foreground placeholder:text-foreground-lighter focus:border-brand-highlight focus:outline-none"
-                  />
-                  <div className="mt-2 flex justify-end gap-2">
-                    <Button type="default" size="tiny" onClick={cancelComposer}>
-                      Cancel
-                    </Button>
-                    <Button
-                      type="primary"
-                      size="tiny"
-                      onClick={addComment}
-                      disabled={!draft.trim()}
-                    >
-                      Comment
-                    </Button>
-                  </div>
-                </article>
-              )}
             </div>
           </aside>
         </>
