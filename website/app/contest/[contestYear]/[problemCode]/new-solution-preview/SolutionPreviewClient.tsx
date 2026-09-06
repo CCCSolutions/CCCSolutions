@@ -803,18 +803,18 @@ function EditorialPanel({
     return (
       <section
         className="flex size-full min-h-0 flex-col items-center bg-surface-200 py-2"
-        aria-label="Editorial"
+        aria-label={`${title} editorial`}
       >
         <button
           type="button"
           onClick={onMinimize}
           className="flex min-h-0 flex-1 flex-col items-center gap-2 text-foreground-light transition-colors hover:text-foreground"
-          aria-label="Restore editorial panel"
-          title="Restore editorial"
+          aria-label={`Restore ${title} editorial panel`}
+          title={`Restore ${title}`}
         >
           <ReaderIcon width="16" height="16" className="shrink-0 text-brand" />
           <span className="[writing-mode:vertical-rl] rotate-180 text-xs font-semibold tracking-wide">
-            Editorial
+            {title}
           </span>
         </button>
         <div className="mt-auto flex flex-col items-center gap-1">
