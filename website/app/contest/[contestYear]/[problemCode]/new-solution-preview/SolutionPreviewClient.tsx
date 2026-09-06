@@ -415,7 +415,10 @@ function WorkspaceView({
   const toggleMinimized = (panel: PanelName) => {
     setFullscreen(null);
     setMinimized((current) => {
-      const next = { ...current, [panel]: !current[panel] };
+      const next = {
+        ...current,
+        [panel]: fullscreen === panel ? true : !current[panel],
+      };
 
       if (next.solution && next.tests) {
         const otherPanel = panel === 'solution' ? 'tests' : 'solution';
@@ -427,7 +430,6 @@ function WorkspaceView({
   };
 
   const toggleFullscreen = (panel: PanelName) => {
-    setMinimized((current) => ({ ...current, [panel]: false }));
     setFullscreen((current) => (current === panel ? null : panel));
   };
 
@@ -477,7 +479,7 @@ function WorkspaceView({
       layoutControls={
         <LayoutControls view={view} onViewChange={onViewChange} onReset={resetLayout} />
       }
-      minimized={minimized.editorial}
+      minimized={fullscreen === 'editorial' ? false : minimized.editorial}
       fullscreen={fullscreen === 'editorial'}
       onMinimize={() => toggleMinimized('editorial')}
       onFullscreen={() => toggleFullscreen('editorial')}
@@ -498,7 +500,7 @@ function WorkspaceView({
       onToggleComments={() => setCommentsVisible((current) => !current)}
       commentSize={commentSize}
       onCommentSizeChange={setCommentSize}
-      minimized={minimized.solution}
+      minimized={fullscreen === 'solution' ? false : minimized.solution}
       fullscreen={fullscreen === 'solution'}
       onMinimize={() => toggleMinimized('solution')}
       onFullscreen={() => toggleFullscreen('solution')}
@@ -515,7 +517,7 @@ function WorkspaceView({
       testData={testData}
       testState={testState}
       onDownload={() => setDownloadOpen(true)}
-      minimized={minimized.tests}
+      minimized={fullscreen === 'tests' ? false : minimized.tests}
       fullscreen={fullscreen === 'tests'}
       onMinimize={() => toggleMinimized('tests')}
       onFullscreen={() => toggleFullscreen('tests')}
