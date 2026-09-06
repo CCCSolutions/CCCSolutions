@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { ChevronRightIcon, Cross2Icon } from '@radix-ui/react-icons';
-import ReactMarkdown from 'react-markdown';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '../../../../../components/ui/button';
 
@@ -87,19 +86,19 @@ function findLastRange(code: string, patterns: RegExp[], fallbackLine: number): 
 function initialComments(code: string): MockComment[] {
   return [
     {
-      id: 1,
-      ...findRange(code, [/t\s*-\s*p\s*<\s*b/i, /\(?T\s*-\s*P\s*-\s*B\)?\s*>=\s*0/i], 6),
-      author: 'mnop',
-      body: 'Could we mention why **this comparison** is sufficient? It took me a second to connect it to the problem statement.',
-      when: '8 min ago',
-      replies: [],
-    },
-    {
       id: 2,
       ...findLastRange(code, [/t\s*-\s*p\s*-\s*b/i, /T\s*-\s*P\s*-\s*B/i], 7),
       author: 'william',
       body: 'It may help to name this value as the number of tickets left after both deductions.',
       when: '3 min ago',
+      replies: [],
+    },
+    {
+      id: 1,
+      ...findRange(code, [/t\s*-\s*p\s*<\s*b/i, /\(?T\s*-\s*P\s*-\s*B\)?\s*>=\s*0/i], 6),
+      author: 'mnop',
+      body: 'Could we mention why this comparison is sufficient? It took me a second to connect it to the problem statement.',
+      when: '8 min ago',
       replies: [],
     },
   ];
@@ -165,11 +164,9 @@ function domRangeForText(root: HTMLElement, code: string, range: TextRange): Ran
   return domRange;
 }
 
-function CommentMarkdown({ children }: { children: string }) {
+function CommentBody({ children }: { children: string }) {
   return (
-    <div className="text-xs leading-relaxed text-foreground-light [&_a]:text-brand [&_a:hover]:underline [&_code]:rounded [&_code]:bg-surface-200 [&_code]:px-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:m-0 [&_pre]:overflow-x-auto [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-4">
-      <ReactMarkdown>{children}</ReactMarkdown>
-    </div>
+    <p className="whitespace-pre-wrap text-xs leading-relaxed text-foreground-light">{children}</p>
   );
 }
 
@@ -191,6 +188,15 @@ export function CommentableCode({
   onRailWidthChange: (width: number) => void;
 }) {
   const { resolvedTheme } = useTheme();
+  const highlightId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const highlightNames = useMemo(
+    () => ({
+      comments: `ccc-comments-${highlightId}`,
+      active: `ccc-comment-active-${highlightId}`,
+      target: `ccc-comment-target-${highlightId}`,
+    }),
+    [highlightId]
+  );
   const workspaceRef = useRef<HTMLDivElement>(null);
   const codeAreaRef = useRef<HTMLDivElement>(null);
   const handledComposerRequest = useRef(composerRequest);
@@ -201,16 +207,6 @@ export function CommentableCode({
   const [draft, setDraft] = useState('');
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [replyDraft, setReplyDraft] = useState('');
-  const [highlightRects, setHighlightRects] = useState<
-    Array<{
-      key: string;
-      left: number;
-      top: number;
-      width: number;
-      height: number;
-      active: boolean;
-    }>
-  >([]);
   const [caretRect, setCaretRect] = useState<{
     left: number;
     top: number;
@@ -238,40 +234,53 @@ export function CommentableCode({
   useEffect(() => {
     const root = codeAreaRef.current;
     if (!root) return;
+    const registry = (
+      CSS as typeof CSS & {
+        highlights?: {
+          set: (name: string, highlight: unknown) => void;
+          delete: (name: string) => void;
+        };
+      }
+    ).highlights;
+    const HighlightConstructor = (
+      window as typeof window & { Highlight?: new (...ranges: Range[]) => unknown }
+    ).Highlight;
     let frame = 0;
 
-    const measure = () => {
-      const rootRect = root.getBoundingClientRect();
-      const nextHighlights: typeof highlightRects = [];
-      const ranges: Array<{ key: string; range: TextRange; active: boolean }> = commentsVisible
-        ? comments.map((comment) => ({
-            key: `comment-${comment.id}`,
-            range: comment,
-            active: comment.id === activeCommentId,
-          }))
-        : [];
+    const updateDecorations = () => {
+      if (registry && HighlightConstructor) {
+        const regular = commentsVisible
+          ? comments
+              .filter((comment) => comment.id !== activeCommentId)
+              .map((comment) => domRangeForText(root, code, comment))
+              .filter((range): range is Range => range !== null)
+          : [];
+        const active = commentsVisible
+          ? comments
+              .filter((comment) => comment.id === activeCommentId)
+              .map((comment) => domRangeForText(root, code, comment))
+              .filter((range): range is Range => range !== null)
+          : [];
+        const targetRange =
+          target.end > target.start && activeCommentId === null
+            ? domRangeForText(root, code, target)
+            : null;
 
-      if (target.end > target.start && activeCommentId === null) {
-        ranges.push({ key: 'target', range: target, active: true });
+        registry.delete(highlightNames.comments);
+        registry.delete(highlightNames.active);
+        registry.delete(highlightNames.target);
+        if (regular.length) {
+          registry.set(highlightNames.comments, new HighlightConstructor(...regular));
+        }
+        if (active.length) {
+          registry.set(highlightNames.active, new HighlightConstructor(...active));
+        }
+        if (targetRange) {
+          registry.set(highlightNames.target, new HighlightConstructor(targetRange));
+        }
       }
 
-      ranges.forEach(({ key, range, active }) => {
-        const domRange = domRangeForText(root, code, range);
-        if (!domRange) return;
-        Array.from(domRange.getClientRects()).forEach((rect, index) => {
-          if (rect.width <= 0 || rect.height <= 0) return;
-          nextHighlights.push({
-            key: `${key}-${index}`,
-            left: rect.left - rootRect.left + root.scrollLeft,
-            top: rect.top - rootRect.top + root.scrollTop,
-            width: rect.width,
-            height: rect.height,
-            active,
-          });
-        });
-      });
-      setHighlightRects(nextHighlights);
-
+      const rootRect = root.getBoundingClientRect();
       const caretPoint = domPointForOffset(root, code, target.end);
       if (!caretPoint) {
         setCaretRect(null);
@@ -303,11 +312,11 @@ export function CommentableCode({
       });
     };
 
-    const scheduleMeasure = () => {
+    const scheduleUpdate = () => {
       window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(measure);
+      frame = window.requestAnimationFrame(updateDecorations);
     };
-    const resizeObserver = new ResizeObserver(scheduleMeasure);
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
     const mutationObserver = new MutationObserver((mutations) => {
       const codeChanged = mutations.some((mutation) =>
         Array.from(mutation.addedNodes).some(
@@ -316,20 +325,23 @@ export function CommentableCode({
             (node.matches('[data-code-line]') || node.querySelector('[data-code-line]'))
         )
       );
-      if (codeChanged) scheduleMeasure();
+      if (codeChanged) scheduleUpdate();
     });
     resizeObserver.observe(root);
     mutationObserver.observe(root, { childList: true, subtree: true });
-    window.addEventListener('resize', scheduleMeasure);
-    scheduleMeasure();
+    window.addEventListener('resize', scheduleUpdate);
+    scheduleUpdate();
 
     return () => {
       window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
-      window.removeEventListener('resize', scheduleMeasure);
+      window.removeEventListener('resize', scheduleUpdate);
+      registry?.delete(highlightNames.comments);
+      registry?.delete(highlightNames.active);
+      registry?.delete(highlightNames.target);
     };
-  }, [activeCommentId, code, comments, commentsVisible, target]);
+  }, [activeCommentId, code, comments, commentsVisible, highlightNames, target]);
 
   const handleSelection = (event: React.MouseEvent<HTMLDivElement>) => {
     const browserSelection = window.getSelection();
@@ -377,6 +389,7 @@ export function CommentableCode({
     );
     setActiveCommentId(commentsVisible ? (comment?.id ?? null) : null);
     setReplyingToId(null);
+    browserSelection?.removeAllRanges();
   };
 
   const activateComment = (id: number) => {
@@ -398,7 +411,7 @@ export function CommentableCode({
       when: 'just now',
       replies: [],
     };
-    setComments((current) => [...current, comment]);
+    setComments((current) => [comment, ...current]);
     setActiveCommentId(comment.id);
     setComposing(false);
     setDraft('');
@@ -447,30 +460,34 @@ export function CommentableCode({
 
   return (
     <div ref={workspaceRef} className="flex size-full min-h-0 overflow-hidden bg-surface-100">
+      <style>{`
+        ::highlight(${highlightNames.comments}) {
+          background-color: hsl(var(--warning-600) / 0.28);
+        }
+        ::highlight(${highlightNames.active}),
+        ::highlight(${highlightNames.target}) {
+          background-color: hsl(var(--warning-600) / 0.48);
+        }
+        @keyframes ccc-comment-caret-flash {
+          0%, 49% { visibility: visible; }
+          50%, 100% { visibility: hidden; }
+        }
+      `}</style>
       <div
         ref={codeAreaRef}
         onMouseUp={handleSelection}
         className="relative min-w-0 flex-1 cursor-text overflow-auto"
       >
         <div className="pointer-events-none absolute inset-0 z-[2]" aria-hidden="true">
-          {highlightRects.map((rect) => (
-            <span
-              key={rect.key}
-              className={`absolute rounded-[2px] ${
-                rect.active ? 'bg-brand-400/50' : 'bg-brand-400/25'
-              }`}
-              style={{
-                left: rect.left,
-                top: rect.top,
-                width: rect.width,
-                height: rect.height,
-              }}
-            />
-          ))}
           {caretRect && (
             <span
-              className="absolute w-0.5 animate-pulse bg-brand-500"
-              style={{ left: caretRect.left, top: caretRect.top, height: caretRect.height }}
+              className="absolute w-0.5 bg-brand-500"
+              style={{
+                left: caretRect.left,
+                top: caretRect.top,
+                height: caretRect.height,
+                animation: 'ccc-comment-caret-flash 1s step-end infinite',
+              }}
             />
           )}
         </div>
@@ -495,10 +512,7 @@ export function CommentableCode({
           lineNumberStyle={{ minWidth: '2.75em', paddingRight: '1em', opacity: 0.45 }}
           lineProps={(lineNumber) => ({
             'data-code-line': lineNumber,
-            style: {
-              display: 'block',
-              minWidth: 'max-content',
-            },
+            style: {},
           })}
         >
           {code || '// No solution code available'}
@@ -574,21 +588,18 @@ export function CommentableCode({
                     rows={3}
                     className="w-full resize-none rounded-md border border-border-strong bg-background px-2.5 py-2 text-xs text-foreground placeholder:text-foreground-lighter focus:border-brand-highlight focus:outline-none"
                   />
-                  <div className="mt-2 flex items-center justify-between gap-2">
-                    <span className="text-[10px] text-foreground-lighter">Markdown supported</span>
-                    <div className="flex gap-2">
-                      <Button type="default" size="tiny" onClick={cancelComposer}>
-                        Cancel
-                      </Button>
-                      <Button
-                        type="primary"
-                        size="tiny"
-                        onClick={addComment}
-                        disabled={!draft.trim()}
-                      >
-                        Comment
-                      </Button>
-                    </div>
+                  <div className="mt-2 flex justify-end gap-2">
+                    <Button type="default" size="tiny" onClick={cancelComposer}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      size="tiny"
+                      onClick={addComment}
+                      disabled={!draft.trim()}
+                    >
+                      Comment
+                    </Button>
                   </div>
                 </article>
               </div>
@@ -616,7 +627,7 @@ export function CommentableCode({
                         {comment.when}
                       </span>
                     </div>
-                    <CommentMarkdown>{comment.body}</CommentMarkdown>
+                    <CommentBody>{comment.body}</CommentBody>
 
                     {comment.replies.map((reply, index) => (
                       <div
@@ -625,7 +636,7 @@ export function CommentableCode({
                       >
                         <span className="text-[11px] font-semibold text-foreground">@you</span>
                         <div className="mt-0.5">
-                          <CommentMarkdown>{reply}</CommentMarkdown>
+                          <CommentBody>{reply}</CommentBody>
                         </div>
                       </div>
                     ))}
