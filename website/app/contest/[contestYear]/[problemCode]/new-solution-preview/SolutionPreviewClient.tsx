@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeftIcon,
-  CheckIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -1046,18 +1045,13 @@ function SolutionSelect({
                   aria-selected={selectedOption}
                   onMouseEnter={() => setFocusedIndex(index)}
                   onClick={() => choose(index)}
-                  className={`flex w-full items-center justify-between gap-3 rounded px-2 py-1.5 text-left text-[11px] transition-colors ${
+                  className={`flex w-full items-center rounded px-2 py-1.5 text-left text-[11px] transition-colors ${
                     focusedOption ? 'bg-surface-300 text-foreground' : 'text-foreground-light'
                   }`}
                 >
                   <span className="whitespace-nowrap">
                     {index + 1} · {languageLabel(languageFromExtension(entry.ext))}
                   </span>
-                  <CheckIcon
-                    width="12"
-                    height="12"
-                    className={selectedOption ? 'text-brand' : 'invisible'}
-                  />
                 </button>
               );
             })}
