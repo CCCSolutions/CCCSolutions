@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import SolutionPreviewClient from './SolutionPreviewClient';
 
 export const metadata: Metadata = {
-  title: 'Solution workspace preview | CCCSolutions',
+  title: 'Solution workspace | CCCSolutions',
   robots: { index: false, follow: false },
 };
 

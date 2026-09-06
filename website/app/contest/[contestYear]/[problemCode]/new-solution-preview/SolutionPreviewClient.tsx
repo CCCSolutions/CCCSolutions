@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeftIcon,
-  ChatBubbleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   CodeIcon,
-  Cross2Icon,
   DownloadIcon,
+  EnterFullScreenIcon,
   ExclamationTriangleIcon,
+  ExitFullScreenIcon,
   FileTextIcon,
   InfoCircledIcon,
   ReaderIcon,
@@ -35,6 +37,7 @@ type ViewMode = 'classic' | 'new';
 type PanelName = 'editorial' | 'solution' | 'tests';
 type LoadState = 'idle' | 'loading' | 'success' | 'error';
 type ListState = 'loading' | 'invalid' | 'error' | 'ok';
+type MinimizedState = Record<PanelName, boolean>;
 
 type SolutionEntry = ContestSolutionMeta & {
   code: string;
@@ -49,42 +52,44 @@ type TestCaseData = {
 const LARGE_FILE_BYTES = 50 * 1024;
 const DEFAULT_LEFT_SIZE = 54;
 const DEFAULT_SOLUTION_SIZE = 64;
+const LAYOUT_STORAGE_KEY = 'cccsolutions-solution-layout-v1';
+const DEFAULT_MINIMIZED: MinimizedState = {
+  editorial: false,
+  solution: false,
+  tests: false,
+};
 
-const MOCK_EDITORIAL = [
+const EDITORIAL_CONTENT = [
   '# Intuition',
   '',
-  'This is placeholder editorial content for the layout preview. Imagine that the key observation is that every customer consumes one ticket until the supply is exhausted.',
+  'The key observation is that the final ticket count depends only on the two groups that already have tickets reserved. Subtract both values from the total capacity.',
   '',
-  'The useful quantity to track is the number of tickets remaining after processing each request. Once that value would become negative, the current request cannot be fulfilled.',
+  'If the remaining count is non-negative, everyone fits and that count is the number of unused tickets. Otherwise, the concert does not have enough tickets.',
   '',
-  '$$\\text{remaining} = T - \\sum_{i=1}^{k} r_i$$',
+  '$$\\text{remaining} = T - P - B$$',
   '',
   '# Approach',
   '',
-  '1. Read the initial number of available tickets.',
-  '2. Process each request in order.',
-  '3. Subtract a request only when enough tickets remain.',
-  '4. Report the first request that cannot be fulfilled, or the final remaining amount.',
-  '',
-  '> Preview note: this prose is intentionally mocked. It exists to test hierarchy, scrolling, math, and code beside a real solution.',
+  '1. Read the number of Bayview students, the ticket capacity, and the number of Portview students.',
+  '2. Compute `remaining = T - P - B`.',
+  '3. Print `Y` and the remaining count when the value is non-negative; otherwise print `N`.',
   '',
   '# Complexity',
   '',
-  '- Time complexity: $O(N)$',
+  '- Time complexity: $O(1)$',
   '- Space complexity: $O(1)$',
   '',
   '# Implementation notes',
   '',
-  'Keep the running total in an integer large enough for the stated constraints. The loop should preserve input order because the first unfulfilled request matters.',
+  'The comparison includes zero because filling every available seat is still a valid result.',
   '',
-  '```cpp',
-  'for (int request : requests) {',
-  '    if (request > remaining) break;',
-  '    remaining -= request;',
-  '}',
+  '```python',
+  'remaining = T - P - B',
+  'if remaining >= 0:',
+  '    print("Y", remaining)',
+  'else:',
+  '    print("N")',
   '```',
-  '',
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. This final paragraph gives the preview enough length to demonstrate independent panel scrolling without pretending to be an official solution.',
 ].join('\n');
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -129,50 +134,74 @@ function difficultyClass(difficulty: string): string {
   }
 }
 
-export default function SolutionPreviewClient() {
-  const [view, setView] = useState<ViewMode>('new');
-
+function LayoutControls({
+  view,
+  onViewChange,
+  onReset,
+}: {
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
+  onReset: () => void;
+}) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="border-b border-border-default bg-surface-100">
-        <div className="mx-auto flex min-h-11 max-w-[1800px] items-center justify-between gap-3 px-4 py-1.5 sm:px-6 lg:px-8">
-          <div className="min-w-0">
-            <span className="text-xs font-medium text-foreground-light">
-              Solution layout preview
-            </span>
-            <span className="ml-2 hidden text-[11px] text-foreground-lighter sm:inline">
-              Frontend-only experiment
-            </span>
-          </div>
-          <div
-            className="inline-flex shrink-0 rounded-md border border-border-default bg-background p-0.5"
-            aria-label="Solution page layout"
+    <div className="flex shrink-0 items-center gap-2">
+      <div
+        className="inline-flex rounded-md border border-border-default bg-background p-0.5"
+        aria-label="Solution page layout"
+      >
+        {(['classic', 'new'] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onViewChange(option)}
+            aria-pressed={view === option}
+            className={`rounded px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              view === option
+                ? 'bg-brand-500 text-white'
+                : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
+            }`}
           >
-            {(['classic', 'new'] as const).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setView(option)}
-                aria-pressed={view === option}
-                className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                  view === option
-                    ? 'bg-brand-500 text-white'
-                    : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
-                }`}
-              >
-                {option === 'classic' ? 'Classic' : 'New'}
-              </button>
-            ))}
-          </div>
-        </div>
+            {option === 'classic' ? 'Classic' : 'New'}
+          </button>
+        ))}
       </div>
-
-      {view === 'classic' ? <ProblemPageClient /> : <WorkspaceView />}
+      <button
+        type="button"
+        onClick={onReset}
+        className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-[11px] text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground"
+      >
+        <ResetIcon width="12" height="12" />
+        Reset layout
+      </button>
     </div>
   );
 }
 
-function WorkspaceView() {
+export default function SolutionPreviewClient() {
+  const [view, setView] = useState<ViewMode>('new');
+
+  const clearSavedLayout = () => {
+    window.localStorage.removeItem(LAYOUT_STORAGE_KEY);
+  };
+
+  return view === 'classic' ? (
+    <ProblemPageClient
+      headerControls={
+        <LayoutControls view={view} onViewChange={setView} onReset={clearSavedLayout} />
+      }
+    />
+  ) : (
+    <WorkspaceView view={view} onViewChange={setView} />
+  );
+}
+
+function WorkspaceView({
+  view,
+  onViewChange,
+}: {
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
+}) {
   const { contestYear, problemCode } = useParams<{
     contestYear: string;
     problemCode: string;
@@ -193,21 +222,52 @@ function WorkspaceView() {
   const [testState, setTestState] = useState<LoadState>('idle');
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(true);
-  const [visible, setVisible] = useState<Record<PanelName, boolean>>({
-    editorial: true,
-    solution: true,
-    tests: true,
-  });
+  const [minimized, setMinimized] = useState<MinimizedState>(DEFAULT_MINIMIZED);
+  const [fullscreen, setFullscreen] = useState<PanelName | null>(null);
   const [leftSize, setLeftSize] = useState(DEFAULT_LEFT_SIZE);
   const [solutionSize, setSolutionSize] = useState(DEFAULT_SOLUTION_SIZE);
   const [mobilePanel, setMobilePanel] = useState<PanelName>('editorial');
+  const [layoutLoaded, setLayoutLoaded] = useState(false);
   const desktopRef = useRef<HTMLDivElement>(null);
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
   const activeSolution =
     activeSolutionIndex === null ? null : (solutions[activeSolutionIndex] ?? null);
   const activeTest = activeTestIndex === null ? null : (tests[activeTestIndex] ?? null);
-  const rightVisible = visible.solution || visible.tests;
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
+      if (saved) {
+        const layout = JSON.parse(saved) as {
+          leftSize?: number;
+          solutionSize?: number;
+          minimized?: Partial<MinimizedState>;
+        };
+        if (typeof layout.leftSize === 'number') {
+          setLeftSize(clamp(layout.leftSize, 28, 72));
+        }
+        if (typeof layout.solutionSize === 'number') {
+          setSolutionSize(clamp(layout.solutionSize, 30, 78));
+        }
+        if (layout.minimized) {
+          setMinimized({ ...DEFAULT_MINIMIZED, ...layout.minimized });
+        }
+      }
+    } catch {
+      window.localStorage.removeItem(LAYOUT_STORAGE_KEY);
+    } finally {
+      setLayoutLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!layoutLoaded) return;
+    window.localStorage.setItem(
+      LAYOUT_STORAGE_KEY,
+      JSON.stringify({ leftSize, solutionSize, minimized })
+    );
+  }, [layoutLoaded, leftSize, minimized, solutionSize]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -333,15 +393,23 @@ function WorkspaceView() {
     return () => controller.abort();
   }, [activeTest, contestYear, problemCode]);
 
-  const togglePanel = (panel: PanelName) => {
-    setVisible((current) => ({ ...current, [panel]: !current[panel] }));
+  const toggleMinimized = (panel: PanelName) => {
+    setFullscreen(null);
+    setMinimized((current) => ({ ...current, [panel]: !current[panel] }));
+  };
+
+  const toggleFullscreen = (panel: PanelName) => {
+    setMinimized((current) => ({ ...current, [panel]: false }));
+    setFullscreen((current) => (current === panel ? null : panel));
   };
 
   const resetLayout = () => {
-    setVisible({ editorial: true, solution: true, tests: true });
+    setMinimized(DEFAULT_MINIMIZED);
+    setFullscreen(null);
     setLeftSize(DEFAULT_LEFT_SIZE);
     setSolutionSize(DEFAULT_SOLUTION_SIZE);
     setMobilePanel('editorial');
+    window.localStorage.removeItem(LAYOUT_STORAGE_KEY);
   };
 
   const startResize = (
@@ -372,7 +440,21 @@ function WorkspaceView() {
     window.addEventListener('pointerup', stop);
   };
 
-  const editorialPanel = <EditorialPanel onClose={() => togglePanel('editorial')} showClose />;
+  const editorialPanel = (
+    <EditorialPanel
+      problemInfo={problemInfo}
+      contestYear={contestYear}
+      problemCode={problemCode}
+      layoutControls={
+        <LayoutControls view={view} onViewChange={onViewChange} onReset={resetLayout} />
+      }
+      minimized={minimized.editorial}
+      fullscreen={fullscreen === 'editorial'}
+      onMinimize={() => toggleMinimized('editorial')}
+      onFullscreen={() => toggleFullscreen('editorial')}
+      showPanelControls
+    />
+  );
   const solutionPanel = (
     <SolutionPanel
       listState={listState}
@@ -385,8 +467,11 @@ function WorkspaceView() {
       problemCode={problemCode}
       commentsVisible={commentsVisible}
       onToggleComments={() => setCommentsVisible((current) => !current)}
-      onClose={() => togglePanel('solution')}
-      showClose
+      minimized={minimized.solution}
+      fullscreen={fullscreen === 'solution'}
+      onMinimize={() => toggleMinimized('solution')}
+      onFullscreen={() => toggleFullscreen('solution')}
+      showPanelControls
     />
   );
   const testsPanel = (
@@ -399,116 +484,37 @@ function WorkspaceView() {
       testData={testData}
       testState={testState}
       onDownload={() => setDownloadOpen(true)}
-      onClose={() => togglePanel('tests')}
-      showClose
+      minimized={minimized.tests}
+      fullscreen={fullscreen === 'tests'}
+      onMinimize={() => toggleMinimized('tests')}
+      onFullscreen={() => toggleFullscreen('tests')}
+      showPanelControls
     />
   );
 
   return (
-    <div className="flex min-h-[calc(100dvh-var(--nav-h)-2.75rem)] flex-col bg-background lg:h-[calc(100dvh-var(--nav-h)-2.75rem)] lg:min-h-[680px]">
-      <header className="shrink-0 border-b border-border-default bg-background px-4 py-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <Link
-              href="/solutions"
-              className="mb-1.5 inline-flex items-center gap-1.5 text-xs text-foreground-lighter transition-colors hover:text-foreground"
-            >
-              <ArrowLeftIcon width="13" height="13" />
-              Back to solutions
-            </Link>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="truncate text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-                {problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`}
-              </h1>
-              {problemInfo?.difficulty && (
-                <span
-                  className={`inline-flex items-center rounded-xs px-2.5 py-1 text-[11px] font-medium leading-none ${difficultyClass(
-                    problemInfo.difficulty
-                  )}`}
-                >
-                  {problemInfo.difficulty}
-                </span>
-              )}
-            </div>
-            {problemInfo?.tags?.length ? (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {problemInfo.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-xs border border-border-default bg-surface-200 px-2 py-0.5 text-[10px] font-medium text-foreground-light"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          {(tests.length > 0 || solutions.length > 0) && (
-            <Button
-              type="default"
-              size="small"
-              iconLeft={<DownloadIcon width="14" height="14" />}
-              onClick={() => setDownloadOpen(true)}
-            >
-              Download
-            </Button>
-          )}
-        </div>
-      </header>
-
-      <div className="hidden shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-100 px-4 py-2 lg:flex lg:px-8">
-        <div className="flex items-center gap-1.5">
-          <span className="mr-1 text-[11px] text-foreground-lighter">Panels</span>
-          {(
-            [
-              ['editorial', 'Editorial'],
-              ['solution', 'Solution'],
-              ['tests', 'Test cases'],
-            ] as const
-          ).map(([panel, label]) => (
-            <button
-              key={panel}
-              type="button"
-              onClick={() => togglePanel(panel)}
-              aria-pressed={visible[panel]}
-              className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                visible[panel]
-                  ? 'border-brand-400 bg-brand-200 text-brand-600 dark:text-brand'
-                  : 'border-border-default bg-background text-foreground-lighter hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={resetLayout}
-          className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-[11px] text-foreground-light hover:bg-surface-200 hover:text-foreground"
-        >
-          <ResetIcon width="12" height="12" />
-          Reset layout
-        </button>
-      </div>
-
+    <div className="mb-3 flex min-h-[70dvh] flex-col bg-background text-foreground lg:h-[calc(100dvh-var(--nav-h)-0.75rem)] lg:min-h-0">
       <div ref={desktopRef} className="hidden min-h-0 flex-1 p-3 lg:flex">
-        {!visible.editorial && !rightVisible ? (
-          <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border-strong text-sm text-foreground-lighter">
-            Reopen a panel from the toolbar above.
+        {fullscreen ? (
+          <div className="min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border border-border-default bg-surface-100">
+            {fullscreen === 'editorial'
+              ? editorialPanel
+              : fullscreen === 'solution'
+                ? solutionPanel
+                : testsPanel}
           </div>
         ) : (
           <>
-            {visible.editorial && (
-              <div
-                className="min-w-0 overflow-hidden rounded-lg border border-border-default bg-surface-100"
-                style={{ width: rightVisible ? `${leftSize}%` : '100%' }}
-              >
-                {editorialPanel}
-              </div>
-            )}
+            <div
+              className={`min-w-0 overflow-hidden rounded-lg border border-border-default bg-surface-100 ${
+                minimized.editorial ? 'shrink-0' : ''
+              }`}
+              style={{ width: minimized.editorial ? '44px' : `${leftSize}%` }}
+            >
+              {editorialPanel}
+            </div>
 
-            {visible.editorial && rightVisible && (
+            {!minimized.editorial && (
               <ResizeHandle
                 orientation="vertical"
                 value={leftSize}
@@ -517,40 +523,54 @@ function WorkspaceView() {
               />
             )}
 
-            {rightVisible && (
-              <div ref={rightColumnRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
-                {visible.solution && (
-                  <div
-                    className="min-h-0 overflow-hidden rounded-lg border border-border-default bg-surface-100"
-                    style={{ height: visible.tests ? `${solutionSize}%` : '100%' }}
-                  >
-                    {solutionPanel}
-                  </div>
-                )}
-
-                {visible.solution && visible.tests && (
-                  <ResizeHandle
-                    orientation="horizontal"
-                    value={solutionSize}
-                    onPointerDown={(event) => startResize('horizontal', event)}
-                    onChange={(delta) =>
-                      setSolutionSize((current) => clamp(current + delta, 30, 78))
-                    }
-                  />
-                )}
-
-                {visible.tests && (
-                  <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border-default bg-surface-100">
-                    {testsPanel}
-                  </div>
-                )}
+            <div ref={rightColumnRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
+              <div
+                className={`overflow-hidden rounded-lg border border-border-default bg-surface-100 ${
+                  minimized.solution
+                    ? 'h-11 shrink-0'
+                    : minimized.tests
+                      ? 'min-h-0 flex-1'
+                      : 'min-h-0'
+                }`}
+                style={
+                  !minimized.solution && !minimized.tests
+                    ? { height: `${solutionSize}%` }
+                    : undefined
+                }
+              >
+                {solutionPanel}
               </div>
-            )}
+
+              {!minimized.solution && !minimized.tests ? (
+                <ResizeHandle
+                  orientation="horizontal"
+                  value={solutionSize}
+                  onPointerDown={(event) => startResize('horizontal', event)}
+                  onChange={(delta) => setSolutionSize((current) => clamp(current + delta, 30, 78))}
+                />
+              ) : (
+                <div className="h-3 shrink-0" />
+              )}
+
+              <div
+                className={`overflow-hidden rounded-lg border border-border-default bg-surface-100 ${
+                  minimized.tests ? 'h-11 shrink-0' : 'min-h-0 flex-1'
+                }`}
+              >
+                {testsPanel}
+              </div>
+            </div>
           </>
         )}
       </div>
 
       <div className="flex min-h-[70dvh] flex-1 flex-col lg:hidden">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-100 px-3 py-2">
+          <span className="min-w-0 truncate text-xs font-semibold text-foreground">
+            {problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`}
+          </span>
+          <LayoutControls view={view} onViewChange={onViewChange} onReset={resetLayout} />
+        </div>
         <div className="flex shrink-0 overflow-x-auto border-b border-border-default bg-surface-100 px-3">
           {(
             [
@@ -574,7 +594,18 @@ function WorkspaceView() {
           ))}
         </div>
         <div className="min-h-0 flex-1 bg-surface-100">
-          {mobilePanel === 'editorial' && <EditorialPanel showClose={false} />}
+          {mobilePanel === 'editorial' && (
+            <EditorialPanel
+              problemInfo={problemInfo}
+              contestYear={contestYear}
+              problemCode={problemCode}
+              minimized={false}
+              fullscreen={false}
+              onMinimize={() => undefined}
+              onFullscreen={() => undefined}
+              showPanelControls={false}
+            />
+          )}
           {mobilePanel === 'solution' && (
             <SolutionPanel
               listState={listState}
@@ -587,7 +618,11 @@ function WorkspaceView() {
               problemCode={problemCode}
               commentsVisible={commentsVisible}
               onToggleComments={() => setCommentsVisible((current) => !current)}
-              showClose={false}
+              minimized={false}
+              fullscreen={false}
+              onMinimize={() => undefined}
+              onFullscreen={() => undefined}
+              showPanelControls={false}
             />
           )}
           {mobilePanel === 'tests' && (
@@ -600,7 +635,11 @@ function WorkspaceView() {
               testData={testData}
               testState={testState}
               onDownload={() => setDownloadOpen(true)}
-              showClose={false}
+              minimized={false}
+              fullscreen={false}
+              onMinimize={() => undefined}
+              onFullscreen={() => undefined}
+              showPanelControls={false}
             />
           )}
         </div>
@@ -623,60 +662,169 @@ function PanelHeader({
   icon,
   title,
   children,
-  onClose,
-  showClose,
+  minimized,
+  fullscreen,
+  onMinimize,
+  onFullscreen,
+  showPanelControls,
+  hideTitleWhenMinimized = false,
 }: {
   icon: React.ReactNode;
   title: string;
   children?: React.ReactNode;
-  onClose?: () => void;
-  showClose: boolean;
+  minimized: boolean;
+  fullscreen: boolean;
+  onMinimize: () => void;
+  onFullscreen: () => void;
+  showPanelControls: boolean;
+  hideTitleWhenMinimized?: boolean;
 }) {
   return (
-    <div className="flex min-h-11 shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-200 px-3">
+    <div
+      className={`group relative flex h-11 shrink-0 items-center border-b border-border-default bg-surface-200 ${
+        minimized && hideTitleWhenMinimized ? 'justify-center px-0' : 'justify-between gap-3 px-3'
+      }`}
+    >
       <div className="flex min-w-0 items-center gap-2 text-xs font-semibold text-foreground">
-        <span className="text-brand">{icon}</span>
-        <span className="truncate">{title}</span>
+        <span className="shrink-0 text-brand">{icon}</span>
+        {(!minimized || !hideTitleWhenMinimized) && <span className="truncate">{title}</span>}
       </div>
-      <div className="flex min-w-0 items-center gap-1.5">
-        {children}
-        {showClose && onClose && (
+      {!minimized && (
+        <div className="flex min-w-0 items-center gap-1.5">
+          {children}
+          {showPanelControls && (
+            <div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <button
+                type="button"
+                onClick={onFullscreen}
+                className="rounded p-1.5 text-foreground-lighter hover:bg-surface-300 hover:text-foreground"
+                aria-label={`${fullscreen ? 'Exit fullscreen for' : 'Fullscreen'} ${title} panel`}
+                title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+              >
+                {fullscreen ? (
+                  <ExitFullScreenIcon width="13" height="13" />
+                ) : (
+                  <EnterFullScreenIcon width="13" height="13" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onMinimize}
+                className="rounded p-1.5 text-foreground-lighter hover:bg-surface-300 hover:text-foreground"
+                aria-label={`Minimize ${title} panel`}
+                title="Minimize"
+              >
+                <ChevronDownIcon width="13" height="13" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {minimized && showPanelControls && (
+        <div
+          className={`opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 ${
+            hideTitleWhenMinimized
+              ? 'absolute inset-0 flex items-center justify-center bg-surface-200'
+              : ''
+          }`}
+        >
           <button
             type="button"
-            onClick={onClose}
+            onClick={onMinimize}
             className="rounded p-1.5 text-foreground-lighter hover:bg-surface-300 hover:text-foreground"
-            aria-label={`Close ${title} panel`}
-            title={`Close ${title}`}
+            aria-label={`Restore ${title} panel`}
+            title="Restore"
           >
-            <Cross2Icon width="13" height="13" />
+            <ChevronUpIcon width="13" height="13" />
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function EditorialPanel({ onClose, showClose }: { onClose?: () => void; showClose: boolean }) {
+function EditorialPanel({
+  problemInfo,
+  contestYear,
+  problemCode,
+  layoutControls,
+  minimized,
+  fullscreen,
+  onMinimize,
+  onFullscreen,
+  showPanelControls,
+}: {
+  problemInfo: (typeof problems)[number] | undefined;
+  contestYear: string;
+  problemCode: string;
+  layoutControls?: React.ReactNode;
+  minimized: boolean;
+  fullscreen: boolean;
+  onMinimize: () => void;
+  onFullscreen: () => void;
+  showPanelControls: boolean;
+}) {
+  const title = problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`;
+
   return (
     <section className="flex size-full min-h-0 flex-col" aria-label="Editorial">
       <PanelHeader
         icon={<ReaderIcon width="15" height="15" />}
-        title="Editorial"
-        onClose={onClose}
-        showClose={showClose}
+        title={title}
+        minimized={minimized}
+        fullscreen={fullscreen}
+        onMinimize={onMinimize}
+        onFullscreen={onFullscreen}
+        showPanelControls={showPanelControls}
+        hideTitleWhenMinimized
       >
-        <Button asChild type="primary" size="tiny">
-          <Link href="/create-post">Ask a question</Link>
-        </Button>
+        {layoutControls}
       </PanelHeader>
-      <article className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-7">
-        <div className="mb-5 rounded-md border border-brand-300 bg-brand-200 px-3 py-2 text-xs text-brand-600 dark:text-brand">
-          Preview editorial · placeholder content only
-        </div>
-        <div className="mx-auto max-w-3xl [&_h1]:mb-3 [&_h1]:mt-8 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1:first-child]:mt-0 [&_blockquote]:rounded-r-md [&_blockquote]:border-l-2 [&_blockquote]:border-brand-400 [&_blockquote]:bg-surface-200 [&_blockquote]:px-3 [&_blockquote]:py-2">
-          <MarkdownPreview content={MOCK_EDITORIAL} />
-        </div>
-      </article>
+      {!minimized && (
+        <article className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-7">
+          <div className="mx-auto mb-6 max-w-3xl border-b border-border-default pb-5">
+            <Link
+              href="/solutions"
+              className="mb-3 inline-flex items-center gap-1.5 text-xs text-foreground-lighter transition-colors hover:text-foreground"
+            >
+              <ArrowLeftIcon width="13" height="13" />
+              Back to solutions
+            </Link>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+                  {title}
+                </h1>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {problemInfo?.difficulty && (
+                    <span
+                      className={`inline-flex items-center rounded-xs px-2.5 py-1 text-[11px] font-medium leading-none ${difficultyClass(
+                        problemInfo.difficulty
+                      )}`}
+                    >
+                      {problemInfo.difficulty}
+                    </span>
+                  )}
+                  {problemInfo?.tags?.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-xs border border-border-default bg-surface-200 px-2 py-0.5 text-[10px] font-medium text-foreground-light"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <Button asChild type="default" size="tiny">
+                <Link href="/create-post">Ask a question</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="mx-auto max-w-3xl [&_h1]:mb-3 [&_h1]:mt-8 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1:first-child]:mt-0 [&_blockquote]:rounded-r-md [&_blockquote]:border-l-2 [&_blockquote]:border-brand-400 [&_blockquote]:bg-surface-200 [&_blockquote]:px-3 [&_blockquote]:py-2">
+            <MarkdownPreview content={EDITORIAL_CONTENT} />
+          </div>
+        </article>
+      )}
     </section>
   );
 }
@@ -692,8 +840,11 @@ function SolutionPanel({
   problemCode,
   commentsVisible,
   onToggleComments,
-  onClose,
-  showClose,
+  minimized,
+  fullscreen,
+  onMinimize,
+  onFullscreen,
+  showPanelControls,
 }: {
   listState: ListState;
   solutions: ContestSolutionMeta[];
@@ -705,16 +856,22 @@ function SolutionPanel({
   problemCode: string;
   commentsVisible: boolean;
   onToggleComments: () => void;
-  onClose?: () => void;
-  showClose: boolean;
+  minimized: boolean;
+  fullscreen: boolean;
+  onMinimize: () => void;
+  onFullscreen: () => void;
+  showPanelControls: boolean;
 }) {
   return (
     <section className="flex size-full min-h-0 flex-col" aria-label="Solution">
       <PanelHeader
         icon={<CodeIcon width="15" height="15" />}
         title="Solution"
-        onClose={onClose}
-        showClose={showClose}
+        minimized={minimized}
+        fullscreen={fullscreen}
+        onMinimize={onMinimize}
+        onFullscreen={onFullscreen}
+        showPanelControls={showPanelControls}
       >
         {solutions.length > 0 && activeSolutionIndex !== null && (
           <select
@@ -730,20 +887,15 @@ function SolutionPanel({
             ))}
           </select>
         )}
-        <button
-          type="button"
+        <Button
+          type={commentsVisible ? 'primary' : 'default'}
+          size="tiny"
           onClick={onToggleComments}
           aria-pressed={commentsVisible}
-          className={`inline-flex h-7 items-center gap-1 rounded-md border px-2 text-[11px] transition-colors ${
-            commentsVisible
-              ? 'border-brand-400 bg-brand-200 text-brand-600 dark:text-brand'
-              : 'border-border-strong bg-surface-100 text-foreground-lighter hover:text-foreground'
-          }`}
           title="Toggle inline comments"
         >
-          <ChatBubbleIcon width="12" height="12" />
-          <span className="hidden xl:inline">Comments</span>
-        </button>
+          Comments
+        </Button>
         {solution && (
           <a
             href={contestDownloadUrl(
@@ -760,26 +912,28 @@ function SolutionPanel({
         )}
       </PanelHeader>
 
-      <div className="min-h-0 flex-1">
-        {listState === 'loading' || solutionState === 'loading' ? (
-          <PanelStatus label="Loading solution…" loading />
-        ) : listState === 'invalid' ? (
-          <PanelStatus label="This problem does not exist." />
-        ) : listState === 'error' || solutionState === 'error' ? (
-          <PanelStatus label="Unable to load solutions right now." error />
-        ) : solutions.length === 0 ? (
-          <PanelStatus label="No solution is available yet." />
-        ) : solution ? (
-          <CommentableCode
-            key={`${solution.n}.${solution.ext}`}
-            code={solution.code}
-            language={solution.language}
-            commentsVisible={commentsVisible}
-          />
-        ) : (
-          <PanelStatus label="Choose a solution to view its code." />
-        )}
-      </div>
+      {!minimized && (
+        <div className="min-h-0 flex-1">
+          {listState === 'loading' || solutionState === 'loading' ? (
+            <PanelStatus label="Loading solution…" loading />
+          ) : listState === 'invalid' ? (
+            <PanelStatus label="This problem does not exist." />
+          ) : listState === 'error' || solutionState === 'error' ? (
+            <PanelStatus label="Unable to load solutions right now." error />
+          ) : solutions.length === 0 ? (
+            <PanelStatus label="No solution is available yet." />
+          ) : solution ? (
+            <CommentableCode
+              key={`${solution.n}.${solution.ext}`}
+              code={solution.code}
+              language={solution.language}
+              commentsVisible={commentsVisible}
+            />
+          ) : (
+            <PanelStatus label="Choose a solution to view its code." />
+          )}
+        </div>
+      )}
     </section>
   );
 }
@@ -793,8 +947,11 @@ function TestsPanel({
   testData,
   testState,
   onDownload,
-  onClose,
-  showClose,
+  minimized,
+  fullscreen,
+  onMinimize,
+  onFullscreen,
+  showPanelControls,
 }: {
   listState: ListState;
   tests: ContestTestMeta[];
@@ -804,8 +961,11 @@ function TestsPanel({
   testData: TestCaseData;
   testState: LoadState;
   onDownload: () => void;
-  onClose?: () => void;
-  showClose: boolean;
+  minimized: boolean;
+  fullscreen: boolean;
+  onMinimize: () => void;
+  onFullscreen: () => void;
+  showPanelControls: boolean;
 }) {
   const largeFile =
     activeTest && Math.max(activeTest.inputBytes, activeTest.outputBytes) > LARGE_FILE_BYTES;
@@ -815,8 +975,11 @@ function TestsPanel({
       <PanelHeader
         icon={<FileTextIcon width="15" height="15" />}
         title="Test cases"
-        onClose={onClose}
-        showClose={showClose}
+        minimized={minimized}
+        fullscreen={fullscreen}
+        onMinimize={onMinimize}
+        onFullscreen={onFullscreen}
+        showPanelControls={showPanelControls}
       >
         {tests.length > 0 && (
           <button
@@ -831,7 +994,7 @@ function TestsPanel({
         )}
       </PanelHeader>
 
-      {tests.length > 0 && (
+      {!minimized && tests.length > 0 && (
         <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border-default bg-surface-100 px-3 py-2">
           {tests.map((test, index) => (
             <button
@@ -850,38 +1013,40 @@ function TestsPanel({
         </div>
       )}
 
-      <div className="min-h-0 flex-1 overflow-auto p-3">
-        {listState === 'loading' || testState === 'loading' ? (
-          <PanelStatus label="Loading test case…" loading />
-        ) : listState === 'invalid' ? (
-          <PanelStatus label="This problem does not exist." />
-        ) : listState === 'error' ? (
-          <PanelStatus label="Unable to load test cases right now." error />
-        ) : tests.length === 0 ? (
-          <PanelStatus label="No test cases are available." />
-        ) : testState === 'error' ? (
-          <PanelStatus label="This test case could not be previewed." error />
-        ) : testState === 'success' && activeTest ? (
-          <div className="space-y-3">
-            {largeFile && (
-              <div className="flex items-start gap-2 rounded-md border border-warning-400 bg-warning-200 px-3 py-2 text-xs text-warning-600">
-                <ExclamationTriangleIcon width="13" height="13" className="mt-0.5 shrink-0" />
-                Preview is truncated because this is a large file. Download it for the full data.
+      {!minimized && (
+        <div className="min-h-0 flex-1 overflow-auto p-3">
+          {listState === 'loading' || testState === 'loading' ? (
+            <PanelStatus label="Loading test case…" loading />
+          ) : listState === 'invalid' ? (
+            <PanelStatus label="This problem does not exist." />
+          ) : listState === 'error' ? (
+            <PanelStatus label="Unable to load test cases right now." error />
+          ) : tests.length === 0 ? (
+            <PanelStatus label="No test cases are available." />
+          ) : testState === 'error' ? (
+            <PanelStatus label="This test case could not be loaded." error />
+          ) : testState === 'success' && activeTest ? (
+            <div className="space-y-3">
+              {largeFile && (
+                <div className="flex items-start gap-2 rounded-md border border-warning-400 bg-warning-200 px-3 py-2 text-xs text-warning-600">
+                  <ExclamationTriangleIcon width="13" height="13" className="mt-0.5 shrink-0" />
+                  This file is too large to display in full. Download it for the complete data.
+                </div>
+              )}
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                <TestValue label="Input" bytes={activeTest.inputBytes} value={testData.input} />
+                <TestValue
+                  label="Expected output"
+                  bytes={activeTest.outputBytes}
+                  value={testData.output}
+                />
               </div>
-            )}
-            <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-              <TestValue label="Input" bytes={activeTest.inputBytes} value={testData.input} />
-              <TestValue
-                label="Expected output"
-                bytes={activeTest.outputBytes}
-                value={testData.output}
-              />
             </div>
-          </div>
-        ) : (
-          <PanelStatus label="Select a test case to view its input and output." />
-        )}
-      </div>
+          ) : (
+            <PanelStatus label="Select a test case to view its input and output." />
+          )}
+        </div>
+      )}
     </section>
   );
 }

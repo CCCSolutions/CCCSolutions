@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
-import { ChatBubbleIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '../../../../../components/ui/button';
 
@@ -18,7 +18,6 @@ const SyntaxHighlighter = dynamic(
 type LineRange = {
   start: number;
   end: number;
-  quote: string;
 };
 
 type MockComment = LineRange & {
@@ -26,17 +25,27 @@ type MockComment = LineRange & {
   author: string;
   body: string;
   when: string;
+  replies: string[];
 };
 
 const INITIAL_COMMENTS: MockComment[] = [
   {
     id: 1,
-    start: 4,
-    end: 5,
-    quote: 'This branch decides whether the remaining tickets are enough.',
+    start: 6,
+    end: 6,
     author: 'mnop',
     body: 'Could we mention why this comparison is sufficient? It took me a second to connect it to the problem statement.',
     when: '8 min ago',
+    replies: [],
+  },
+  {
+    id: 2,
+    start: 7,
+    end: 7,
+    author: 'william',
+    body: 'It may help to name this value as the number of tickets left after both deductions.',
+    when: '3 min ago',
+    replies: [],
   },
 ];
 
@@ -46,6 +55,10 @@ function lineFromNode(node: Node | null): number | null {
   if (!line) return null;
   const parsed = Number(line);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function lineLabel(range: LineRange): string {
+  return range.start === range.end ? `Line ${range.start}` : `Lines ${range.start}–${range.end}`;
 }
 
 export function CommentableCode({
@@ -61,19 +74,37 @@ export function CommentableCode({
   const codeAreaRef = useRef<HTMLDivElement>(null);
   const [comments, setComments] = useState<MockComment[]>(INITIAL_COMMENTS);
   const [selection, setSelection] = useState<LineRange | null>(null);
-  const [activeCommentId, setActiveCommentId] = useState<number | null>(1);
+  const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
   const [composing, setComposing] = useState(false);
   const [draft, setDraft] = useState('');
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyDraft, setReplyDraft] = useState('');
 
-  const activeComment = comments.find((comment) => comment.id === activeCommentId) ?? null;
   const lineCount = useMemo(() => Math.max(1, code.split('\n').length), [code]);
   const codeStyle = resolvedTheme === 'dark' ? oneDark : oneLight;
 
-  const selectedOrCommentedLine = (line: number) => {
-    if (selection && line >= selection.start && line <= selection.end) return true;
-    return (
-      commentsVisible && comments.some((comment) => line >= comment.start && line <= comment.end)
-    );
+  useEffect(() => {
+    if (commentsVisible) return;
+    setSelection(null);
+    setActiveCommentId(null);
+    setComposing(false);
+    setReplyingToId(null);
+    window.getSelection()?.removeAllRanges();
+  }, [commentsVisible]);
+
+  const commentForLine = (line: number) =>
+    comments.find((comment) => line >= comment.start && line <= comment.end);
+
+  const lineBackground = (line: number) => {
+    if (selection && line >= selection.start && line <= selection.end) {
+      return 'hsl(var(--brand-300) / 0.72)';
+    }
+
+    const comment = commentForLine(line);
+    if (!commentsVisible || !comment) return 'transparent';
+    return comment.id === activeCommentId
+      ? 'hsl(var(--brand-300) / 0.72)'
+      : 'hsl(var(--brand-300) / 0.34)';
   };
 
   const handleSelection = () => {
@@ -92,20 +123,26 @@ export function CommentableCode({
 
     const anchorLine = lineFromNode(browserSelection.anchorNode);
     const focusLine = lineFromNode(browserSelection.focusNode);
-    const quote = browserSelection.toString().trim();
-    if (anchorLine === null || focusLine === null || !quote) return;
+    if (anchorLine === null || focusLine === null || !browserSelection.toString().trim()) return;
 
     setSelection({
       start: Math.min(anchorLine, focusLine),
       end: Math.max(anchorLine, focusLine),
-      quote: quote.slice(0, 180),
     });
     setActiveCommentId(null);
     setComposing(false);
+    setReplyingToId(null);
   };
 
-  const openComposer = (range: LineRange) => {
-    setSelection(range);
+  const activateComment = (id: number) => {
+    setActiveCommentId(id);
+    setSelection(null);
+    setComposing(false);
+    setReplyingToId(null);
+    window.getSelection()?.removeAllRanges();
+  };
+
+  const openComposer = () => {
     setActiveCommentId(null);
     setComposing(true);
     setDraft('');
@@ -119,6 +156,7 @@ export function CommentableCode({
       author: 'you',
       body: draft.trim(),
       when: 'just now',
+      replies: [],
     };
     setComments((current) => [...current, comment]);
     setActiveCommentId(comment.id);
@@ -128,16 +166,33 @@ export function CommentableCode({
     window.getSelection()?.removeAllRanges();
   };
 
-  const closeThread = () => {
-    setActiveCommentId(null);
+  const cancelComposer = () => {
     setComposing(false);
     setSelection(null);
+    setDraft('');
     window.getSelection()?.removeAllRanges();
   };
 
+  const addReply = (commentId: number) => {
+    if (!replyDraft.trim()) return;
+    setComments((current) =>
+      current.map((comment) =>
+        comment.id === commentId
+          ? { ...comment, replies: [...comment.replies, replyDraft.trim()] }
+          : comment
+      )
+    );
+    setReplyingToId(null);
+    setReplyDraft('');
+  };
+
   return (
-    <div className="relative size-full min-h-0 overflow-hidden bg-surface-100">
-      <div ref={codeAreaRef} onMouseUp={handleSelection} className="absolute inset-0 overflow-auto">
+    <div className="flex size-full min-h-0 overflow-hidden bg-surface-100">
+      <div
+        ref={codeAreaRef}
+        onMouseUp={handleSelection}
+        className="relative min-w-0 flex-1 overflow-auto"
+      >
         <SyntaxHighlighter
           language={language}
           style={codeStyle}
@@ -151,56 +206,36 @@ export function CommentableCode({
             background: 'transparent',
             fontSize: '13px',
             lineHeight: '20px',
-            padding: '16px 52px 16px 16px',
+            padding: '16px 48px 16px 16px',
           }}
           codeTagProps={{ style: { background: 'transparent' } }}
           lineNumberStyle={{ minWidth: '2.75em', paddingRight: '1em', opacity: 0.45 }}
           lineProps={(lineNumber) => ({
             'data-code-line': lineNumber,
+            onClick: () => {
+              const browserSelection = window.getSelection();
+              if (browserSelection && !browserSelection.isCollapsed) return;
+              const comment = commentForLine(lineNumber);
+              if (commentsVisible && comment) activateComment(comment.id);
+            },
             style: {
               display: 'block',
               minWidth: 'max-content',
-              background: selectedOrCommentedLine(lineNumber)
-                ? 'hsl(var(--brand-300) / 0.45)'
-                : 'transparent',
+              cursor: commentsVisible && commentForLine(lineNumber) ? 'pointer' : 'text',
+              background: lineBackground(lineNumber),
             },
           })}
         >
           {code || '// No solution code available'}
         </SyntaxHighlighter>
 
-        {commentsVisible &&
-          comments.map((comment, index) => (
-            <button
-              key={comment.id}
-              type="button"
-              onClick={() => {
-                setActiveCommentId(comment.id);
-                setSelection(null);
-                setComposing(false);
-              }}
-              className={`absolute right-2 z-10 flex size-6 items-center justify-center rounded-full border text-[11px] font-semibold shadow-sm transition-colors ${
-                activeCommentId === comment.id
-                  ? 'border-brand-highlight bg-brand-500 text-white'
-                  : 'border-border-strong bg-surface-100 text-brand hover:border-brand-highlight'
-              }`}
-              style={{ top: `${16 + (Math.min(comment.start, lineCount) - 1) * 20}px` }}
-              aria-label={`Open comment on lines ${comment.start} to ${comment.end}`}
-              title={`Comment on line${comment.start === comment.end ? '' : 's'} ${comment.start}${
-                comment.start === comment.end ? '' : `–${comment.end}`
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-
         {commentsVisible && selection && !composing && (
           <button
             type="button"
-            onClick={() => openComposer(selection)}
+            onClick={openComposer}
             className="absolute right-2 z-20 flex size-7 items-center justify-center rounded-full border border-brand-highlight bg-brand-500 text-white shadow-md hover:brightness-110"
             style={{ top: `${16 + (Math.min(selection.start, lineCount) - 1) * 20}px` }}
-            aria-label="Comment on selected code"
+            aria-label={`Comment on ${lineLabel(selection).toLowerCase()}`}
             title="Add comment"
           >
             <PlusIcon width="15" height="15" />
@@ -208,65 +243,110 @@ export function CommentableCode({
         )}
       </div>
 
-      {commentsVisible && !selection && !activeComment && !composing && (
-        <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-border-default bg-surface-100/95 px-2.5 py-1.5 text-[11px] text-foreground-lighter shadow-sm">
-          Select code to add a comment
-        </div>
-      )}
+      {commentsVisible && (
+        <aside
+          className="w-[min(17rem,42%)] min-w-52 shrink-0 overflow-y-auto border-l border-border-default bg-background p-2"
+          aria-label="Inline comments"
+        >
+          <div className="space-y-2">
+            {comments.map((comment) => {
+              const active = comment.id === activeCommentId;
+              const replying = comment.id === replyingToId;
 
-      {commentsVisible && (activeComment || composing) && (
-        <aside className="absolute right-3 top-3 z-30 w-[min(19rem,calc(100%-1.5rem))] rounded-lg border border-border-strong bg-surface-100 shadow-xl">
-          <div className="flex items-center justify-between border-b border-border-default px-3 py-2">
-            <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-              <ChatBubbleIcon width="14" height="14" className="text-brand" />
-              {composing
-                ? `New comment · line${selection?.start === selection?.end ? '' : 's'} ${
-                    selection?.start
-                  }${selection?.start === selection?.end ? '' : `–${selection?.end}`}`
-                : `Line${activeComment?.start === activeComment?.end ? '' : 's'} ${
-                    activeComment?.start
-                  }${activeComment?.start === activeComment?.end ? '' : `–${activeComment?.end}`}`}
-            </div>
-            <button
-              type="button"
-              onClick={closeThread}
-              className="rounded p-1 text-foreground-lighter hover:bg-surface-200 hover:text-foreground"
-              aria-label="Close comment"
-            >
-              <Cross2Icon width="14" height="14" />
-            </button>
-          </div>
-
-          <div className="p-3">
-            <blockquote className="mb-3 border-l-2 border-brand-400 pl-2 text-[11px] leading-relaxed text-foreground-lighter">
-              {composing ? selection?.quote : activeComment?.quote}
-            </blockquote>
-
-            {activeComment && !composing ? (
-              <div>
-                <div className="mb-1 flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-semibold text-foreground">
-                    @{activeComment.author}
-                  </span>
-                  <span className="text-[10px] text-foreground-lighter">{activeComment.when}</span>
-                </div>
-                <p className="text-xs leading-relaxed text-foreground-light">
-                  {activeComment.body}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelection(activeComment);
-                    setComposing(true);
-                    setDraft('');
-                  }}
-                  className="mt-3 text-xs font-medium text-brand hover:underline"
+              return (
+                <article
+                  key={comment.id}
+                  onClick={() => activateComment(comment.id)}
+                  className={`cursor-pointer rounded-lg border p-3 transition-colors ${
+                    active
+                      ? 'border-brand-highlight bg-surface-200 shadow-sm'
+                      : 'border-border-default bg-surface-100 hover:border-border-strong'
+                  }`}
                 >
-                  Reply
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2">
+                  <div className="mb-2 flex items-baseline justify-between gap-2">
+                    <span className="text-xs font-semibold text-foreground">@{comment.author}</span>
+                    <span className="shrink-0 text-[10px] text-foreground-lighter">
+                      {comment.when}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-foreground-light">{comment.body}</p>
+
+                  {comment.replies.map((reply, index) => (
+                    <div
+                      key={`${comment.id}-reply-${index}`}
+                      className="mt-3 border-l-2 border-border-strong pl-2"
+                    >
+                      <span className="text-[11px] font-semibold text-foreground">@you</span>
+                      <p className="mt-0.5 text-xs leading-relaxed text-foreground-light">
+                        {reply}
+                      </p>
+                    </div>
+                  ))}
+
+                  {replying ? (
+                    <div className="mt-3 space-y-2" onClick={(event) => event.stopPropagation()}>
+                      <textarea
+                        value={replyDraft}
+                        onChange={(event) => setReplyDraft(event.target.value)}
+                        placeholder="Reply…"
+                        autoFocus
+                        rows={2}
+                        className="w-full resize-none rounded-md border border-border-strong bg-background px-2.5 py-2 text-xs text-foreground placeholder:text-foreground-lighter focus:border-brand-highlight focus:outline-none"
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="default"
+                          size="tiny"
+                          onClick={() => {
+                            setReplyingToId(null);
+                            setReplyDraft('');
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="primary"
+                          size="tiny"
+                          onClick={() => addReply(comment.id)}
+                          disabled={!replyDraft.trim()}
+                        >
+                          Reply
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        activateComment(comment.id);
+                        setReplyingToId(comment.id);
+                        setReplyDraft('');
+                      }}
+                      className="mt-2 text-xs font-medium text-brand hover:underline"
+                    >
+                      Reply
+                    </button>
+                  )}
+                </article>
+              );
+            })}
+
+            {composing && selection && (
+              <article className="rounded-lg border border-brand-highlight bg-surface-100 p-3 shadow-sm">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-foreground">
+                    New comment · {lineLabel(selection)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={cancelComposer}
+                    className="rounded p-1 text-foreground-lighter hover:bg-surface-200 hover:text-foreground"
+                    aria-label="Cancel comment"
+                  >
+                    <Cross2Icon width="13" height="13" />
+                  </button>
+                </div>
                 <textarea
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
@@ -275,19 +355,16 @@ export function CommentableCode({
                   rows={3}
                   className="w-full resize-none rounded-md border border-border-strong bg-background px-2.5 py-2 text-xs text-foreground placeholder:text-foreground-lighter focus:border-brand-highlight focus:outline-none"
                 />
-                <div className="flex justify-end gap-2">
-                  <Button type="default" size="tiny" onClick={closeThread}>
+                <div className="mt-2 flex justify-end gap-2">
+                  <Button type="default" size="tiny" onClick={cancelComposer}>
                     Cancel
                   </Button>
                   <Button type="primary" size="tiny" onClick={addComment} disabled={!draft.trim()}>
                     Comment
                   </Button>
                 </div>
-              </div>
+              </article>
             )}
-          </div>
-          <div className="border-t border-border-default px-3 py-2 text-[10px] text-foreground-lighter">
-            Preview only · comments are not saved
           </div>
         </aside>
       )}

@@ -67,7 +67,7 @@ const formatSize = (bytes: number) =>
     ? `${(bytes / (1024 * 1024)).toFixed(1)}MB`
     : `${(bytes / 1024).toFixed(1)}KB`;
 
-const Problem = () => {
+const Problem = ({ headerControls }: { headerControls?: React.ReactNode }) => {
   const { contestYear, problemCode } = useParams<{
     contestYear: string;
     problemCode: string;
@@ -409,9 +409,12 @@ const Problem = () => {
 
         {/* Problem header */}
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-            {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
-          </h1>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
+            </h1>
+            {headerControls}
+          </div>
           <div className="flex flex-wrap items-center gap-2 mt-4">
             {problemInfo?.difficulty && (
               <span
@@ -632,7 +635,7 @@ const Problem = () => {
                         <span>
                           {getFileSizeWarning(activeTest.inputBytes) ||
                             getFileSizeWarning(activeTest.outputBytes)}{' '}
-                          — preview is truncated, use the Download button for the full file
+                          — display is truncated, use the Download button for the full file
                         </span>
                       </p>
                     </div>
