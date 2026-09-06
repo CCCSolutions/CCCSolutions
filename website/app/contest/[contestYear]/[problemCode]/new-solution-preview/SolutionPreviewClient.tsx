@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeftIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ChevronUpIcon,
   CodeIcon,
   DownloadIcon,
@@ -52,6 +54,7 @@ type TestCaseData = {
 const LARGE_FILE_BYTES = 50 * 1024;
 const DEFAULT_LEFT_SIZE = 54;
 const DEFAULT_SOLUTION_SIZE = 64;
+const DEFAULT_COMMENT_SIZE = 272;
 const LAYOUT_STORAGE_KEY = 'cccsolutions-solution-layout-v1';
 const DEFAULT_MINIMIZED: MinimizedState = {
   editorial: false,
@@ -138,10 +141,12 @@ function LayoutControls({
   view,
   onViewChange,
   onReset,
+  showReset = true,
 }: {
   view: ViewMode;
   onViewChange: (view: ViewMode) => void;
   onReset: () => void;
+  showReset?: boolean;
 }) {
   return (
     <div className="flex shrink-0 items-center gap-2">
@@ -165,14 +170,16 @@ function LayoutControls({
           </button>
         ))}
       </div>
-      <button
-        type="button"
-        onClick={onReset}
-        className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-[11px] text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground"
-      >
-        <ResetIcon width="12" height="12" />
-        Reset layout
-      </button>
+      {showReset && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-[11px] text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground"
+        >
+          <ResetIcon width="12" height="12" />
+          Reset layout
+        </button>
+      )}
     </div>
   );
 }
@@ -187,7 +194,12 @@ export default function SolutionPreviewClient() {
   return view === 'classic' ? (
     <ProblemPageClient
       headerControls={
-        <LayoutControls view={view} onViewChange={setView} onReset={clearSavedLayout} />
+        <LayoutControls
+          view={view}
+          onViewChange={setView}
+          onReset={clearSavedLayout}
+          showReset={false}
+        />
       }
     />
   ) : (
@@ -226,6 +238,7 @@ function WorkspaceView({
   const [fullscreen, setFullscreen] = useState<PanelName | null>(null);
   const [leftSize, setLeftSize] = useState(DEFAULT_LEFT_SIZE);
   const [solutionSize, setSolutionSize] = useState(DEFAULT_SOLUTION_SIZE);
+  const [commentSize, setCommentSize] = useState(DEFAULT_COMMENT_SIZE);
   const [mobilePanel, setMobilePanel] = useState<PanelName>('editorial');
   const [layoutLoaded, setLayoutLoaded] = useState(false);
   const desktopRef = useRef<HTMLDivElement>(null);
@@ -242,6 +255,7 @@ function WorkspaceView({
         const layout = JSON.parse(saved) as {
           leftSize?: number;
           solutionSize?: number;
+          commentSize?: number;
           minimized?: Partial<MinimizedState>;
         };
         if (typeof layout.leftSize === 'number') {
@@ -250,8 +264,13 @@ function WorkspaceView({
         if (typeof layout.solutionSize === 'number') {
           setSolutionSize(clamp(layout.solutionSize, 30, 78));
         }
+        if (typeof layout.commentSize === 'number') {
+          setCommentSize(clamp(layout.commentSize, 176, 440));
+        }
         if (layout.minimized) {
-          setMinimized({ ...DEFAULT_MINIMIZED, ...layout.minimized });
+          const restored = { ...DEFAULT_MINIMIZED, ...layout.minimized };
+          if (restored.solution && restored.tests) restored.tests = false;
+          setMinimized(restored);
         }
       }
     } catch {
@@ -265,9 +284,9 @@ function WorkspaceView({
     if (!layoutLoaded) return;
     window.localStorage.setItem(
       LAYOUT_STORAGE_KEY,
-      JSON.stringify({ leftSize, solutionSize, minimized })
+      JSON.stringify({ leftSize, solutionSize, commentSize, minimized })
     );
-  }, [layoutLoaded, leftSize, minimized, solutionSize]);
+  }, [commentSize, layoutLoaded, leftSize, minimized, solutionSize]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -395,7 +414,16 @@ function WorkspaceView({
 
   const toggleMinimized = (panel: PanelName) => {
     setFullscreen(null);
-    setMinimized((current) => ({ ...current, [panel]: !current[panel] }));
+    setMinimized((current) => {
+      const next = { ...current, [panel]: !current[panel] };
+
+      if (next.solution && next.tests) {
+        const otherPanel = panel === 'solution' ? 'tests' : 'solution';
+        next[otherPanel] = false;
+      }
+
+      return next;
+    });
   };
 
   const toggleFullscreen = (panel: PanelName) => {
@@ -408,6 +436,7 @@ function WorkspaceView({
     setFullscreen(null);
     setLeftSize(DEFAULT_LEFT_SIZE);
     setSolutionSize(DEFAULT_SOLUTION_SIZE);
+    setCommentSize(DEFAULT_COMMENT_SIZE);
     setMobilePanel('editorial');
     window.localStorage.removeItem(LAYOUT_STORAGE_KEY);
   };
@@ -467,6 +496,8 @@ function WorkspaceView({
       problemCode={problemCode}
       commentsVisible={commentsVisible}
       onToggleComments={() => setCommentsVisible((current) => !current)}
+      commentSize={commentSize}
+      onCommentSizeChange={setCommentSize}
       minimized={minimized.solution}
       fullscreen={fullscreen === 'solution'}
       onMinimize={() => toggleMinimized('solution')}
@@ -522,6 +553,7 @@ function WorkspaceView({
                 onChange={(delta) => setLeftSize((current) => clamp(current + delta, 28, 72))}
               />
             )}
+            {minimized.editorial && <div className="w-3 shrink-0" />}
 
             <div ref={rightColumnRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
               <div
@@ -618,6 +650,8 @@ function WorkspaceView({
               problemCode={problemCode}
               commentsVisible={commentsVisible}
               onToggleComments={() => setCommentsVisible((current) => !current)}
+              commentSize={commentSize}
+              onCommentSizeChange={setCommentSize}
               minimized={false}
               fullscreen={false}
               onMinimize={() => undefined}
@@ -667,7 +701,7 @@ function PanelHeader({
   onMinimize,
   onFullscreen,
   showPanelControls,
-  hideTitleWhenMinimized = false,
+  minimizeIcon,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -677,23 +711,19 @@ function PanelHeader({
   onMinimize: () => void;
   onFullscreen: () => void;
   showPanelControls: boolean;
-  hideTitleWhenMinimized?: boolean;
+  minimizeIcon?: React.ReactNode;
 }) {
   return (
-    <div
-      className={`group relative flex h-11 shrink-0 items-center border-b border-border-default bg-surface-200 ${
-        minimized && hideTitleWhenMinimized ? 'justify-center px-0' : 'justify-between gap-3 px-3'
-      }`}
-    >
+    <div className="group relative flex h-11 shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-200 px-3">
       <div className="flex min-w-0 items-center gap-2 text-xs font-semibold text-foreground">
         <span className="shrink-0 text-brand">{icon}</span>
-        {(!minimized || !hideTitleWhenMinimized) && <span className="truncate">{title}</span>}
+        <span className="truncate">{title}</span>
       </div>
       {!minimized && (
         <div className="flex min-w-0 items-center gap-1.5">
           {children}
           {showPanelControls && (
-            <div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+            <div className="flex items-center">
               <button
                 type="button"
                 onClick={onFullscreen}
@@ -714,20 +744,23 @@ function PanelHeader({
                 aria-label={`Minimize ${title} panel`}
                 title="Minimize"
               >
-                <ChevronDownIcon width="13" height="13" />
+                {minimizeIcon ?? <ChevronDownIcon width="13" height="13" />}
               </button>
             </div>
           )}
         </div>
       )}
       {minimized && showPanelControls && (
-        <div
-          className={`opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 ${
-            hideTitleWhenMinimized
-              ? 'absolute inset-0 flex items-center justify-center bg-surface-200'
-              : ''
-          }`}
-        >
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={onFullscreen}
+            className="rounded p-1.5 text-foreground-lighter hover:bg-surface-300 hover:text-foreground"
+            aria-label={`Fullscreen ${title} panel`}
+            title="Fullscreen"
+          >
+            <EnterFullScreenIcon width="13" height="13" />
+          </button>
           <button
             type="button"
             onClick={onMinimize}
@@ -766,6 +799,48 @@ function EditorialPanel({
 }) {
   const title = problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`;
 
+  if (minimized && showPanelControls) {
+    return (
+      <section
+        className="flex size-full min-h-0 flex-col items-center bg-surface-200 py-2"
+        aria-label="Editorial"
+      >
+        <button
+          type="button"
+          onClick={onMinimize}
+          className="flex min-h-0 flex-1 flex-col items-center gap-2 text-foreground-light transition-colors hover:text-foreground"
+          aria-label="Restore editorial panel"
+          title="Restore editorial"
+        >
+          <ReaderIcon width="16" height="16" className="shrink-0 text-brand" />
+          <span className="[writing-mode:vertical-rl] rotate-180 text-xs font-semibold tracking-wide">
+            Editorial
+          </span>
+        </button>
+        <div className="mt-auto flex flex-col items-center gap-1">
+          <button
+            type="button"
+            onClick={onFullscreen}
+            className="rounded p-2 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground"
+            aria-label="Fullscreen editorial panel"
+            title="Fullscreen"
+          >
+            <EnterFullScreenIcon width="14" height="14" />
+          </button>
+          <button
+            type="button"
+            onClick={onMinimize}
+            className="rounded p-2 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground"
+            aria-label="Restore editorial panel"
+            title="Restore"
+          >
+            <ChevronRightIcon width="15" height="15" />
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="flex size-full min-h-0 flex-col" aria-label="Editorial">
       <PanelHeader
@@ -776,7 +851,7 @@ function EditorialPanel({
         onMinimize={onMinimize}
         onFullscreen={onFullscreen}
         showPanelControls={showPanelControls}
-        hideTitleWhenMinimized
+        minimizeIcon={<ChevronLeftIcon width="13" height="13" />}
       >
         {layoutControls}
       </PanelHeader>
@@ -815,7 +890,7 @@ function EditorialPanel({
                   ))}
                 </div>
               </div>
-              <Button asChild type="default" size="tiny">
+              <Button asChild type="primary" size="tiny">
                 <Link href="/create-post">Ask a question</Link>
               </Button>
             </div>
@@ -840,6 +915,8 @@ function SolutionPanel({
   problemCode,
   commentsVisible,
   onToggleComments,
+  commentSize,
+  onCommentSizeChange,
   minimized,
   fullscreen,
   onMinimize,
@@ -856,6 +933,8 @@ function SolutionPanel({
   problemCode: string;
   commentsVisible: boolean;
   onToggleComments: () => void;
+  commentSize: number;
+  onCommentSizeChange: (size: number) => void;
   minimized: boolean;
   fullscreen: boolean;
   onMinimize: () => void;
@@ -928,6 +1007,9 @@ function SolutionPanel({
               code={solution.code}
               language={solution.language}
               commentsVisible={commentsVisible}
+              onCloseComments={onToggleComments}
+              railWidth={commentSize}
+              onRailWidthChange={onCommentSizeChange}
             />
           ) : (
             <PanelStatus label="Choose a solution to view its code." />
