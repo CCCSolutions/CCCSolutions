@@ -1134,7 +1134,7 @@ function SolutionPanel({
           type="button"
           onClick={onStartComment}
           disabled={!solution}
-          className="rounded border border-border-strong bg-surface-100 p-1.5 text-brand transition-colors hover:border-brand-400 hover:bg-brand-200 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded border border-border-strong bg-surface-100 p-1.5 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Add comment"
           title="Add comment"
         >

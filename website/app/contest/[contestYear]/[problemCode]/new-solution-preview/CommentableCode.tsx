@@ -51,6 +51,12 @@ function rangeLabel(code: string, range: TextRange): string {
   return first === last ? `Line ${first}` : `Lines ${first}–${last}`;
 }
 
+function commentTarget(code: string, range: TextRange): TextRange {
+  if (range.end > range.start || code.length === 0) return range;
+  const start = Math.min(range.start, code.length - 1);
+  return { start, end: start + 1 };
+}
+
 function fallbackRange(code: string, preferredLine: number): TextRange {
   const lines = code.split('\n');
   const lineIndex = clamp(preferredLine - 1, 0, Math.max(0, lines.length - 1));
@@ -228,8 +234,9 @@ export function CommentableCode({
     setActiveCommentId(null);
     setReplyingToId(null);
     setDraft('');
+    setTarget((current) => commentTarget(code, current));
     setComposing(true);
-  }, [composerRequest]);
+  }, [code, composerRequest]);
 
   useEffect(() => {
     const root = codeAreaRef.current;
@@ -403,8 +410,9 @@ export function CommentableCode({
 
   const addComment = () => {
     if (!draft.trim()) return;
+    const range = commentTarget(code, target);
     const comment: MockComment = {
-      ...target,
+      ...range,
       id: Date.now(),
       author: 'you',
       body: draft.trim(),
@@ -412,6 +420,7 @@ export function CommentableCode({
       replies: [],
     };
     setComments((current) => [comment, ...current]);
+    setTarget(range);
     setActiveCommentId(comment.id);
     setComposing(false);
     setDraft('');
