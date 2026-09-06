@@ -524,7 +524,7 @@ function WorkspaceView({
   );
 
   return (
-    <div className="mb-3 flex min-h-[70dvh] flex-col bg-background text-foreground lg:h-[calc(100dvh-var(--nav-h)-0.75rem)] lg:min-h-0">
+    <div className="mb-3 flex min-h-[70dvh] flex-col bg-background text-foreground lg:mb-0 lg:h-[calc(100dvh-var(--nav-h))] lg:min-h-0">
       <div ref={desktopRef} className="hidden min-h-0 flex-1 p-3 lg:flex">
         {fullscreen ? (
           <div className="min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border border-border-default bg-surface-100">
