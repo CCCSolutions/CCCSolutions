@@ -324,7 +324,7 @@ export default function ForumPage() {
                         }
                         readOnly
                         theme="bubble"
-                        className="text-foreground-light max-h-24 overflow-hidden"
+                        className="text-foreground-light max-h-24 overflow-hidden [&_.ql-container]:!bg-transparent [&_.ql-editor]:!bg-transparent [&_.ql-code-block-container]:!bg-transparent"
                       />
                       <div className="mt-2 text-xs text-foreground-lighter">
                         By {post.author?.username ?? 'Unknown'} ·{' '}
