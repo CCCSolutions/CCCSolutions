@@ -1,6 +1,6 @@
 import type { Context, Next } from 'hono';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { Bindings } from '../types';
 import { profiles } from '../db/schema';
 import { getDb } from '../db';
