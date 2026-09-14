@@ -51,7 +51,7 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.5.12",
     "postcss": "^8.5.16",
-    "prettier": "^3.9.4",
+    "prettier": "3.9.5",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.9.3",
     "wrangler": "^4.110.0"
