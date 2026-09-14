@@ -46,6 +46,13 @@
   --colors-gray-light-1000: 0deg 0% 52.2%;
   --colors-gray-light-1100: 0deg 0% 43.5%;
   --colors-gray-light-1200: 0deg 0% 9%;
+
+  --colors-sand-light-100: 42deg 38% 99%;
+  --colors-sand-light-200: 42deg 32% 98%;
+  --colors-sand-light-300: 42deg 26% 97%;
+  --colors-sand-light-400: 41deg 20% 95.5%;
+  --colors-sand-light-500: 40deg 16% 93.5%;
+  --colors-sand-light-600: 39deg 13% 91.5%;
 }
 
 [data-theme='dark'],
@@ -141,18 +148,18 @@
   --border-overlay: var(--colors-gray-light-500);
   --border-control: var(--colors-gray-light-800);
 
-  /* Light mode: bg sits subtly below pure white so cards (surface-100) visibly lift. */
-  --background-default: 0deg 0% 98.5%;
-  --background-200: var(--colors-gray-light-300);
-  --background-surface-75: 0deg 0% 100%;
-  --background-surface-100: 0deg 0% 100%;
-  --background-surface-200: 0deg 0% 95.3%;
-  --background-surface-300: 0deg 0% 92.9%;
-  --background-surface-400: 0deg 0% 89.8%;
-  --background-muted: 0deg 0% 96.9%;
+  /* Warm paper backgrounds reduce glare without changing neutral text or borders. */
+  --background-default: var(--colors-sand-light-300);
+  --background-200: var(--colors-sand-light-300);
+  --background-surface-75: var(--colors-sand-light-200);
+  --background-surface-100: var(--colors-sand-light-100);
+  --background-surface-200: var(--colors-sand-light-300);
+  --background-surface-300: var(--colors-sand-light-400);
+  --background-surface-400: var(--colors-sand-light-500);
+  --background-muted: var(--colors-sand-light-300);
   --background-selection: var(--colors-gray-light-400);
-  --background-alternative-default: 0deg 0% 99.2%;
-  --background-control: var(--colors-gray-light-300);
+  --background-alternative-default: var(--colors-sand-light-200);
+  --background-control: var(--colors-sand-light-300);
 
   --foreground-default: var(--colors-gray-light-1200);
   --foreground-light: 0deg 0% 32.2%;
