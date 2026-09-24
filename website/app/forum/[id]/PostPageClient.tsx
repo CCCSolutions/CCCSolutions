@@ -8,6 +8,7 @@ import {
   ArrowDownIcon,
   DrawingPinFilledIcon,
 } from '@radix-ui/react-icons';
+import { AdminBadge } from '../AdminBadge';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
@@ -27,7 +28,7 @@ type PostDetail = {
   score: number;
   createdAt: string;
   isPinned: boolean;
-  author: { username: string | null };
+  author: { username: string | null; role: string | null };
 };
 
 type CommentRow = {
@@ -35,7 +36,7 @@ type CommentRow = {
   content: string;
   score: number;
   createdAt: string;
-  author: { username: string | null };
+  author: { username: string | null; role: string | null };
 };
 
 type Props = {
@@ -271,8 +272,9 @@ export default function PostPageClient({ id }: Props) {
                 By{' '}
                 <span className="font-semibold text-foreground-light">
                   {post.author?.username ?? 'Unknown'}
-                </span>{' '}
-                on {new Date(post.createdAt).toISOString().split('T')[0]}
+                </span>
+                {post.author?.role === 'admin' && <AdminBadge />} on{' '}
+                {new Date(post.createdAt).toISOString().split('T')[0]}
               </span>
 
               <div className="flex items-center gap-2">
@@ -325,8 +327,9 @@ export default function PostPageClient({ id }: Props) {
                         By{' '}
                         <span className="font-medium text-foreground-light">
                           {comment.author?.username ?? 'Unknown'}
-                        </span>{' '}
-                        on {new Date(comment.createdAt).toISOString().split('T')[0]}
+                        </span>
+                        {comment.author?.role === 'admin' && <AdminBadge />} on{' '}
+                        {new Date(comment.createdAt).toISOString().split('T')[0]}
                       </p>
                       <div className="flex items-center gap-1.5">
                         <button
