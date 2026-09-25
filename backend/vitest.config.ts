@@ -4,8 +4,8 @@ export default defineConfig({
   test: {
     include: ['test/**/*.test.ts'],
     // Integration tests hit a local Supabase stack and have their own runner
-    // (`bun run test:integration`, see vitest.integration.config.ts) — CI has no
-    // DB, so they must never run under the default `test` script.
+    // (`bun run test:integration`, see vitest.integration.config.ts), which CI runs
+    // in the db-migrate workflow — they must never run under this DB-less script.
     exclude: [...configDefaults.exclude, 'test/integration/**'],
     environment: 'node',
     coverage: {
@@ -15,7 +15,7 @@ export default defineConfig({
       // DB-client factory, the cron keep-alive, and type-only files. (2) Auth + DB-gated
       // logic (forum, user, middleware): it only runs behind a real JWT and a live
       // Supabase, so it is exercised only by the integration suite, which does not run
-      // under this script (see the test exclude above; CI has no DB). Measuring it here
+      // under this script (see the test exclude above). Measuring it here
       // would show ~0% and blow the thresholds. What stays measured is the route logic
       // that is unit-testable without a DB: r2 (fake bucket) and admin (shared token).
       exclude: [
