@@ -152,9 +152,17 @@ forum.post('/posts/:id/pin', requireAuth, async (c) => {
     .update(posts)
     .set(parsed.data.pinned ? { isPinned: true, pinnedAt: new Date() } : { isPinned: false })
     .where(eq(posts.id, c.req.param('id')!))
-    .returning({ id: posts.id, isPinned: posts.isPinned });
+    .returning({ id: posts.id, title: posts.title, isPinned: posts.isPinned });
   if (!updated) return c.json({ error: 'Post not found' }, 404);
   purgeForum(c);
+  notify(c, {
+    kind: 'pin',
+    title: updated.isPinned ? 'Post pinned' : 'Post unpinned',
+    description: updated.title,
+    actor: c.get('profile').username,
+    path: `/forum/${updated.id}`,
+    ping: false,
+  });
   return c.json({ ok: true, isPinned: updated.isPinned });
 });
 

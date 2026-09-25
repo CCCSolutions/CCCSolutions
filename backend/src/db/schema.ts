@@ -75,7 +75,9 @@ export const posts = pgTable(
     pgPolicy('posts_insert_self', {
       for: 'insert',
       to: authenticatedRole,
-      withCheck: sql`${t.profileId} = ${ownProfileId}`,
+      // is_pinned is admin-only. 0004 locks it on UPDATE with a column grant; INSERT
+      // can't use one, because Drizzle names every column (as DEFAULT) in its inserts.
+      withCheck: sql`${t.profileId} = ${ownProfileId} and ${t.isPinned} = false`,
     }),
     pgPolicy('posts_update_self', {
       for: 'update',

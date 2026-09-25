@@ -36,6 +36,13 @@
       "when": 1788638133977,
       "tag": "0004_lock_is_pinned_column",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790307311299,
+      "tag": "0005_lock_is_pinned_on_insert",
+      "breakpoints": true
     }
   ]
 }

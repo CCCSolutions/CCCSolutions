@@ -1,0 +1,1 @@
+ALTER POLICY "posts_insert_self" ON "posts" TO authenticated WITH CHECK ("posts"."profile_id" = (select id from profiles where auth_user_id = (select auth.uid())) and "posts"."is_pinned" = false);
