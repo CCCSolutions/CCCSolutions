@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import type { Bindings } from './types';
 import admin from './admin/routes';
 import forum from './forum/routes';
@@ -40,6 +41,16 @@ app.get('/health', (c) => {
   c.header('Cache-Control', 'no-store');
   return c.json({ status: 'ok' });
   // TODO: deeper checks — R2, DB, downstream services (not just liveness)
+});
+
+// Last resort for anything a route didn't handle. Bad input is already a 4xx from
+// validation, so reaching this means a real server fault. no-store because a route may
+// have set a cacheable Cache-Control before it threw, and an error must never be cached.
+app.onError((err, c) => {
+  if (err instanceof HTTPException) return err.getResponse();
+  console.error('unhandled error', { method: c.req.method, path: c.req.path, err });
+  c.header('Cache-Control', 'no-store');
+  return c.json({ error: 'Internal server error' }, 500);
 });
 
 app.route('/admin', admin);

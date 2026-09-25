@@ -92,10 +92,11 @@ let counter = 0;
 // this independent of [auth.email] enable_confirmations, and sends no email.
 export async function signUp(
   prefix = 'itest',
+  chosenUsername?: string,
 ): Promise<{ accessToken: string; userId: string; email: string; username: string }> {
   const unique = `${Date.now()}_${process.pid}_${counter++}`;
   const email = `${prefix}_${unique}@example.com`;
-  const username = `${prefix}${unique}`.replace(/[^a-z0-9_]/gi, '').slice(0, 24);
+  const username = chosenUsername ?? `${prefix}${unique}`.replace(/[^a-z0-9_]/gi, '').slice(0, 24);
   const password = 'password123!';
   const { publishable, secret } = getKeys();
 

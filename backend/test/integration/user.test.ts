@@ -18,4 +18,14 @@ describe.skipIf(!dbUp)('user routes (integration, local Supabase)', () => {
     expect(profile.username).toBe(username);
     expect(profile.role).toBe('user');
   });
+
+  it('a second user who picks a taken username gets a numbered one, not a 500', async () => {
+    const first = await signUp('dupename');
+    await appRequest('/user/me', { headers: authHeader(first.accessToken) });
+
+    const second = await signUp('dupename', first.username);
+    const res = await appRequest('/user/me', { headers: authHeader(second.accessToken) });
+    expect(res.status).toBe(200);
+    expect(((await res.json()) as { username: string }).username).toBe(`${first.username}1`);
+  });
 });

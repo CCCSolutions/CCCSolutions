@@ -1,10 +1,17 @@
 import { Hono, type Context } from 'hono';
 import { and, desc, eq, sql, inArray } from 'drizzle-orm';
 import type { Bindings } from '../types';
-import { getDb, withUser } from '../db';
+import { getDb, withUser, pgErrorCode } from '../db';
 import { posts, comments, profiles, votes } from '../db/schema';
 import { requireAuth, type AuthVars } from '../middleware/auth';
-import { createPostSchema, createCommentSchema, voteSchema, unvoteSchema } from './validation';
+import {
+  createPostSchema,
+  createCommentSchema,
+  voteSchema,
+  unvoteSchema,
+  idParamSchema,
+  myVotesQuerySchema,
+} from './validation';
 import { resolvePageSize, resolveOffset } from './pagination';
 import { notify } from '../notify';
 import { purgeCacheTags } from '../cache';
@@ -60,7 +67,12 @@ forum.get('/posts', async (c) => {
 });
 
 forum.get('/posts/:id', async (c) => {
-  const id = c.req.param('id');
+  const parsedId = idParamSchema.safeParse(c.req.param('id'));
+  if (!parsedId.success) {
+    c.header('Cache-Control', 'no-store');
+    return c.json({ error: 'Invalid post id' }, 400);
+  }
+  const id = parsedId.data;
   const db = getDb(c.env);
   const [post] = await db
     .select({
@@ -119,22 +131,31 @@ forum.post('/posts', requireAuth, async (c) => {
 });
 
 forum.post('/posts/:id/comments', requireAuth, async (c) => {
+  const postId = idParamSchema.safeParse(c.req.param('id'));
+  if (!postId.success) return c.json({ error: 'Invalid post id' }, 400);
   const parsed = createCommentSchema.safeParse(await c.req.json().catch(() => null));
   if (!parsed.success) return c.json({ error: 'Invalid comment' }, 400);
   const profile = c.get('profile');
-  const [comment] = await withUser(getDb(c.env), c.get('claims'), (tx) =>
-    tx
-      .insert(comments)
-      .values({ postId: c.req.param('id')!, profileId: profile.id, content: parsed.data.content })
-      .returning(),
-  );
+  let comment: typeof comments.$inferSelect;
+  try {
+    [comment] = await withUser(getDb(c.env), c.get('claims'), (tx) =>
+      tx
+        .insert(comments)
+        .values({ postId: postId.data, profileId: profile.id, content: parsed.data.content })
+        .returning(),
+    );
+  } catch (err) {
+    // 23503 = foreign_key_violation: the post doesn't exist (or was just deleted).
+    if (pgErrorCode(err) === '23503') return c.json({ error: 'Post not found' }, 404);
+    throw err;
+  }
   purgeForum(c);
   notify(c, {
     kind: 'comment',
     title: 'New comment',
     description: comment.content,
     actor: profile.username,
-    path: `/forum/${c.req.param('id')}`,
+    path: `/forum/${postId.data}`,
   });
   return c.json(comment, 201);
 });
@@ -170,16 +191,13 @@ forum.delete('/vote', requireAuth, async (c) => {
 
 forum.get('/votes/mine', requireAuth, async (c) => {
   c.header('Cache-Control', 'no-store');
-  const voteType = c.req.query('type');
-  if (!voteType || (voteType != 'post' && voteType != 'comment')) {
-    return c.json({ error: 'invalid or missing vote type' }, 400);
-  }
-  // we filter here to remove degenerate IDs like "" when request is ,,
-  const ids =
-    c.req
-      .query('ids')
-      ?.split(',')
-      .filter((id) => id) ?? [];
+  const parsed = myVotesQuerySchema.safeParse({
+    type: c.req.query('type'),
+    // filter drops degenerate IDs like "" when the request is ?ids=,,
+    ids: (c.req.query('ids') ?? '').split(',').filter((id) => id),
+  });
+  if (!parsed.success) return c.json({ error: 'invalid vote type or ids' }, 400);
+  const { type: voteType, ids } = parsed.data;
   const db = getDb(c.env);
   const data = await db
     .select({ votableId: votes.votableId, value: votes.value })

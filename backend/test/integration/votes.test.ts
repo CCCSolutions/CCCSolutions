@@ -62,6 +62,13 @@ describe.skipIf(!dbUp)('GET /forum/votes/mine (integration, local Supabase)', ()
     expect(rows).toEqual([]);
   });
 
+  it('400s when an id is not a uuid (instead of a Postgres cast error)', async () => {
+    const res = await appRequest(`/forum/votes/mine?type=post&ids=${votedId},not-a-uuid`, {
+      headers: authHeader(user.accessToken),
+    });
+    expect(res.status).toBe(400);
+  });
+
   it('returns an empty array when ids is empty', async () => {
     const res = await appRequest('/forum/votes/mine?type=post&ids=', { headers: authHeader(user.accessToken) });
     expect(res.status).toBe(200);
