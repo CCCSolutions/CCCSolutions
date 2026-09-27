@@ -97,7 +97,7 @@ export function EditorialContent({
         This editorial isn&apos;t available yet
       </h2>
       <div className="mt-5 flex w-full max-w-xs flex-col gap-2">
-        <Button asChild type="outline" size="medium" block className="justify-start">
+        <Button asChild type="outline" size="medium" block className="justify-center">
           <a
             href={dmojEditorialUrl(contestYear, problemCode)}
             target="_blank"
