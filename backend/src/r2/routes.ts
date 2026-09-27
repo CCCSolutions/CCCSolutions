@@ -26,6 +26,7 @@ r2.get('/:year/:code/list', async (c) => {
 
   const testsByKey: Record<string, { n: number; sample: boolean; inputBytes?: number; outputBytes?: number }> = {};
   const solutions: { n: number; ext: string; bytes: number }[] = [];
+  let editorial = false;
 
   for (const obj of objects) {
     const rel = obj.key.slice(prefix.length);
@@ -43,13 +44,15 @@ r2.get('/:year/:code/list', async (c) => {
 
     const sol = rel.match(/^solutions\/(\d+)\.([a-z]+)$/);
     if (sol) solutions.push({ n: Number(sol[1]), ext: sol[2], bytes: obj.size });
+
+    if (rel === 'editorial.md') editorial = true;
   }
 
   const tests = Object.values(testsByKey).sort((a, b) => Number(a.sample) - Number(b.sample) || a.n - b.n);
   solutions.sort((a, b) => a.n - b.n);
 
   setContestCache(c, year, code);
-  return c.json({ tests, solutions });
+  return c.json({ tests, solutions, editorial });
 });
 
 // R2 preview endpoint for test case files
@@ -59,9 +62,10 @@ r2.get('/:year/:code/preview', async (c) => {
   if (!params.success || !file.success)
     return c.text('Bad request: /contests/<year>/<code>/preview?file=tests/1.in', 400);
   const key = `contests/${params.data.year}/${params.data.code}/${file.data}`;
-  const isSolution = file.data.startsWith('solutions/');
+  // Solutions and the editorial come back whole. Test files are truncated.
+  const whole = file.data.startsWith('solutions/') || file.data === 'editorial.md';
 
-  const obj = isSolution
+  const obj = whole
     ? await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key)
     : await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key, { range: { offset: 0, length: 8192 } });
 
@@ -74,7 +78,7 @@ r2.get('/:year/:code/preview', async (c) => {
 
   const text = await obj.text();
   setContestCache(c, params.data.year, params.data.code);
-  return c.text(isSolution ? text : text.split('\n').slice(0, 50).join('\n'));
+  return c.text(whole ? text : text.split('\n').slice(0, 50).join('\n'));
 });
 
 // Friendly download filename: samples read clearly, solutions carry year+code.

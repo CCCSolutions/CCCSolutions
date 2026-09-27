@@ -45,6 +45,19 @@ describe('GET /contests/:year/:code/preview', () => {
     expect(bucket.get).toHaveBeenCalledWith('contests/2024/s1/solutions/1.py');
   });
 
+  it('returns the full editorial (no range read)', async () => {
+    const markdown = '## Subtask 1\n'.repeat(100);
+    const bucket = bucketReturning(markdown);
+    const res = await app.request(
+      '/contests/2024/s1/preview?file=editorial.md',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe(markdown);
+    expect(bucket.get).toHaveBeenCalledWith('contests/2024/s1/editorial.md');
+  });
+
   it('returns 400 for a bad file', async () => {
     const bucket = bucketReturning('x');
     const res = await app.request(
@@ -195,6 +208,20 @@ describe('GET /contests/:year/:code/list', () => {
       { n: 2, ext: 'py', bytes: 1500 },
     ]);
     expect(bucket.list).toHaveBeenCalledWith({ prefix: 'contests/2024/s1/' });
+  });
+
+  it('reports whether editorial.md exists', async () => {
+    const withEditorial = bucketListing([['contests/2024/s1/editorial.md', 3000]]);
+    const res = await app.request(
+      '/contests/2024/s1/list',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: withEditorial, ...R2_ENV },
+    );
+    expect(((await res.json()) as { editorial: boolean }).editorial).toBe(true);
+
+    const without = bucketListing([['contests/2024/s1/solutions/1.cpp', 2000]]);
+    const res2 = await app.request('/contests/2024/s1/list', {}, { TESTCASES_SOLUTIONS_BUCKET: without, ...R2_ENV });
+    expect(((await res2.json()) as { editorial: boolean }).editorial).toBe(false);
   });
 
   it('returns 400 for a bad problem code', async () => {

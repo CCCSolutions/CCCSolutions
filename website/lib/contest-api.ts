@@ -16,6 +16,7 @@ export interface ContestSolutionMeta {
 export interface ContestListResponse {
   tests: ContestTestMeta[];
   solutions: ContestSolutionMeta[];
+  editorial?: boolean;
 }
 
 export function fetchContestList(year: string, code: string, signal?: AbortSignal) {

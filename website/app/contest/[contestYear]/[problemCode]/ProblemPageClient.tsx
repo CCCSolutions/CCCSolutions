@@ -155,7 +155,13 @@ const Problem = ({
             <h2 className="text-xl font-semibold text-foreground">Editorial</h2>
           </div>
           <Card>
-            <EditorialContent contestYear={contestYear} problemCode={problemCode} />
+            <EditorialContent
+              contestYear={contestYear}
+              problemCode={problemCode}
+              markdown={data.editorial}
+              loading={loading}
+              className="p-6"
+            />
           </Card>
         </section>
 

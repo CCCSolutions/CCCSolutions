@@ -10,11 +10,13 @@ import 'katex/dist/katex.min.css';
 // light-mode hljs theme.
 import 'highlight.js/styles/github-dark.css';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 
-export function MarkdownPreview({ content }: { content: string }) {
+// gfm turns on GitHub Markdown extras such as tables. The editorials need it; forum posts don't use it yet.
+export function MarkdownPreview({ content, gfm = false }: { content: string; gfm?: boolean }) {
   if (!content.trim()) {
     return <p className="text-sm text-foreground-lighter italic">Nothing to preview yet.</p>;
   }
@@ -26,9 +28,15 @@ export function MarkdownPreview({ content }: { content: string }) {
         [&_p]:m-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
         [&_:not(pre)>code]:rounded [&_:not(pre)>code]:bg-surface-200 [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:py-0.5 [&_:not(pre)>code]:text-xs
         [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:text-xs [&_pre]:leading-relaxed
-        [&_a]:text-brand [&_a:hover]:underline"
+        [&_a]:text-brand [&_a:hover]:underline
+        [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs
+        [&_th]:border [&_th]:border-border-default [&_th]:bg-surface-200 [&_th]:px-2 [&_th]:py-1 [&_th]:text-left
+        [&_td]:border [&_td]:border-border-default [&_td]:px-2 [&_td]:py-1"
     >
-      <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex, rehypeHighlight]}>
+      <ReactMarkdown
+        remarkPlugins={gfm ? [remarkGfm, remarkMath] : [remarkMath]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      >
         {content}
       </ReactMarkdown>
     </div>
