@@ -1,28 +1,42 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { Button } from '../ui/button';
+import { Tooltip } from '../ui/tooltip';
 import { problems } from '../../constants';
+
+const DifficultyLegend = () => (
+  <>
+    <div className="mb-1">
+      <strong className="text-foreground font-medium">Easy</strong>: an average grade 11 student
+      should get this
+    </div>
+    <div className="mb-1">
+      <strong className="text-foreground font-medium">Normal</strong>: an average grade 12 student
+      should get this
+    </div>
+    <div className="mb-1">
+      <strong className="text-foreground font-medium">Hard</strong>: a good grade 12 student MIGHT
+      get this
+    </div>
+    <div className="mb-1">
+      <strong className="text-foreground font-medium">Insane</strong>: the best grade 12 student
+      MIGHT get this, given enough time
+    </div>
+    <div>
+      <strong className="text-foreground font-medium">Wicked</strong>: the teacher will get this
+      after many days, or maybe never :-)
+    </div>
+  </>
+);
 
 const ProblemsTable = () => {
   const searchParams = useSearchParams();
   const initialPage = parseInt(searchParams.get('page') || '1') || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [showDifficultyInfo, setShowDifficultyInfo] = useState(false);
-  const difficultyInfoRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (difficultyInfoRef.current && !difficultyInfoRef.current.contains(e.target as Node)) {
-        setShowDifficultyInfo(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const problemsPerPage = 20;
 
@@ -69,42 +83,15 @@ const ProblemsTable = () => {
             <th className="w-32 pr-6 py-3 text-left font-medium">
               <div className="flex items-center gap-2 relative">
                 <span className="leading-none">Difficulty</span>
-                <div className="relative group leading-none" ref={difficultyInfoRef}>
+                <Tooltip side="bottom" className="w-64 p-3" content={<DifficultyLegend />}>
                   <button
                     type="button"
-                    onClick={() => setShowDifficultyInfo((v) => !v)}
                     className="inline-flex items-center leading-none p-0 border-0 bg-transparent text-foreground-lighter cursor-pointer"
                     aria-label="Difficulty legend"
                   >
                     <InfoCircledIcon width="16" height="16" />
                   </button>
-                  <div
-                    className={`absolute left-1/2 transform -translate-x-1/2 top-full mt-2 ${
-                      showDifficultyInfo ? 'block' : 'hidden'
-                    } md:group-hover:block w-64 p-3 text-xs bg-surface-100 border border-border-default rounded-md text-foreground-light z-10 whitespace-normal`}
-                  >
-                    <div className="mb-1">
-                      <strong className="text-foreground font-medium">Easy</strong>: an average
-                      grade 11 student should get this
-                    </div>
-                    <div className="mb-1">
-                      <strong className="text-foreground font-medium">Normal</strong>: an average
-                      grade 12 student should get this
-                    </div>
-                    <div className="mb-1">
-                      <strong className="text-foreground font-medium">Hard</strong>: a good grade 12
-                      student MIGHT get this
-                    </div>
-                    <div className="mb-1">
-                      <strong className="text-foreground font-medium">Insane</strong>: the best
-                      grade 12 student MIGHT get this, given enough time
-                    </div>
-                    <div>
-                      <strong className="text-foreground font-medium">Wicked</strong>: the teacher
-                      will get this after many days, or maybe never :-)
-                    </div>
-                  </div>
-                </div>
+                </Tooltip>
               </div>
             </th>
             <th className="pl-4 md:pl-6 py-3 text-left font-medium">Tags</th>
