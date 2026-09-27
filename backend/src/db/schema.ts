@@ -12,7 +12,7 @@
 //     only so old posts still show an author; nobody can log in as them.
 
 import { sql } from 'drizzle-orm';
-import { pgTable, uuid, text, timestamp, smallint, check, uniqueIndex, pgPolicy } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, timestamp, smallint, check, uniqueIndex, pgPolicy } from 'drizzle-orm/pg-core';
 import { authUsers, authenticatedRole } from 'drizzle-orm/supabase';
 
 export const profiles = pgTable(
@@ -62,8 +62,10 @@ export const posts = pgTable(
     profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
     title: text('title').notNull(),
     content: text('content').notNull(),
+    isPinned: boolean('is_pinned').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    pinnedAt: timestamp('pinned_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     pgPolicy('posts_select_all', {
@@ -73,7 +75,9 @@ export const posts = pgTable(
     pgPolicy('posts_insert_self', {
       for: 'insert',
       to: authenticatedRole,
-      withCheck: sql`${t.profileId} = ${ownProfileId}`,
+      // is_pinned is admin-only. 0004 locks it on UPDATE with a column grant; INSERT
+      // can't use one, because Drizzle names every column (as DEFAULT) in its inserts.
+      withCheck: sql`${t.profileId} = ${ownProfileId} and ${t.isPinned} = false`,
     }),
     pgPolicy('posts_update_self', {
       for: 'update',

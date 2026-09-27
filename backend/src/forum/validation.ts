@@ -19,3 +19,7 @@ export const unvoteSchema = z.object({
   votableType: z.enum(['post', 'comment']),
   votableId: z.string().uuid(),
 });
+
+export const pinSchema = z.object({
+  pinned: z.boolean(),
+});
