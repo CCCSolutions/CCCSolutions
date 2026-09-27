@@ -1,38 +1,27 @@
-import { defineConfig, configDefaults } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 
+// One config for every test. Unit tests need nothing; integration tests
+// (test/integration) need a local Supabase stack and skip without one. Scripts:
+//   test              unit tests only, no DB. CI's fast job runs it on every PR.
+//   test:integration  integration tests only (supabase start && bun run db:migrate first)
+//   test:coverage     everything, with the coverage gate. CI runs it in db-migrate.yml
+//                     against a fresh local Supabase, so the gate covers the whole API.
 export default defineConfig({
   test: {
     include: ['test/**/*.test.ts'],
-    // Integration tests hit a local Supabase stack and have their own runner
-    // (`bun run test:integration`, see vitest.integration.config.ts), which CI runs
-    // in the db-migrate workflow — they must never run under this DB-less script.
-    exclude: [...configDefaults.exclude, 'test/integration/**'],
     environment: 'node',
     coverage: {
       provider: 'v8',
-      // Two groups are excluded. (1) Declarative / infra code with no meaningful
-      // unit-test surface: schema + policy definitions, generated migrations, the thin
-      // DB-client factory, the cron keep-alive, and type-only files. (2) Auth + DB-gated
-      // logic (forum, user, middleware): it only runs behind a real JWT and a live
-      // Supabase, so it is exercised only by the integration suite, which does not run
-      // under this script (see the test exclude above). Measuring it here
-      // would show ~0% and blow the thresholds. What stays measured is the route logic
-      // that is unit-testable without a DB: r2 (fake bucket) and admin (shared token).
-      exclude: [
-        'src/db/**',
-        'src/forum/**',
-        'src/user/**',
-        'src/middleware/**',
-        'src/scheduled.ts',
-        'src/types.ts',
-        'drizzle/**',
-        '**/*.config.ts',
-      ],
+      include: ['src/**'],
+      // Only files with no runtime behaviour to test: table/policy definitions and types.
+      exclude: ['src/db/schema.ts', 'src/types.ts'],
+      // A few points under the measured numbers (Sept 2026: 94.7% statements, 85.2%
+      // branches, 92.2% functions, 97.9% lines), so a real drop fails CI.
       thresholds: {
-        lines: 70,
-        statements: 70,
-        functions: 70,
-        branches: 70,
+        lines: 95,
+        statements: 90,
+        functions: 90,
+        branches: 80,
       },
     },
   },

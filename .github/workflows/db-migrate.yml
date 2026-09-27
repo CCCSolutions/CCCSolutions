@@ -2,15 +2,15 @@ name: db migrations
 
 # Migrations are applied ONLY by this workflow — never by a developer running
 # db:migrate against production. On a PR we prove the committed migrations apply
-# to a fresh database, then run the integration suite against it; on merge to main
-# we apply them to the hosted project.
+# to a fresh database, then run every test against it with the coverage gate; on
+# merge to main we apply them to the hosted project.
 
 on:
   pull_request:
     paths:
       - 'backend/src/**'
-      - 'backend/test/integration/**'
-      - 'backend/vitest.integration.config.ts'
+      - 'backend/test/**'
+      - 'backend/vitest.config.ts'
       - 'backend/package.json'
       - 'backend/bun.lock'
       - 'backend/drizzle/**'
@@ -32,7 +32,7 @@ jobs:
   # PRs: apply the committed migrations to a throwaway Supabase stack (which
   # provides the auth schema + roles our migration references), fail if
   # schema.ts was changed without generating a matching migration, then run
-  # test/integration against that stack.
+  # every test (unit + integration) against that stack with the coverage gate.
   verify:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -74,9 +74,9 @@ jobs:
             git status --porcelain -- drizzle
             exit 1
           fi
-      - name: Integration tests (test/integration, against the stack above)
+      - name: All tests with the coverage gate (unit + integration, against the stack above)
         # CI=true makes an unreachable DB fail the run instead of skipping every suite.
-        run: bun run test:integration
+        run: bun run test:coverage
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
           SUPABASE_URL: http://127.0.0.1:54321

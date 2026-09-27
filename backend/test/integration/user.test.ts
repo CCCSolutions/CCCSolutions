@@ -19,6 +19,17 @@ describe.skipIf(!dbUp)('user routes (integration, local Supabase)', () => {
     expect(profile.role).toBe('user');
   });
 
+  it('GET /user/username-available: taken, free, and malformed names', async () => {
+    const { accessToken, username } = await signUp('availcheck');
+    await appRequest('/user/me', { headers: authHeader(accessToken) });
+
+    const check = async (u: string) =>
+      ((await (await appRequest(`/user/username-available?u=${u}`)).json()) as { available: boolean }).available;
+    expect(await check(username)).toBe(false);
+    expect(await check(`free${Date.now()}`)).toBe(true);
+    expect(await check('x')).toBe(false); // under the 2-char minimum
+  });
+
   it('a second user who picks a taken username gets a numbered one, not a 500', async () => {
     const first = await signUp('dupename');
     await appRequest('/user/me', { headers: authHeader(first.accessToken) });
