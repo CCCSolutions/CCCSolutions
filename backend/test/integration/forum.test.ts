@@ -96,6 +96,29 @@ describe.skipIf(!dbUp)('forum routes (integration, local Supabase)', () => {
     expect(body.content).toBe('nice post');
   });
 
+  it('POST /forum/posts/:id/comments on an unknown post is a 404, not a 500', async () => {
+    const res = await appRequest('/forum/posts/00000000-0000-0000-0000-000000000000/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeader(userB.accessToken) },
+      body: JSON.stringify({ content: 'into the void' }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it('POST /forum/posts rejects an empty Quill body and a blank title', async () => {
+    for (const payload of [
+      { title: 'real title', content: '<p><br></p>' },
+      { title: '   ', content: '<p>real body</p>' },
+    ]) {
+      const res = await appRequest('/forum/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader(userA.accessToken) },
+        body: JSON.stringify(payload),
+      });
+      expect(res.status).toBe(400);
+    }
+  });
+
   it('voting: upvote raises score, flip to downvote updates it, delete removes it', async () => {
     const scoreOf = async () => {
       const res = await appRequest(`/forum/posts/${postId}`);

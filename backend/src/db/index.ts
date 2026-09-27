@@ -19,6 +19,14 @@ export function getDb(env: Bindings) {
   return drizzle(client, { schema });
 }
 
+// The Postgres error code (e.g. '23505' unique_violation) of a failed query. Drizzle
+// wraps driver errors in DrizzleQueryError and keeps the original on `.cause`, so
+// `err.code` alone is always undefined.
+export function pgErrorCode(err: unknown): string | undefined {
+  const e = err as { code?: string; cause?: { code?: string } };
+  return e.cause?.code ?? e.code;
+}
+
 type Db = ReturnType<typeof getDb>;
 // the type of Drizzle's transaction object that drizzle hands to our callback connection
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];

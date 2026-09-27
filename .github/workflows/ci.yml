@@ -49,7 +49,9 @@ jobs:
       - name: Format check (prettier)
         run: bun run format:check
 
-      - name: Test (vitest, coverage threshold enforced in vitest.config.ts)
+      # Unit tests only. The coverage gate runs with the integration suite in
+      # db-migrate.yml, which has a database.
+      - name: Unit tests (vitest)
         run: bun run test
 
   website:

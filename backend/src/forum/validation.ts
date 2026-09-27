@@ -1,12 +1,18 @@
 import { z } from 'zod';
 
+// Quill sends HTML, so an empty editor is still markup like <p><br></p>. A post body
+// needs visible text or an image: some text between tags that isn't only whitespace
+// or &nbsp;. This is a check, not a sanitizer; the stored HTML is left unchanged.
+const hasVisibleContent = (html: string) =>
+  /<img\b/i.test(html) || html.split(/<[^>]*>/).some((text) => !/^(?:\s|&nbsp;)*$/i.test(text));
+
 export const createPostSchema = z.object({
-  title: z.string().min(1).max(300),
-  content: z.string().min(1).max(50000),
+  title: z.string().trim().min(1).max(300),
+  content: z.string().max(50000).refine(hasVisibleContent),
 });
 
 export const createCommentSchema = z.object({
-  content: z.string().min(1).max(10000),
+  content: z.string().trim().min(1).max(10000),
 });
 
 export const voteSchema = z.object({
@@ -22,4 +28,13 @@ export const unvoteSchema = z.object({
 
 export const pinSchema = z.object({
   pinned: z.boolean(),
+});
+
+// Route params and query strings get the same treatment as bodies: bad input is a
+// 400 here, not a Postgres cast error (a 500) later.
+export const idParamSchema = z.string().uuid();
+
+export const myVotesQuerySchema = z.object({
+  type: z.enum(['post', 'comment']),
+  ids: z.array(z.string().uuid()).max(500),
 });

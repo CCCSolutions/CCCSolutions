@@ -3,7 +3,7 @@ import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 import { eq } from 'drizzle-orm';
 import type { Bindings } from '../types';
 import { profiles } from '../db/schema';
-import { getDb } from '../db';
+import { getDb, pgErrorCode } from '../db';
 
 export type Profile = typeof profiles.$inferSelect;
 
@@ -39,7 +39,7 @@ async function getOrCreateProfile(env: Bindings, authUserId: string, claims: JWT
         .returning();
       return created[0];
     } catch (err) {
-      if ((err as { code?: string }).code !== '23505') throw err;
+      if (pgErrorCode(err) !== '23505') throw err;
       const raced = await db.select().from(profiles).where(eq(profiles.authUserId, authUserId)).limit(1);
       if (raced[0]) return raced[0];
     }
