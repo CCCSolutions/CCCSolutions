@@ -17,9 +17,17 @@ import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
 import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
 import { Problem as ProblemType, problems } from '../../../../constants';
+import {
+  CONTEST_API_BASE,
+  contestDownloadUrl,
+  fetchContestList,
+  fetchContestPreview,
+  type ContestListResponse,
+  type ContestSolutionMeta,
+  type ContestTestMeta,
+} from '../../../../lib/contest-api';
 import dynamic from 'next/dynamic';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
 const LARGE_FILE_BYTES = 50 * 1024;
 
 const SyntaxHighlighter = dynamic(
@@ -35,29 +43,11 @@ interface TestCaseData {
   output: string | null;
 }
 
-interface TestMeta {
-  n: number;
-  sample: boolean;
-  inputBytes: number;
-  outputBytes: number;
-}
-
-interface SolutionMeta {
-  n: number;
-  ext: string;
-  bytes: number;
-}
-
 interface SolutionEntry {
   code: string;
   language: string;
   n: number;
   ext: string;
-}
-
-interface ListResponse {
-  tests: TestMeta[];
-  solutions: SolutionMeta[];
 }
 
 const SOLUTION_MISSING_MESSAGE =
@@ -77,7 +67,7 @@ const formatSize = (bytes: number) =>
     ? `${(bytes / (1024 * 1024)).toFixed(1)}MB`
     : `${(bytes / 1024).toFixed(1)}KB`;
 
-const Problem = () => {
+const Problem = ({ headerControls }: { headerControls?: React.ReactNode }) => {
   const { contestYear, problemCode } = useParams<{
     contestYear: string;
     problemCode: string;
@@ -90,8 +80,8 @@ const Problem = () => {
   const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
   );
-  const [tests, setTests] = useState<TestMeta[]>([]);
-  const [solutionsMeta, setSolutionsMeta] = useState<SolutionMeta[]>([]);
+  const [tests, setTests] = useState<ContestTestMeta[]>([]);
+  const [solutionsMeta, setSolutionsMeta] = useState<ContestSolutionMeta[]>([]);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -149,7 +139,7 @@ const Problem = () => {
       setListStatus('loading');
 
       try {
-        const res = await fetch(`${API_BASE}/contests/${contestYear}/${problemCode}/list`);
+        const res = await fetchContestList(contestYear, problemCode);
 
         // 400 means the year/code itself is invalid (e.g. j8, or a s/j code
         // before 2000) — a different situation from a real API failure.
@@ -162,7 +152,7 @@ const Problem = () => {
           return;
         }
         if (!res.ok) throw new Error(`list ${res.status}`);
-        const data: ListResponse = await res.json();
+        const data: ContestListResponse = await res.json();
         if (cancelled) return;
         setListStatus('ok');
 
@@ -176,8 +166,10 @@ const Problem = () => {
         const solutionEntries = await Promise.all(
           (data.solutions ?? []).map(async (s) => {
             try {
-              const sres = await fetch(
-                `${API_BASE}/contests/${contestYear}/${problemCode}/preview?file=solutions/${s.n}.${s.ext}`
+              const sres = await fetchContestPreview(
+                contestYear,
+                problemCode,
+                `solutions/${s.n}.${s.ext}`
               );
               if (!sres.ok) return null;
               const code = await sres.text();
@@ -223,11 +215,10 @@ const Problem = () => {
     };
   }, [contestYear, problemCode]);
 
-  const testFilePath = (test: TestMeta, kind: 'in' | 'out') =>
+  const testFilePath = (test: ContestTestMeta, kind: 'in' | 'out') =>
     `${test.sample ? 'tests/sample' : 'tests'}/${test.n}.${kind}`;
 
-  const downloadUrl = (relpath: string) =>
-    `${API_BASE}/contests/${contestYear}/${problemCode}/download?file=${relpath}`;
+  const downloadUrl = (relpath: string) => contestDownloadUrl(contestYear, problemCode, relpath);
 
   const fetchTestCase = async (idx: number) => {
     const test = tests[idx];
@@ -235,12 +226,10 @@ const Problem = () => {
     setTestCaseState('loading');
     setTestCaseData({ input: '', output: '' });
 
-    const base = `${API_BASE}/contests/${contestYear}/${problemCode}/preview`;
-
     try {
       const [inputResponse, outputResponse] = await Promise.all([
-        fetch(`${base}?file=${testFilePath(test, 'in')}`),
-        fetch(`${base}?file=${testFilePath(test, 'out')}`),
+        fetchContestPreview(contestYear, problemCode, testFilePath(test, 'in')),
+        fetchContestPreview(contestYear, problemCode, testFilePath(test, 'out')),
       ]);
 
       if (!inputResponse.ok && !outputResponse.ok) {
@@ -420,9 +409,12 @@ const Problem = () => {
 
         {/* Problem header */}
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-            {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
-          </h1>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
+            </h1>
+            {headerControls}
+          </div>
           <div className="flex flex-wrap items-center gap-2 mt-4">
             {problemInfo?.difficulty && (
               <span
@@ -643,7 +635,7 @@ const Problem = () => {
                         <span>
                           {getFileSizeWarning(activeTest.inputBytes) ||
                             getFileSizeWarning(activeTest.outputBytes)}{' '}
-                          — preview is truncated, use the Download button for the full file
+                          — display is truncated, use the Download button for the full file
                         </span>
                       </p>
                     </div>
@@ -686,7 +678,7 @@ const Problem = () => {
       <DownloadDialog
         open={downloadOpen}
         onClose={() => setDownloadOpen(false)}
-        apiBase={API_BASE}
+        apiBase={CONTEST_API_BASE}
         year={contestYear}
         code={problemCode}
         tests={tests}
