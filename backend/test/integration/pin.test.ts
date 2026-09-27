@@ -54,6 +54,15 @@ describe.skipIf(!dbUp)('POST /forum/posts/:id/pin (integration, local Supabase)'
     expect(res.status).toBe(403);
   });
 
+  it('400s on a malformed post id instead of reaching Postgres', async () => {
+    const res = await appRequest('/forum/posts/not-a-uuid/pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeader(admin.accessToken) },
+      body: JSON.stringify({ pinned: true }),
+    });
+    expect(res.status).toBe(400);
+  });
+
   it('lets an admin pin: post reports isPinned and floats to the top of the list', async () => {
     const res = await appRequest(`/forum/posts/${postId}/pin`, {
       method: 'POST',

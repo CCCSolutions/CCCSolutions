@@ -168,12 +168,14 @@ forum.post('/posts/:id/pin', requireAuth, async (c) => {
   // migration), so it can only be written via the privileged pooler role: plain getDb,
   // NOT withUser. Authorization is enforced here in code.
   if (c.get('profile').role !== 'admin') return c.json({ error: 'Forbidden' }, 403);
+  const postId = idParamSchema.safeParse(c.req.param('id'));
+  if (!postId.success) return c.json({ error: 'Invalid post id' }, 400);
   const parsed = pinSchema.safeParse(await c.req.json().catch(() => null));
   if (!parsed.success) return c.json({ error: 'Invalid pin' }, 400);
   const [updated] = await getDb(c.env)
     .update(posts)
     .set(parsed.data.pinned ? { isPinned: true, pinnedAt: new Date() } : { isPinned: false })
-    .where(eq(posts.id, c.req.param('id')!))
+    .where(eq(posts.id, postId.data))
     .returning({ id: posts.id, title: posts.title, isPinned: posts.isPinned });
   if (!updated) return c.json({ error: 'Post not found' }, 404);
   purgeForum(c);
