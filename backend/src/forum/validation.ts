@@ -29,6 +29,10 @@ export const unvoteSchema = z.object({
   votableId: z.string().uuid(),
 });
 
+export const pinSchema = z.object({
+  pinned: z.boolean(),
+});
+
 // Route params and query strings get the same treatment as bodies: bad input is a
 // 400 here, not a Postgres cast error (a 500) later.
 export const idParamSchema = z.string().uuid();

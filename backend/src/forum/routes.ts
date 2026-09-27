@@ -9,6 +9,7 @@ import {
   createCommentSchema,
   voteSchema,
   unvoteSchema,
+  pinSchema,
   idParamSchema,
   myVotesQuerySchema,
 } from './validation';
@@ -51,13 +52,14 @@ forum.get('/posts', async (c) => {
       id: posts.id,
       title: posts.title,
       content: posts.content,
+      isPinned: posts.isPinned,
       createdAt: posts.createdAt,
       score: postScore,
       author: { username: profiles.username, avatarUrl: profiles.avatarUrl, role: profiles.role },
     })
     .from(posts)
     .leftJoin(profiles, eq(profiles.id, posts.profileId))
-    .orderBy(sort === 'top' ? desc(postScore) : desc(posts.createdAt))
+    .orderBy(desc(posts.isPinned), sort === 'top' ? desc(postScore) : desc(posts.createdAt))
     .limit(limit)
     .offset(offset);
   const total = await db.$count(posts);
@@ -79,6 +81,7 @@ forum.get('/posts/:id', async (c) => {
       id: posts.id,
       title: posts.title,
       content: posts.content,
+      isPinned: posts.isPinned,
       createdAt: posts.createdAt,
       score: postScore,
       author: { username: profiles.username, avatarUrl: profiles.avatarUrl, role: profiles.role },
@@ -158,6 +161,31 @@ forum.post('/posts/:id/comments', requireAuth, async (c) => {
     path: `/forum/${postId.data}`,
   });
   return c.json(comment, 201);
+});
+
+forum.post('/posts/:id/pin', requireAuth, async (c) => {
+  // Admin-only. is_pinned is REVOKEd from the `authenticated` role (see the 0004 grants
+  // migration), so it can only be written via the privileged pooler role: plain getDb,
+  // NOT withUser. Authorization is enforced here in code.
+  if (c.get('profile').role !== 'admin') return c.json({ error: 'Forbidden' }, 403);
+  const parsed = pinSchema.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return c.json({ error: 'Invalid pin' }, 400);
+  const [updated] = await getDb(c.env)
+    .update(posts)
+    .set(parsed.data.pinned ? { isPinned: true, pinnedAt: new Date() } : { isPinned: false })
+    .where(eq(posts.id, c.req.param('id')!))
+    .returning({ id: posts.id, title: posts.title, isPinned: posts.isPinned });
+  if (!updated) return c.json({ error: 'Post not found' }, 404);
+  purgeForum(c);
+  notify(c, {
+    kind: 'pin',
+    title: updated.isPinned ? 'Post pinned' : 'Post unpinned',
+    description: updated.title,
+    actor: c.get('profile').username,
+    path: `/forum/${updated.id}`,
+    ping: false,
+  });
+  return c.json({ ok: true, isPinned: updated.isPinned });
 });
 
 forum.post('/vote', requireAuth, async (c) => {
