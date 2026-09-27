@@ -69,7 +69,7 @@ export function EditorialContent({
     return (
       <div
         className={cn(
-          '[&_h1]:mb-3 [&_h1]:mt-8 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1:first-child]:mt-0 [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-foreground [&_h2:first-child]:mt-0 [&_h3]:mt-4 [&_h3]:font-semibold [&_h3]:text-foreground [&_blockquote]:rounded-r-md [&_blockquote]:border-l-2 [&_blockquote]:border-brand-400 [&_blockquote]:bg-surface-200 [&_blockquote]:px-3 [&_blockquote]:py-2',
+          '[&_h1]:mb-3 [&_h1]:mt-8 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1:first-child]:mt-0 [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-foreground [&_h2:first-child]:mt-0 [&_h3]:mt-4 [&_h3]:font-semibold [&_h3]:text-foreground [&_blockquote]:rounded-r-md [&_blockquote]:border-l-2 [&_blockquote]:border-brand-400 [&_blockquote]:bg-surface-200 [&_blockquote]:px-3 [&_blockquote]:py-2 [&_li>*+*]:mt-3!',
           className
         )}
       >
