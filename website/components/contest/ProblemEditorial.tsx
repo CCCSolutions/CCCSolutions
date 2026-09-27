@@ -85,7 +85,6 @@ export function EditorialContent({
             >
               CEMC commentary
             </a>
-            , converted to Markdown.
           </p>
         )}
       </div>
