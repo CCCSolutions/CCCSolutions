@@ -32,6 +32,8 @@ export function usePanelLayout() {
   const [layoutLoaded, setLayoutLoaded] = useState(false);
   const desktopRef = useRef<HTMLDivElement>(null);
   const rightColumnRef = useRef<HTMLDivElement>(null);
+  const editorialPanelRef = useRef<HTMLDivElement>(null);
+  const solutionPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -121,18 +123,30 @@ export function usePanelLayout() {
     const previousUserSelect = document.body.style.userSelect;
     document.body.style.userSelect = 'none';
 
+    // While dragging, size the panel element directly so React doesn't re-render the panels
+    // (and their highlighted code) on every pointer move. State and localStorage update on release.
+    const panel = axis === 'vertical' ? editorialPanelRef.current : solutionPanelRef.current;
+    let size: number | null = null;
+    let frame = 0;
+
     const move = (pointerEvent: PointerEvent) => {
-      if (axis === 'vertical') {
-        setLeftSize(
-          clamp(((pointerEvent.clientX - rect.left) / rect.width) * 100, ...LEFT_SIZE_RANGE)
-        );
-      } else {
-        setSolutionSize(
-          clamp(((pointerEvent.clientY - rect.top) / rect.height) * 100, ...SOLUTION_SIZE_RANGE)
-        );
-      }
+      size =
+        axis === 'vertical'
+          ? clamp(((pointerEvent.clientX - rect.left) / rect.width) * 100, ...LEFT_SIZE_RANGE)
+          : clamp(((pointerEvent.clientY - rect.top) / rect.height) * 100, ...SOLUTION_SIZE_RANGE);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!panel || size === null) return;
+        if (axis === 'vertical') panel.style.width = `${size}%`;
+        else panel.style.height = `${size}%`;
+      });
     };
     const stop = () => {
+      cancelAnimationFrame(frame);
+      if (size !== null) {
+        if (axis === 'vertical') setLeftSize(size);
+        else setSolutionSize(size);
+      }
       document.body.style.userSelect = previousUserSelect;
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
@@ -153,6 +167,8 @@ export function usePanelLayout() {
     setCommentSize,
     desktopRef,
     rightColumnRef,
+    editorialPanelRef,
+    solutionPanelRef,
     toggleMinimized,
     toggleFullscreen,
     resetLayout,

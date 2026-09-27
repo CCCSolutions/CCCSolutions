@@ -135,6 +135,7 @@ export function WorkspaceView({
         ) : (
           <>
             <div
+              ref={layout.editorialPanelRef}
               className={`min-w-0 overflow-hidden rounded-lg border border-border-default bg-surface-100 ${
                 minimized.editorial ? 'shrink-0' : ''
               }`}
@@ -157,6 +158,7 @@ export function WorkspaceView({
 
             <div ref={layout.rightColumnRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
               <div
+                ref={layout.solutionPanelRef}
                 className={`overflow-hidden rounded-lg border border-border-default bg-surface-100 ${
                   minimized.solution
                     ? 'h-11 shrink-0'
