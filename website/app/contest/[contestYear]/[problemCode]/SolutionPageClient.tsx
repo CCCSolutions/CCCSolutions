@@ -23,13 +23,15 @@ export default function SolutionPageClient() {
     [contestYear, problemCode]
   );
   const data = useContestData(contestYear, problemCode);
-  const [view, setView] = useState<ViewMode>('new');
+  // null until the saved choice is read, so the page never flashes the wrong view.
+  const [view, setView] = useState<ViewMode | null>(null);
 
   useEffect(() => {
+    let saved: string | null = null;
     try {
-      const saved = window.localStorage.getItem(VIEW_STORAGE_KEY);
-      if (saved === 'classic' || saved === 'new') setView(saved);
+      saved = window.localStorage.getItem(VIEW_STORAGE_KEY);
     } catch {}
+    setView(saved === 'classic' ? 'classic' : 'new');
   }, []);
 
   const changeView = (next: ViewMode) => {
@@ -95,7 +97,9 @@ export default function SolutionPageClient() {
           }).replace(/</g, '\\u003c'),
         }}
       />
-      {view === 'classic' ? (
+      {view === null ? (
+        <div className="min-h-[70dvh] lg:h-[calc(100dvh-var(--nav-h))]" />
+      ) : view === 'classic' ? (
         <ProblemPageClient
           contestYear={contestYear}
           problemCode={problemCode}
