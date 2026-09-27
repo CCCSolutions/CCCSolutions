@@ -1,13 +1,10 @@
 import { z } from 'zod';
 
 // Quill sends HTML, so an empty editor is still markup like <p><br></p>. A post body
-// needs visible text or an image.
+// needs visible text or an image: some text between tags that isn't only whitespace
+// or &nbsp;. This is a check, not a sanitizer; the stored HTML is left unchanged.
 const hasVisibleContent = (html: string) =>
-  /<img\b/i.test(html) ||
-  html
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/gi, ' ')
-    .trim().length > 0;
+  /<img\b/i.test(html) || html.split(/<[^>]*>/).some((text) => !/^(?:\s|&nbsp;)*$/i.test(text));
 
 export const createPostSchema = z.object({
   title: z.string().trim().min(1).max(300),
