@@ -115,7 +115,6 @@ const Problem = () => {
           difficulty: 'Unknown',
           tags: [],
           link: '',
-          hasSolution: false,
         });
       }
     };

@@ -2,6 +2,9 @@ import type { Context, ExecutionContext as HonoExecutionContext } from 'hono';
 import { send } from './notify';
 import type { Bindings } from './types';
 
+// Cache tag on GET /contests/index. Every R2 write purges it along with the contest tag.
+export const INDEX_CACHE_TAG = 'contests:index';
+
 type CacheExecutionContext = HonoExecutionContext & Pick<ExecutionContext, 'cache'>;
 
 async function reportPurgeFailure(env: Bindings, scope: string, tags: string[], failure: string): Promise<void> {
