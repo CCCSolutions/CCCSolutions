@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardTitle, CardDescription } from '../../../components/ui/card';
 import { SectionContainer } from '../../../components/ui/section-container';
 import { Button } from '../../../components/ui/button';
+import { problems } from '../../../constants';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
 const TOKEN_KEY = 'ccc_admin_token';
@@ -12,7 +13,8 @@ const TOKEN_KEY = 'ccc_admin_token';
 // Mirrors the backend schemas (problemParamsSchema / fileSchema).
 const YEAR_RE = /^\d{4}$/;
 const CODE_RE = /^[sjp][1-5]$/;
-const FILE_RE = /^(tests\/(sample\/)?\d+\.(in|out)|solutions\/\d+\.(cpp|py|java|t|txt))$/;
+const FILE_RE =
+  /^(tests\/(sample\/)?\d+\.(in|out)|solutions\/\d+\.(cpp|py|java|t|txt)|editorial\.md|editorial\/[a-z0-9-]+\.(png|jpg)|README\.md)$/;
 const SOLUTION_EXTS = ['cpp', 'py', 'java', 't', 'txt'] as const;
 
 const inputClass =
@@ -28,6 +30,13 @@ export default function AdminUploadPage() {
   const [token, setToken] = useState('');
   const [remember, setRemember] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  // A shared Junior problem's entry in constants.ts links to its Senior page.
+  const sharedTarget = useMemo(() => {
+    if (!YEAR_RE.test(year) || !CODE_RE.test(code)) return null;
+    const entry = problems.find((p) => p.name.startsWith(`${year} ${code.toUpperCase()} `));
+    return entry && entry.link !== `/contest/${year}/${code}` ? entry.link : null;
+  }, [year, code]);
 
   // Solution-path quick builder.
   const [solN, setSolN] = useState('1');
@@ -104,8 +113,12 @@ export default function AdminUploadPage() {
       <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-2">
         Admin upload
       </h1>
-      <p className="text-foreground-light mb-8">
+      <p className="text-foreground-light mb-2">
         Stage solutions and test cases into R2. Requires the admin bearer token.
+      </p>
+      <p className="text-sm text-foreground-lighter mb-8">
+        Some Junior problems are the same problem as a Senior one, and their pages redirect to the
+        Senior page. The site only reads the Senior folder, so upload those to the Senior code.
       </p>
 
       <Card>
@@ -136,6 +149,13 @@ export default function AdminUploadPage() {
               />
               {code && !CODE_RE.test(code) && (
                 <p className="mt-1 text-xs text-destructive">Must match [sjp][1-5], e.g. j5.</p>
+              )}
+              {sharedTarget && (
+                <p className="mt-1 text-xs text-warning">
+                  {year} {code.toUpperCase()} is the same problem as{' '}
+                  {sharedTarget.replace('/contest/', '').replace('/', ' ').toUpperCase()}. The site
+                  never reads this folder. Upload to the Senior code instead.
+                </p>
               )}
             </div>
           </div>

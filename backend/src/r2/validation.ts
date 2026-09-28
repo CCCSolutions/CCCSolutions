@@ -15,4 +15,13 @@ export const problemParamsSchema = z
 // A file within a problem, relative to contests/<year>/<code>/ (mirrors scripts/stage-r2.js):
 //   tests/<n>.in|out        (samples under tests/sample/)
 //   solutions/<n>.<cpp|py|java|t|txt>
-export const fileSchema = z.string().regex(/^(tests\/(sample\/)?\d+\.(in|out)|solutions\/\d+\.(cpp|py|java|t|txt))$/);
+//   editorial.md             (the CEMC commentary for this problem, as Markdown)
+//   editorial/<name>.png|jpg (an image the editorial links to)
+//   README.md                (a note about the folder, e.g. on a shared Junior code)
+export const editorialImageSchema = z.string().regex(/^editorial\/[a-z0-9-]+\.(png|jpg)$/);
+
+export const fileSchema = z
+  .string()
+  .regex(
+    /^(tests\/(sample\/)?\d+\.(in|out)|solutions\/\d+\.(cpp|py|java|t|txt)|editorial\.md|editorial\/[a-z0-9-]+\.(png|jpg)|README\.md)$/,
+  );

@@ -81,6 +81,19 @@ const Footer = () => {
       <p className="text-center text-sm text-foreground-lighter">
         Made with love by the CCCSolutions team
       </p>
+      <p className="mt-2 text-center text-xs text-foreground-muted">
+        Contest problems, test data and editorials are from the CEMC at the University of Waterloo,
+        used under{' '}
+        <a
+          href="https://creativecommons.org/licenses/by-nc/4.0/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          CC BY-NC 4.0
+        </a>
+        .
+      </p>
     </footer>
   );
 };

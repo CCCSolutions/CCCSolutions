@@ -39,7 +39,18 @@ describe('problemParamsSchema', () => {
 
 describe('fileSchema', () => {
   it('accepts valid relative files', () => {
-    const ok = ['tests/1.in', 'tests/1.out', 'tests/sample/2.in', 'solutions/1.cpp', 'solutions/3.py', 'solutions/1.t'];
+    const ok = [
+      'tests/1.in',
+      'tests/1.out',
+      'tests/sample/2.in',
+      'solutions/1.cpp',
+      'solutions/3.py',
+      'solutions/1.t',
+      'editorial.md',
+      'editorial/fig-1.png',
+      'editorial/tree.jpg',
+      'README.md',
+    ];
     for (const f of ok) expect(fileSchema.safeParse(f).success).toBe(true);
   });
 
@@ -50,6 +61,11 @@ describe('fileSchema', () => {
       'solutions/1.exe', // ext not allowed
       'contests/2024/s1/tests/1.in', // full key, not relative
       'tests/1', // no extension
+      'editorial.txt', // the editorial is only Markdown
+      'solutions/editorial.md', // the editorial sits at the problem root
+      'editorial/fig.svg', // images are png or jpg only
+      'editorial/../tests/1.in', // no traversal out of editorial/
+      'readme.md', // the README name is exact
     ];
     for (const f of bad) expect(fileSchema.safeParse(f).success).toBe(false);
   });

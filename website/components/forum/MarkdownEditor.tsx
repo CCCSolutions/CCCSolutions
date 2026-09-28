@@ -16,6 +16,7 @@ import {
   ColumnsIcon,
 } from '@radix-ui/react-icons';
 import { MarkdownPreview } from './MarkdownPreview';
+import { Tooltip } from '../ui/tooltip';
 
 const codeLanguages = [
   { value: 'cpp', label: 'C++' },
@@ -129,16 +130,16 @@ export function MarkdownEditor({
     <div className="rounded-md border border-border-strong bg-surface-100 focus-within:border-brand-highlight transition-colors overflow-hidden">
       <div className="flex items-center gap-0.5 px-2 pt-2 pb-1 border-b border-border-default flex-wrap">
         {actions.map((action) => (
-          <button
-            key={action.label}
-            type="button"
-            title={action.label}
-            aria-label={action.label}
-            onClick={() => runAction(action)}
-            className="p-1.5 rounded text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors"
-          >
-            {action.icon}
-          </button>
+          <Tooltip key={action.label} content={action.label}>
+            <button
+              type="button"
+              aria-label={action.label}
+              onClick={() => runAction(action)}
+              className="p-1.5 rounded text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors"
+            >
+              {action.icon}
+            </button>
+          </Tooltip>
         ))}
 
         <div className="flex items-center gap-1 border-l border-border-default pl-1 ml-0.5">
@@ -154,16 +155,17 @@ export function MarkdownEditor({
               </option>
             ))}
           </select>
-          <button
-            type="button"
-            title="Insert code block"
-            aria-label="Insert code block"
-            onClick={insertCodeBlock}
-            className="px-2 h-[26px] inline-flex items-center gap-1 rounded text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors"
-          >
-            <CodeIcon width="14" height="14" />
-            <span className="text-xs hidden sm:inline">Code block</span>
-          </button>
+          <Tooltip content="Insert code block">
+            <button
+              type="button"
+              aria-label="Insert code block"
+              onClick={insertCodeBlock}
+              className="px-2 h-[26px] inline-flex items-center gap-1 rounded text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors"
+            >
+              <CodeIcon width="14" height="14" />
+              <span className="text-xs hidden sm:inline">Code block</span>
+            </button>
+          </Tooltip>
         </div>
 
         <span className="ml-auto hidden sm:inline text-[11px] text-foreground-lighter pr-1">
@@ -171,34 +173,36 @@ export function MarkdownEditor({
         </span>
 
         <div className="flex items-center gap-0.5 border-l border-border-default pl-1 ml-1">
-          <button
-            type="button"
-            title="Write"
-            aria-label="Write only"
-            aria-pressed={mode === 'write'}
-            onClick={() => setMode('write')}
-            className={`p-1.5 rounded transition-colors ${
-              mode === 'write'
-                ? 'bg-surface-300 text-foreground'
-                : 'text-foreground-light hover:text-foreground hover:bg-surface-200'
-            }`}
-          >
-            <TextIcon width="14" height="14" />
-          </button>
-          <button
-            type="button"
-            title="Write + live preview"
-            aria-label="Split view with live preview"
-            aria-pressed={mode === 'split'}
-            onClick={() => setMode('split')}
-            className={`p-1.5 rounded transition-colors ${
-              mode === 'split'
-                ? 'bg-surface-300 text-foreground'
-                : 'text-foreground-light hover:text-foreground hover:bg-surface-200'
-            }`}
-          >
-            <ColumnsIcon width="14" height="14" />
-          </button>
+          <Tooltip content="Write">
+            <button
+              type="button"
+              aria-label="Write only"
+              aria-pressed={mode === 'write'}
+              onClick={() => setMode('write')}
+              className={`p-1.5 rounded transition-colors ${
+                mode === 'write'
+                  ? 'bg-surface-300 text-foreground'
+                  : 'text-foreground-light hover:text-foreground hover:bg-surface-200'
+              }`}
+            >
+              <TextIcon width="14" height="14" />
+            </button>
+          </Tooltip>
+          <Tooltip content="Write + live preview">
+            <button
+              type="button"
+              aria-label="Split view with live preview"
+              aria-pressed={mode === 'split'}
+              onClick={() => setMode('split')}
+              className={`p-1.5 rounded transition-colors ${
+                mode === 'split'
+                  ? 'bg-surface-300 text-foreground'
+                  : 'text-foreground-light hover:text-foreground hover:bg-surface-200'
+              }`}
+            >
+              <ColumnsIcon width="14" height="14" />
+            </button>
+          </Tooltip>
         </div>
       </div>
 

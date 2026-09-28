@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -12,15 +11,22 @@ import {
   ArrowLeftIcon,
   DownloadIcon,
   ExclamationTriangleIcon,
+  ReaderIcon,
 } from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
+import { Tooltip } from '../../../../components/ui/tooltip';
 import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
-import { Problem as ProblemType, problems } from '../../../../constants';
+import { EditorialContent, ProblemActions } from '../../../../components/contest/ProblemEditorial';
+import {
+  formatSize,
+  LARGE_FILE_BYTES,
+  useTestCase,
+  type useContestData,
+} from '../../../../components/contest/useContestData';
+import { Problem as ProblemType } from '../../../../constants';
+import { CONTEST_API_BASE, contestDownloadUrl } from '../../../../lib/contest-api';
 import dynamic from 'next/dynamic';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
-const LARGE_FILE_BYTES = 50 * 1024;
 
 const SyntaxHighlighter = dynamic(
   () => import('react-syntax-highlighter').then((mod) => mod.Prism),
@@ -29,36 +35,6 @@ const SyntaxHighlighter = dynamic(
     loading: () => <div className="p-4 text-foreground-lighter">Loading code…</div>,
   }
 );
-
-interface TestCaseData {
-  input: string | null;
-  output: string | null;
-}
-
-interface TestMeta {
-  n: number;
-  sample: boolean;
-  inputBytes: number;
-  outputBytes: number;
-}
-
-interface SolutionMeta {
-  n: number;
-  ext: string;
-  bytes: number;
-}
-
-interface SolutionEntry {
-  code: string;
-  language: string;
-  n: number;
-  ext: string;
-}
-
-interface ListResponse {
-  tests: TestMeta[];
-  solutions: SolutionMeta[];
-}
 
 const SOLUTION_MISSING_MESSAGE =
   'Solution does not currently exist. If you have a solution, please upload your solution along with a commented explanation on our forum. Thank you!';
@@ -72,197 +48,40 @@ const PROBLEM_INVALID_MESSAGE =
 const PROBLEM_ERROR_MESSAGE =
   'Unable to load this problem right now. The API may be temporarily unavailable, please try again shortly.';
 
-const formatSize = (bytes: number) =>
-  bytes > 1024 * 1024
-    ? `${(bytes / (1024 * 1024)).toFixed(1)}MB`
-    : `${(bytes / 1024).toFixed(1)}KB`;
-
-const Problem = () => {
-  const { contestYear, problemCode } = useParams<{
-    contestYear: string;
-    problemCode: string;
-  }>();
-  const [solutions, setSolutions] = useState<SolutionEntry[]>([]);
-  const [solutionsError, setSolutionsError] = useState(false);
-  const [listStatus, setListStatus] = useState<'loading' | 'invalid' | 'error' | 'ok'>('loading');
+const Problem = ({
+  contestYear,
+  problemCode,
+  problemInfo,
+  data,
+  headerControls,
+}: {
+  contestYear: string;
+  problemCode: string;
+  problemInfo: ProblemType | undefined;
+  data: ReturnType<typeof useContestData>;
+  headerControls?: React.ReactNode;
+}) => {
+  const { listStatus, loading, tests, solutionsMeta, solutions, solutionsError } = data;
   const [activeTab, setActiveTab] = useState<number | null>(null);
-  const [testCaseData, setTestCaseData] = useState<TestCaseData>({ input: '', output: '' });
-  const [testCaseState, setTestCaseState] = useState<'idle' | 'loading' | 'success' | 'error'>(
-    'idle'
-  );
-  const [tests, setTests] = useState<TestMeta[]>([]);
-  const [solutionsMeta, setSolutionsMeta] = useState<SolutionMeta[]>([]);
   const [downloadOpen, setDownloadOpen] = useState(false);
-  const [problemInfo, setProblemInfo] = useState<ProblemType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const activeTest = activeTab !== null ? (tests[activeTab] ?? null) : null;
+  const { data: testCaseData, state: testCaseState } = useTestCase(
+    contestYear,
+    problemCode,
+    activeTest
+  );
+
+  useEffect(() => setActiveTab(null), [tests]);
 
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const codeStyle = mounted && resolvedTheme === 'dark' ? oneDark : oneLight;
 
-  useEffect(() => {
-    const fetchProblemInfo = async () => {
-      try {
-        const problemData = problems.find(
-          (p) => p.link === `/contest/${contestYear}/${problemCode}`
-        );
-        setProblemInfo(problemData || null);
-      } catch (error) {
-        console.error('Error fetching problem info:', error);
-        setProblemInfo({
-          name: `${contestYear} ${(problemCode as string).toUpperCase()}`,
-          difficulty: 'Unknown',
-          tags: [],
-          link: '',
-        });
-      }
-    };
-
-    fetchProblemInfo();
-  }, [contestYear, problemCode]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const extToLanguage = (ext: string, code: string) => {
-      switch (ext) {
-        case 'py':
-          return 'python';
-        case 'cpp':
-          return 'cpp';
-        case 'java':
-          return 'java';
-        case 't':
-          return 'turing';
-        default:
-          return getLanguageFromCode(code);
-      }
-    };
-
-    const loadContest = async () => {
-      setLoading(true);
-      setActiveTab(null);
-      setTestCaseState('idle');
-      setSolutionsError(false);
-      setListStatus('loading');
-
-      try {
-        const res = await fetch(`${API_BASE}/contests/${contestYear}/${problemCode}/list`);
-
-        // 400 means the year/code itself is invalid (e.g. j8, or a s/j code
-        // before 2000) — a different situation from a real API failure.
-        if (res.status === 400) {
-          if (cancelled) return;
-          setTests([]);
-          setSolutionsMeta([]);
-          setSolutions([]);
-          setListStatus('invalid');
-          return;
-        }
-        if (!res.ok) throw new Error(`list ${res.status}`);
-        const data: ListResponse = await res.json();
-        if (cancelled) return;
-        setListStatus('ok');
-
-        // Show sample cases first, then graded — each group by ascending n.
-        const listTests = [...(data.tests ?? [])].sort(
-          (a, b) => Number(b.sample) - Number(a.sample) || a.n - b.n
-        );
-        setTests(listTests);
-        setSolutionsMeta([...(data.solutions ?? [])].sort((a, b) => a.n - b.n));
-
-        const solutionEntries = await Promise.all(
-          (data.solutions ?? []).map(async (s) => {
-            try {
-              const sres = await fetch(
-                `${API_BASE}/contests/${contestYear}/${problemCode}/preview?file=solutions/${s.n}.${s.ext}`
-              );
-              if (!sres.ok) return null;
-              const code = await sres.text();
-              return { code, language: extToLanguage(s.ext, code), n: s.n, ext: s.ext };
-            } catch (error) {
-              console.error(`Error fetching solution ${s.n}:`, error);
-              return null;
-            }
-          })
-        );
-        if (cancelled) return;
-
-        const validSolutions = solutionEntries.filter(
-          (e): e is NonNullable<typeof e> => e !== null
-        );
-        const attemptedCount = (data.solutions ?? []).length;
-
-        if (validSolutions.length > 0) {
-          setSolutions(validSolutions);
-        } else if (attemptedCount === 0) {
-          // API responded fine, there just isn't a solution uploaded yet.
-          setSolutions([]);
-        } else {
-          // Solutions exist server-side but every fetch for them failed.
-          setSolutions([]);
-          setSolutionsError(true);
-        }
-      } catch (error) {
-        console.error('Error loading contest data:', error);
-        if (cancelled) return;
-        setTests([]);
-        setSolutionsMeta([]);
-        setSolutions([]);
-        setListStatus('error');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    loadContest();
-    return () => {
-      cancelled = true;
-    };
-  }, [contestYear, problemCode]);
-
-  const testFilePath = (test: TestMeta, kind: 'in' | 'out') =>
-    `${test.sample ? 'tests/sample' : 'tests'}/${test.n}.${kind}`;
-
-  const downloadUrl = (relpath: string) =>
-    `${API_BASE}/contests/${contestYear}/${problemCode}/download?file=${relpath}`;
-
-  const fetchTestCase = async (idx: number) => {
-    const test = tests[idx];
-    if (!test) return;
-    setTestCaseState('loading');
-    setTestCaseData({ input: '', output: '' });
-
-    const base = `${API_BASE}/contests/${contestYear}/${problemCode}/preview`;
-
-    try {
-      const [inputResponse, outputResponse] = await Promise.all([
-        fetch(`${base}?file=${testFilePath(test, 'in')}`),
-        fetch(`${base}?file=${testFilePath(test, 'out')}`),
-      ]);
-
-      if (!inputResponse.ok && !outputResponse.ok) {
-        setTestCaseState('error');
-        setTestCaseData({ input: null, output: null });
-        return;
-      }
-
-      setTestCaseData({
-        input: inputResponse.ok ? await inputResponse.text() : null,
-        output: outputResponse.ok ? await outputResponse.text() : null,
-      });
-      setTestCaseState('success');
-    } catch (error) {
-      console.error(`Error fetching test case ${test.n}:`, error);
-      setTestCaseState('error');
-      setTestCaseData({ input: null, output: null });
-    }
-  };
+  const downloadUrl = (relpath: string) => contestDownloadUrl(contestYear, problemCode, relpath);
 
   const handleTabClick = (idx: number) => {
     setActiveTab(idx);
-    fetchTestCase(idx);
   };
 
   const getFileSizeWarning = (bytes: number | undefined) =>
@@ -285,128 +104,8 @@ const Problem = () => {
     }
   };
 
-  const getLanguageFromCode = (code: string) => {
-    const trimmedCode = code.trim();
-
-    if (
-      /^var\s+\w+\s*:/m.test(code) ||
-      /\bput\s+/.test(code) ||
-      /\bget\s+/.test(code) ||
-      /^loop\s*$/m.test(code) ||
-      /\bend\s+loop/m.test(code) ||
-      /\b:=\b/.test(code)
-    ) {
-      return 'turing';
-    }
-
-    if (
-      /#include\s*</.test(code) ||
-      /using\s+namespace\s+std/.test(code) ||
-      /std::/.test(code) ||
-      /\bcin\s*>>/.test(code) ||
-      /\bcout\s*<</.test(code) ||
-      /vector</.test(code) ||
-      /int\s+main\s*\(/m.test(code)
-    ) {
-      return 'cpp';
-    }
-
-    if (
-      /import java\./m.test(code) ||
-      /package /m.test(code) ||
-      /public\s+class\s+\w+/m.test(code) ||
-      /public\s+static\s+void\s+main/m.test(code) ||
-      /System\.out\.print/m.test(code) ||
-      /Scanner/m.test(code) ||
-      /BufferedReader/m.test(code) ||
-      /String\[\]\s+args/m.test(code) ||
-      /Integer\.parseInt/m.test(code)
-    ) {
-      return 'java';
-    }
-
-    if (
-      /^(import|from) \w+/m.test(trimmedCode) ||
-      /^def \w+\s*\(/m.test(trimmedCode) ||
-      /^class \w+:/m.test(trimmedCode) ||
-      /input\(\)/.test(code) ||
-      /print\(/.test(code) ||
-      /\brange\(/.test(code) ||
-      /__name__/.test(code) ||
-      /\.readline\(\)/.test(code) ||
-      /\.append\(/.test(code) ||
-      /\beval\(/.test(code) ||
-      /^#\s*[A-Z]/.test(trimmedCode) ||
-      /\bfor\s+\w+\s+in\s+/.test(code) ||
-      /\bif\s+.*:\s*$/m.test(code)
-    ) {
-      return 'python';
-    }
-
-    if (/\bpublic\b|\bprivate\b|\bprotected\b/.test(code)) return 'java';
-
-    return 'cpp';
-  };
-
-  const activeTest = activeTab !== null ? (tests[activeTab] ?? null) : null;
-
   return (
     <div className="bg-background text-foreground min-h-screen">
-      {/* SEO structured data — escape "<" to prevent breaking out of the <script> tag */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://cccsolutions.ca' },
-              {
-                '@type': 'ListItem',
-                position: 2,
-                name: 'Solutions',
-                item: 'https://cccsolutions.ca/solutions',
-              },
-              {
-                '@type': 'ListItem',
-                position: 3,
-                name: `CCC ${contestYear}`,
-                item: `https://cccsolutions.ca/solutions?year=${contestYear}`,
-              },
-              {
-                '@type': 'ListItem',
-                position: 4,
-                name: problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`,
-              },
-            ],
-          }).replace(/</g, '\\u003c'),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'TechArticle',
-            headline:
-              problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()} Solution`,
-            description: `Solution to ${
-              problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`
-            } from the Canadian Computing Competition`,
-            author: { '@type': 'Organization', name: 'CCCSolutions Community' },
-            publisher: {
-              '@type': 'Organization',
-              name: 'CCCSolutions',
-              logo: { '@type': 'ImageObject', url: 'https://cccsolutions.ca/icon.png' },
-            },
-            datePublished: `${contestYear}-02-01`,
-            dateModified: `${contestYear}-02-01`,
-            proficiencyLevel: problemInfo?.difficulty || 'Intermediate',
-            dependencies: problemInfo?.tags?.join(', ') || 'algorithms',
-          }).replace(/</g, '\\u003c'),
-        }}
-      />
-
       <SectionContainer size="large" className="pt-12 pb-20">
         {/* Back link */}
         <Link
@@ -419,9 +118,12 @@ const Problem = () => {
 
         {/* Problem header */}
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-            {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
-          </h1>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              {problemInfo?.name || `CCC ${contestYear} ${problemCode.toUpperCase()}`}
+            </h1>
+            {headerControls}
+          </div>
           <div className="flex flex-wrap items-center gap-2 mt-4">
             {problemInfo?.difficulty && (
               <span
@@ -441,7 +143,27 @@ const Problem = () => {
               </span>
             ))}
           </div>
+          <ProblemActions contestYear={contestYear} problemCode={problemCode} className="mt-6" />
         </div>
+
+        <hr className="mb-10 border-border-default" />
+
+        {/* Editorial section */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <ReaderIcon width="18" height="18" className="text-brand" />
+            <h2 className="text-xl font-semibold text-foreground">Editorial</h2>
+          </div>
+          <Card>
+            <EditorialContent
+              contestYear={contestYear}
+              problemCode={problemCode}
+              markdown={data.editorial}
+              loading={loading}
+              className="p-6"
+            />
+          </Card>
+        </section>
 
         {/* Solutions section */}
         <section className="mb-10">
@@ -501,14 +223,15 @@ const Problem = () => {
                       <span className="text-xs font-medium text-foreground-lighter uppercase">
                         {solution.language}
                       </span>
-                      <a
-                        href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
-                        className="text-foreground-lighter hover:text-brand transition-colors"
-                        aria-label={`Download solution ${idx + 1}`}
-                        title="Download solution"
-                      >
-                        <DownloadIcon width="15" height="15" />
-                      </a>
+                      <Tooltip content="Download solution">
+                        <a
+                          href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
+                          className="text-foreground-lighter hover:text-brand transition-colors"
+                          aria-label={`Download solution ${idx + 1}`}
+                        >
+                          <DownloadIcon width="15" height="15" />
+                        </a>
+                      </Tooltip>
                     </div>
                   </div>
                   <SyntaxHighlighter
@@ -685,7 +408,7 @@ const Problem = () => {
       <DownloadDialog
         open={downloadOpen}
         onClose={() => setDownloadOpen(false)}
-        apiBase={API_BASE}
+        apiBase={CONTEST_API_BASE}
         year={contestYear}
         code={problemCode}
         tests={tests}
