@@ -2071,8 +2071,7 @@ const contributors: Contributor[] = [
     initials: 'MS',
     name: 'Morgan Su',
     schools: 'Bayview Secondary School',
-    contributions:
-      '2026 J1, 2026 J2, 2019 J1, 2020 J1, 2021 J2, 2021 J1, 2018 J1, 2022 J1, 2018 J2, 2022 J2, 2019 J2, 2019 J3, 2020 J2, 2020 J3, 2021 J3, 2022 J3',
+    contributions: 'Various solutions from 2018-2026',
   },
   {
     initials: 'NB',
