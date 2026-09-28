@@ -17,32 +17,7 @@ import { Card, CardContent, CardDescription, CardTitle } from '../components/ui/
 import { SectionContainer } from '../components/ui/section-container';
 
 import { stats } from '../constants';
-import { kFormatter } from '../lib/utils';
 import { SolutionPreview } from '../components/solutions/SolutionPreview';
-
-async function getGithubStars(): Promise<number | null> {
-  try {
-    const res = await fetch('https://api.github.com/repos/CCCSolutions/CCCSolutions', {
-      // Baked at build time (force-cache) rather than per-request. GitHub's unauthenticated API is too low and both hosts
-      // share egress IPs so a runtime fetch gets throttled. Fetching once per build sidesteps the shared-IP throttle and
-      // refreshes on deploy. If the build fetch is itself throttled/fails, return null and hide the count
-      // TODO: see the tracking issue and fix it with an authenticated endpoint
-      cache: 'force-cache',
-      headers: { Accept: 'application/vnd.github+json' },
-    });
-    if (!res.ok) {
-      // Logged so the build output shows the real cause (e.g. 403 rate-limit) instead of
-      // silently baking a blank count. See the tracking issue.
-      console.warn(`[github-stars] fetch failed: ${res.status} ${res.statusText}`);
-      return null;
-    }
-    const data = await res.json();
-    return typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
-  } catch (err) {
-    console.warn('[github-stars] fetch threw:', err);
-    return null;
-  }
-}
 
 const features = [
   {
@@ -77,8 +52,7 @@ const features = [
   },
 ];
 
-const Home = async () => {
-  const githubStars = await getGithubStars();
+const Home = () => {
   return (
     <div className="bg-background text-foreground">
       {/* Announcement + Hero share the first viewport — flex column sized to (100svh - navbar).
@@ -249,12 +223,6 @@ const Home = async () => {
                 >
                   <GitHubLogoIcon width="18" height="18" />
                   <span>cccsolutions</span>
-                  {githubStars !== null && (
-                    <>
-                      <span className="text-foreground-muted px-1">|</span>
-                      <span>{kFormatter(githubStars)}</span>
-                    </>
-                  )}
                 </a>
               </Button>
             </div>
