@@ -1986,7 +1986,7 @@ const contributors: Contributor[] = [
     name: 'Daniel Zhang',
     school: 'Pinetree Secondary School',
     contributions:
-      'Website revamp, 2018 S4, 2019 S3, 2019 S4, 2020 S3, 2020 S4, 2021 S4, 2022 S4, 2023 J1, 2023 J2, 2023 J3, 2024 J1, 2024 J2, 2024 J3, 2024 J5, 2025 J1, 2025 J5, 2025 S1, 2025 S2, 2025 S4, 2025 S5',
+      'Website revamp, various solutions from 2018-2025 (J1, J2, J3, J5, S1, S2, S3, S4, S5)',
   },
   {
     initials: 'ES',
