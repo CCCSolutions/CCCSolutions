@@ -3,6 +3,8 @@ export interface Problem {
   difficulty: string;
   tags: string[];
   link: string;
+  // A Junior problem that is the same as a Senior one: the Senior page's link.
+  sameAs?: string;
 }
 
 export interface Contributor {
@@ -49,7 +51,8 @@ const problems: Problem[] = [
     name: '2026 J5 - Beams of Light',
     difficulty: 'Normal',
     tags: ['prefix sums', 'implementation'],
-    link: '/contest/2026/s2',
+    link: '/contest/2026/j5',
+    sameAs: '/contest/2026/s2',
   },
 
   // 2026 Senior
@@ -235,7 +238,8 @@ const problems: Problem[] = [
     name: '2023 J4 - Trianglane',
     difficulty: 'Normal',
     tags: ['simple math'],
-    link: '/contest/2023/s1',
+    link: '/contest/2023/j4',
+    sameAs: '/contest/2023/s1',
   },
   {
     name: '2023 J5 - CCC Word Hunt',
@@ -299,7 +303,8 @@ const problems: Problem[] = [
     name: '2022 J4 - Good Groups',
     difficulty: 'Normal',
     tags: ['implementation'],
-    link: '/contest/2022/s2',
+    link: '/contest/2022/j4',
+    sameAs: '/contest/2022/s2',
   },
   {
     name: '2022 J5 - Square Pool',
@@ -369,7 +374,8 @@ const problems: Problem[] = [
     name: '2021 J5 - Modern Art',
     difficulty: 'Normal',
     tags: ['implementation'],
-    link: '/contest/2021/s2',
+    link: '/contest/2021/j5',
+    sameAs: '/contest/2021/s2',
   },
   // 2021 Senior
   {
@@ -432,7 +438,8 @@ const problems: Problem[] = [
     name: '2020 J5 - Escape Room',
     difficulty: 'Insane',
     tags: ['graph theory'],
-    link: '/contest/2020/s2',
+    link: '/contest/2020/j5',
+    sameAs: '/contest/2020/s2',
   },
 
   // 2020 Senior
@@ -490,7 +497,8 @@ const problems: Problem[] = [
     name: '2019 J4 - Flipper',
     difficulty: 'Easy',
     tags: ['implementation'],
-    link: '/contest/2019/s1',
+    link: '/contest/2019/j4',
+    sameAs: '/contest/2019/s1',
   },
   {
     name: '2019 J5 - Rule of Three',
@@ -554,7 +562,8 @@ const problems: Problem[] = [
     name: '2018 J4 - Sunflowers',
     difficulty: 'Normal',
     tags: ['implementation'],
-    link: '/contest/2018/s2',
+    link: '/contest/2018/j4',
+    sameAs: '/contest/2018/s2',
   },
   {
     name: '2018 J5 - Choose your own path',
@@ -624,7 +633,8 @@ const problems: Problem[] = [
     name: '2017 J5 - Nailed It!',
     difficulty: 'Hard',
     tags: ['simple math'],
-    link: '/contest/2017/s3',
+    link: '/contest/2017/j5',
+    sameAs: '/contest/2017/s3',
   },
 
   // 2017 Senior
@@ -688,7 +698,8 @@ const problems: Problem[] = [
     name: '2016 J5 - Tandem Bicycle',
     difficulty: 'Normal',
     tags: ['greedy'],
-    link: '/contest/2016/s2',
+    link: '/contest/2016/j5',
+    sameAs: '/contest/2016/s2',
   },
 
   // 2016 Senior
@@ -810,13 +821,15 @@ const problems: Problem[] = [
     name: '2014 J4 - Party Invitation',
     difficulty: 'Normal',
     tags: ['1D array'],
-    link: '/contest/2014/s1',
+    link: '/contest/2014/j4',
+    sameAs: '/contest/2014/s1',
   },
   {
     name: '2014 J5 - Assigning Partners',
     difficulty: 'Hard',
     tags: ['arrays', 'sorting'],
     link: '/contest/2014/j5',
+    sameAs: '/contest/2014/s2',
   },
 
   // 2014 Senior
@@ -868,7 +881,8 @@ const problems: Problem[] = [
     name: '2013 J3 - From 1987 to 2013',
     difficulty: 'Normal',
     tags: ['digit processing'],
-    link: '/contest/2013/s1',
+    link: '/contest/2013/j3',
+    sameAs: '/contest/2013/s1',
   },
   {
     name: '2013 J4 - Time on Task',
@@ -880,7 +894,8 @@ const problems: Problem[] = [
     name: '2013 J5 - Chances of Winning',
     difficulty: 'Hard',
     tags: ['recursion', 'loops'],
-    link: '/contest/2013/s3',
+    link: '/contest/2013/j5',
+    sameAs: '/contest/2013/s3',
   },
 
   // 2013 Senior
@@ -944,7 +959,8 @@ const problems: Problem[] = [
     name: '2012 J5 - A Coin Game',
     difficulty: 'Hard',
     tags: ['BFS', 'game tree'],
-    link: '/contest/2012/s4',
+    link: '/contest/2012/j5',
+    sameAs: '/contest/2012/s4',
   },
 
   // 2012 Senior
@@ -1137,6 +1153,7 @@ const problems: Problem[] = [
     difficulty: 'Hard',
     tags: ['graph theory', '2D arrays'],
     link: '/contest/2009/j5',
+    sameAs: '/contest/2009/s3',
   },
 
   // 2009 Senior
@@ -1200,7 +1217,8 @@ const problems: Problem[] = [
     name: '2008 J5 - Nukit',
     difficulty: 'Hard',
     tags: ['recursion'],
-    link: '/contest/2008/s5',
+    link: '/contest/2008/j5',
+    sameAs: '/contest/2008/s5',
   },
 
   // 2008 Senior
@@ -1508,19 +1526,22 @@ const problems: Problem[] = [
     name: '2003 J3 - Snakes and Ladders',
     difficulty: 'Easy',
     tags: ['counting', 'decisions'],
-    link: '/contest/2003/s1',
+    link: '/contest/2003/j3',
+    sameAs: '/contest/2003/s1',
   },
   {
     name: '2003 J4 - Poetry',
     difficulty: 'Normal',
     tags: ['strings', 'decisions'],
     link: '/contest/2003/j4',
+    sameAs: '/contest/2003/s2',
   },
   {
     name: '2003 J5 - Floor Plan',
     difficulty: 'Hard',
     tags: ['2D array', 'recursion'],
     link: '/contest/2003/j5',
+    sameAs: '/contest/2003/s3',
   },
 
   // 2003 Senior
@@ -1572,22 +1593,31 @@ const problems: Problem[] = [
     name: "2002 J3 - Student Council's Breakfast",
     difficulty: 'Easy',
     tags: ['nested loops'],
-    link: '/contest/2002/s1',
+    link: '/contest/2002/j3',
+    sameAs: '/contest/2002/s1',
   },
   {
     name: '2002 J4 - Fraction Action',
     difficulty: 'Easy',
     tags: ['GCD algorithm'],
-    link: '/contest/2002/s2',
+    link: '/contest/2002/j4',
+    sameAs: '/contest/2002/s2',
   },
   {
     name: '2002 J5 - Blindfold',
     difficulty: 'Normal',
     tags: ['1D array', '2D array'],
-    link: '/contest/2002/s3',
+    link: '/contest/2002/j5',
+    sameAs: '/contest/2002/s3',
   },
 
   // 2002 Senior
+  {
+    name: "2002 S1 - Student Council's Breakfast",
+    difficulty: 'Easy',
+    tags: ['nested loops'],
+    link: '/contest/2002/s1',
+  },
   {
     name: '2002 S2 - Fraction Action',
     difficulty: 'Easy',
@@ -1631,18 +1661,21 @@ const problems: Problem[] = [
     difficulty: 'Easy',
     tags: ['strings', 'decisions'],
     link: '/contest/2001/j3',
+    sameAs: '/contest/2001/s1',
   },
   {
     name: '2001 J4 - Spirals',
     difficulty: 'Normal',
     tags: ['loops', 'decisions'],
     link: '/contest/2001/j4',
+    sameAs: '/contest/2001/s2',
   },
   {
     name: '2001 J5 - Strategic Bombing',
     difficulty: 'Hard',
     tags: ['graph theory', "Warshall's algorithm"],
     link: '/contest/2001/j5',
+    sameAs: '/contest/2001/s3',
   },
 
   // 2001 Senior
@@ -1694,19 +1727,22 @@ const problems: Problem[] = [
     name: '2000 J3 - Slot Machines',
     difficulty: 'Easy',
     tags: ['loops', 'decisions'],
-    link: '/contest/2000/s1',
+    link: '/contest/2000/j3',
+    sameAs: '/contest/2000/s1',
   },
   {
     name: '2000 J4 - Babbling Brooks',
     difficulty: 'Normal',
     tags: ['1D array manipulation'],
-    link: '/contest/2000/s2',
+    link: '/contest/2000/j4',
+    sameAs: '/contest/2000/s2',
   },
   {
     name: '2000 J5 - Surfing',
     difficulty: 'Hard',
     tags: ['graph theory', "Warshall's algorithm", 'BFS'],
-    link: '/contest/2000/s3',
+    link: '/contest/2000/j5',
+    sameAs: '/contest/2000/s3',
   },
 
   // 2000 Senior

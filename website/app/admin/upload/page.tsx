@@ -31,11 +31,10 @@ export default function AdminUploadPage() {
   const [remember, setRemember] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  // A shared Junior problem's entry in constants.ts links to its Senior page.
+  // A shared Junior problem's entry in constants.ts names its Senior page in sameAs.
   const sharedTarget = useMemo(() => {
     if (!YEAR_RE.test(year) || !CODE_RE.test(code)) return null;
-    const entry = problems.find((p) => p.name.startsWith(`${year} ${code.toUpperCase()} `));
-    return entry && entry.link !== `/contest/${year}/${code}` ? entry.link : null;
+    return problems.find((p) => p.link === `/contest/${year}/${code}`)?.sameAs ?? null;
   }, [year, code]);
 
   // Solution-path quick builder.

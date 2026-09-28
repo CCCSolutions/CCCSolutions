@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { MagnifyingGlassIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { Problem } from '../../constants';
+import { problemHref } from '../../lib/problems';
 
 interface SearchBarProps {
   problems: Problem[];
@@ -103,7 +104,7 @@ const SearchBar = ({ problems }: SearchBarProps) => {
                 key={problem.name}
                 className="border-b border-border-default last:border-none hover:bg-surface-200/60 transition-colors"
               >
-                <Link href={problem.link} className="block p-4">
+                <Link href={problemHref(problem)} className="block p-4">
                   <span className="text-brand font-medium hover:underline">{problem.name}</span>
                   <p className="text-sm text-foreground-light mt-1">
                     Difficulty: {problem.difficulty}
