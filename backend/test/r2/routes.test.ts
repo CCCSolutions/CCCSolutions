@@ -341,3 +341,35 @@ describe('Workers Cache headers', () => {
     expect(res.headers.get('cache-control')).toBe('no-store');
   });
 });
+
+describe('GET /contests/index', () => {
+  it('counts solutions per problem across every page of the listing', async () => {
+    const pages = [
+      {
+        objects: [
+          { key: 'contests/2026/s2/solutions/1.cpp' },
+          { key: 'contests/2026/s2/tests/1.in' },
+          { key: 'contests/2026/j5/solutions/1.py' },
+        ],
+        truncated: true,
+        cursor: 'next',
+      },
+      {
+        objects: [
+          { key: 'contests/2026/s2/solutions/2.py' },
+          { key: 'contests/2026/s2/editorial.md' },
+          { key: 'contests/1997/p1/solutions/1.t' },
+        ],
+        truncated: false,
+      },
+    ];
+    const bucket = { list: vi.fn(async () => pages.shift()) };
+    const res = await app.request('/contests/index', {}, { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ solutions: { '2026/s2': 2, '2026/j5': 1, '1997/p1': 1 } });
+    expect(bucket.list).toHaveBeenNthCalledWith(1, { prefix: 'contests/', cursor: undefined });
+    expect(bucket.list).toHaveBeenNthCalledWith(2, { prefix: 'contests/', cursor: 'next' });
+    expect(res.headers.get('Cache-Tag')).toBe('contests:index');
+    expect(res.headers.get('Cache-Control')).toContain('s-maxage=604800');
+  });
+});

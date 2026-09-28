@@ -74,7 +74,7 @@ describe('POST /admin/contests/:year/:code/upload', () => {
     expect(await res.json()).toEqual({ ok: true, key: 'contests/2024/s1/solutions/1.py' });
     expect(b.put).toHaveBeenCalledTimes(1);
     expect(b.put).toHaveBeenCalledWith('contests/2024/s1/solutions/1.py', expect.anything());
-    expect(purge).toHaveBeenCalledWith({ tags: ['contest:2024:s1'] });
+    expect(purge).toHaveBeenCalledWith({ tags: ['contest:2024:s1', 'contests:index'] });
   });
 
   it('returns 400 for a bad file path', async () => {
@@ -113,7 +113,7 @@ describe('DELETE /admin/contests/:year/:code/file', () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
     expect(b.delete).toHaveBeenCalledWith('contests/2024/s1/solutions/1.py');
-    expect(purge).toHaveBeenCalledWith({ tags: ['contest:2024:s1'] });
+    expect(purge).toHaveBeenCalledWith({ tags: ['contest:2024:s1', 'contests:index'] });
   });
 
   it('returns 400 for a bad file path', async () => {

@@ -8,6 +8,12 @@ import { Button } from '../ui/button';
 import { Tooltip } from '../ui/tooltip';
 import { problems } from '../../constants';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
+
+// "/contest/2026/s2" -> "2026/s2". A shared Junior problem links to its Senior page, so it
+// picks up the Senior folder's count.
+const indexKey = (link: string) => link.replace(/^\/contest\//, '');
+
 const DifficultyLegend = () => (
   <>
     <div className="mb-1">
@@ -37,6 +43,19 @@ const ProblemsTable = () => {
   const searchParams = useSearchParams();
   const initialPage = parseInt(searchParams.get('page') || '1') || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
+  // Solution count per problem from the API. null while loading or if the request fails.
+  const [solutionCounts, setSolutionCounts] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_BASE}/contests/index`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`index ${res.status}`))))
+      .then((data: { solutions: Record<string, number> }) => setSolutionCounts(data.solutions))
+      .catch((error) => {
+        if (!controller.signal.aborted) console.error('Error loading solution index:', error);
+      });
+    return () => controller.abort();
+  }, []);
 
   const problemsPerPage = 20;
 
@@ -104,7 +123,11 @@ const ProblemsTable = () => {
               className="border-b border-border-default hover:bg-surface-200/50 transition-colors"
             >
               <td className="py-3 whitespace-nowrap">
-                {problem.hasSolution ? (
+                {solutionCounts === null ? (
+                  <div className="px-10" aria-label="Checking for a solution">
+                    <div className="size-5 animate-pulse rounded bg-surface-300" />
+                  </div>
+                ) : (solutionCounts[indexKey(problem.link)] ?? 0) > 0 ? (
                   <div className="px-10 text-green-600 dark:text-green-400">
                     <ReaderIcon width="20" height="20" />
                   </div>
