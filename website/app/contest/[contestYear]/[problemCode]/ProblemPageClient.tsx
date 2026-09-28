@@ -15,6 +15,7 @@ import {
 } from '@radix-ui/react-icons';
 import { Card, CardContent } from '../../../../components/ui/card';
 import { SectionContainer } from '../../../../components/ui/section-container';
+import { Tooltip } from '../../../../components/ui/tooltip';
 import { DownloadDialog } from '../../../../components/contest/DownloadDialog';
 import { Problem as ProblemType, problems } from '../../../../constants';
 import dynamic from 'next/dynamic';
@@ -502,14 +503,15 @@ const Problem = () => {
                       <span className="text-xs font-medium text-foreground-lighter uppercase">
                         {solution.language}
                       </span>
-                      <a
-                        href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
-                        className="text-foreground-lighter hover:text-brand transition-colors"
-                        aria-label={`Download solution ${idx + 1}`}
-                        title="Download solution"
-                      >
-                        <DownloadIcon width="15" height="15" />
-                      </a>
+                      <Tooltip content="Download solution">
+                        <a
+                          href={downloadUrl(`solutions/${solution.n}.${solution.ext}`)}
+                          className="text-foreground-lighter hover:text-brand transition-colors"
+                          aria-label={`Download solution ${idx + 1}`}
+                        >
+                          <DownloadIcon width="15" height="15" />
+                        </a>
+                      </Tooltip>
                     </div>
                   </div>
                   <SyntaxHighlighter
