@@ -1985,13 +1985,14 @@ const contributors: Contributor[] = [
     initials: 'DZ',
     name: 'Daniel Zhang',
     school: 'Pinetree Secondary School',
-    contributions: 'Website revamp, 2019 S4',
+    contributions:
+      'Website revamp, 2018 S4, 2019 S3, 2019 S4, 2020 S3, 2020 S4, 2021 S4, 2022 S4, 2023 J1, 2023 J2, 2023 J3, 2024 J1, 2024 J2, 2024 J3, 2024 J5, 2025 J1, 2025 J5, 2025 S1, 2025 S2, 2025 S4, 2025 S5',
   },
   {
     initials: 'ES',
     name: 'Ethan Shen',
     school: 'Orchard Park PS, London ON',
-    contributions: '2023 S4, 2019 S5, 2017 J3, 2017 J4, 2016 S5',
+    contributions: '2023 S4, 2019 S5, 2017 J3, 2017 J4, 2016 J5',
   },
   {
     initials: 'GV',
@@ -2009,7 +2010,8 @@ const contributors: Contributor[] = [
     initials: 'IL',
     name: 'Ivan Li',
     school: 'Markville Secondary School',
-    contributions: '2010 J5: 2013 S4: 2018 J5: 2014 S1: 2014 S2: 2013 S1: 2013 S2: 2018 S2 2015 J5',
+    contributions:
+      '2010 J5: 2013 S4: 2018 J5: 2014 S1: 2014 S2: 2013 S1: 2013 S2: 2018 S2, 2015 J5',
   },
   {
     initials: 'JC',
@@ -2070,7 +2072,7 @@ const contributors: Contributor[] = [
     name: 'Morgan Su',
     schools: 'Bayview Secondary School',
     contributions:
-      '2026 J1, 2026 J2, 2019 J1, 2020 J1, 2021 J2, 2021 J1, 2018 J1, 2022 J1, 2018 J2, 2018 J1',
+      '2026 J1, 2026 J2, 2019 J1, 2020 J1, 2021 J2, 2021 J1, 2018 J1, 2022 J1, 2018 J2, 2022 J2, 2019 J2, 2019 J3, 2020 J2, 2020 J3, 2021 J3, 2022 J3',
   },
   {
     initials: 'NB',
@@ -2136,7 +2138,7 @@ const contributors: Contributor[] = [
     school: 'Northview Heights S.S.',
     contributions: '2003 S4, S5: 2002 S4',
   },
-  { initials: 'VSi', name: 'Vincent Siao', school: "St George's School", contributions: 'S010 S3' },
+  { initials: 'VSi', name: 'Vincent Siao', school: "St George's School", contributions: '2010 S3' },
   { initials: 'VW', name: 'Victor Wang', school: 'Tecumseh Elementary', contributions: '2013 S2' },
   { initials: 'W', name: 'WATER', school: 'N/A', contributions: '2025 J2' },
   {
