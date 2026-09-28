@@ -2071,7 +2071,7 @@ const contributors: Contributor[] = [
     initials: 'MS',
     name: 'Morgan Su',
     schools: 'Bayview Secondary School',
-    contributions: 'Various solutions from 2018-2026',
+    contributions: 'Various solutions from 2018-2026 (J1, J2, J3)',
   },
   {
     initials: 'NB',
