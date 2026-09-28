@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { problems } from '../../../../constants';
 import { findProblem } from '../../../../lib/problems';
 import SolutionPageClient from './SolutionPageClient';
@@ -53,6 +54,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: Props) {
+  const { contestYear, problemCode } = await params;
+  // next.config.ts also redirects these, but Netlify doesn't apply those redirects.
+  const shared = problems.find((p) => p.link === `/contest/${contestYear}/${problemCode}`)?.sameAs;
+  if (shared) redirect(shared);
   return <SolutionPageClient />;
 }
