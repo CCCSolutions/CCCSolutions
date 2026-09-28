@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { problems } from '../../../../constants';
+import { findProblem } from '../../../../lib/problems';
 import SolutionPageClient from './SolutionPageClient';
 
 type Props = {
@@ -7,14 +9,10 @@ type Props = {
 };
 
 export function generateStaticParams() {
-  const seen = new Set<string>();
-
-  // 20 shared junior problems point their link at the senior page, so the same
-  // route shows up twice — duplicate params break the build.
+  // A shared Junior problem redirects to its Senior page, so it gets no page of its own.
   return problems.flatMap((problem) => {
     const match = /^\/contest\/([^/]+)\/([^/]+)$/.exec(problem.link);
-    if (!match || seen.has(problem.link)) return [];
-    seen.add(problem.link);
+    if (!match || problem.sameAs) return [];
     return [{ contestYear: match[1], problemCode: match[2] }];
   });
 }
@@ -22,7 +20,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { contestYear, problemCode } = await params;
   const url = `/contest/${contestYear}/${problemCode}`;
-  const problem = problems.find((p) => p.link === url);
+  const problem = findProblem(contestYear, problemCode);
 
   if (!problem) {
     return { title: 'Problem Not Found | CCCSolutions' };
@@ -56,6 +54,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page() {
+export default async function Page({ params }: Props) {
+  const { contestYear, problemCode } = await params;
+  // next.config.ts also redirects these, but Netlify doesn't apply those redirects.
+  const shared = problems.find((p) => p.link === `/contest/${contestYear}/${problemCode}`)?.sameAs;
+  if (shared) redirect(shared);
   return <SolutionPageClient />;
 }

@@ -7,11 +7,11 @@ import { Cross2Icon, ReaderIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { Button } from '../ui/button';
 import { Tooltip } from '../ui/tooltip';
 import { problems } from '../../constants';
+import { problemHref } from '../../lib/problems';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.cccsolutions.ca';
 
-// "/contest/2026/s2" -> "2026/s2". A shared Junior problem links to its Senior page, so it
-// picks up the Senior folder's count.
+// "/contest/2026/s2" -> "2026/s2". A shared Junior problem picks up its Senior folder's count.
 const indexKey = (link: string) => link.replace(/^\/contest\//, '');
 
 const DifficultyLegend = () => (
@@ -127,7 +127,7 @@ const ProblemsTable = () => {
                   <div className="px-10" aria-label="Checking for a solution">
                     <div className="size-5 animate-pulse rounded bg-surface-300" />
                   </div>
-                ) : (solutionCounts[indexKey(problem.link)] ?? 0) > 0 ? (
+                ) : (solutionCounts[indexKey(problemHref(problem))] ?? 0) > 0 ? (
                   <div className="px-10 text-green-600 dark:text-green-400">
                     <ReaderIcon width="20" height="20" />
                   </div>
@@ -139,7 +139,7 @@ const ProblemsTable = () => {
               </td>
               <td className="pl-4 md:px-6 py-3 overflow-hidden">
                 <Link
-                  href={problem.link}
+                  href={problemHref(problem)}
                   className="block truncate text-brand font-medium hover:underline"
                 >
                   {problem.name}

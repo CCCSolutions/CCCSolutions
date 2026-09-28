@@ -8,7 +8,7 @@ import {
   type ViewMode,
 } from '../../../../components/contest/workspace/LayoutControls';
 import { WorkspaceView } from '../../../../components/contest/workspace/WorkspaceView';
-import { problems } from '../../../../constants';
+import { findProblem } from '../../../../lib/problems';
 import ProblemPageClient from './ProblemPageClient';
 
 const VIEW_STORAGE_KEY = 'cccsolutions-solution-view';
@@ -19,7 +19,7 @@ export default function SolutionPageClient() {
     problemCode: string;
   }>();
   const problemInfo = useMemo(
-    () => problems.find((problem) => problem.link === `/contest/${contestYear}/${problemCode}`),
+    () => findProblem(contestYear, problemCode),
     [contestYear, problemCode]
   );
   const data = useContestData(contestYear, problemCode);
