@@ -31,11 +31,13 @@ export function Tooltip({
   children,
   side = 'top',
   className,
+  triggerClassName,
 }: {
   content: ReactNode;
   children: ReactElement<{ 'aria-describedby'?: string }>;
   side?: Side;
   className?: string;
+  triggerClassName?: string;
 }) {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -124,7 +126,7 @@ export function Tooltip({
   return (
     <span
       ref={triggerRef}
-      className="inline-flex"
+      className={cn('inline-flex', triggerClassName)}
       onPointerEnter={(e) => isMouse(e) && show()}
       onPointerLeave={(e) => isMouse(e) && hideSoon()}
       onPointerUp={(e) => {

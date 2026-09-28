@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { problems } from '../../../../constants';
-import ProblemPageClient from './ProblemPageClient';
+import SolutionPageClient from './SolutionPageClient';
 
 type Props = {
   params: Promise<{ contestYear: string; problemCode: string }>;
@@ -57,5 +57,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function Page() {
-  return <ProblemPageClient />;
+  return <SolutionPageClient />;
 }
