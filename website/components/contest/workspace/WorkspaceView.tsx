@@ -122,7 +122,7 @@ export function WorkspaceView({
   );
 
   return (
-    <div className="mb-3 flex min-h-[70dvh] flex-col bg-background text-foreground lg:mb-0 lg:h-[calc(100dvh-var(--nav-h))] lg:min-h-0">
+    <div className="flex min-h-[calc(100dvh-var(--nav-h))] flex-col bg-background text-foreground lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
       <div ref={layout.desktopRef} className="hidden min-h-0 flex-1 p-3 lg:flex">
         {fullscreen ? (
           <div className="min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border border-border-default bg-surface-100">
@@ -202,36 +202,38 @@ export function WorkspaceView({
         )}
       </div>
 
-      <div className="flex min-h-[70dvh] flex-1 flex-col lg:hidden">
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-100 px-3 py-2">
-          <span className="min-w-0 truncate text-xs font-semibold text-foreground">
-            {problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`}
-          </span>
-          {layoutControls}
+      <div className="flex flex-1 flex-col lg:hidden">
+        <div className="sticky top-0 z-10">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-default bg-surface-100 px-3 py-2">
+            <span className="min-w-0 truncate text-xs font-semibold text-foreground">
+              {problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`}
+            </span>
+            {layoutControls}
+          </div>
+          <div className="flex shrink-0 overflow-x-auto border-b border-border-default bg-surface-100 px-3">
+            {(
+              [
+                ['editorial', 'Editorial'],
+                ['solution', 'Solution'],
+                ['tests', 'Test cases'],
+              ] as const
+            ).map(([panel, label]) => (
+              <button
+                key={panel}
+                type="button"
+                onClick={() => setMobilePanel(panel)}
+                className={`border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap ${
+                  mobilePanel === panel
+                    ? 'border-brand-500 text-brand'
+                    : 'border-transparent text-foreground-light'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex shrink-0 overflow-x-auto border-b border-border-default bg-surface-100 px-3">
-          {(
-            [
-              ['editorial', 'Editorial'],
-              ['solution', 'Solution'],
-              ['tests', 'Test cases'],
-            ] as const
-          ).map(([panel, label]) => (
-            <button
-              key={panel}
-              type="button"
-              onClick={() => setMobilePanel(panel)}
-              className={`border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                mobilePanel === panel
-                  ? 'border-brand-500 text-brand'
-                  : 'border-transparent text-foreground-light'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className="min-h-0 flex-1 bg-surface-100">
+        <div className="flex-1 bg-surface-100">
           {mobilePanel === 'editorial' && renderEditorial(false)}
           {mobilePanel === 'solution' && renderSolution(false)}
           {mobilePanel === 'tests' && renderTests(false)}

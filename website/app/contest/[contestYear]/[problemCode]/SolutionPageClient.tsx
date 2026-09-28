@@ -98,7 +98,7 @@ export default function SolutionPageClient() {
         }}
       />
       {view === null ? (
-        <div className="min-h-[70dvh] lg:h-[calc(100dvh-var(--nav-h))]" />
+        <div className="min-h-[calc(100dvh-var(--nav-h))] lg:h-[calc(100dvh-var(--nav-h))]" />
       ) : view === 'classic' ? (
         <ProblemPageClient
           contestYear={contestYear}
