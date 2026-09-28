@@ -58,6 +58,28 @@ describe('GET /contests/:year/:code/preview', () => {
     expect(bucket.get).toHaveBeenCalledWith('contests/2024/s1/editorial.md');
   });
 
+  it('returns the full README (no range read)', async () => {
+    const bucket = bucketReturning('Upload to 2024/s1.');
+    const res = await app.request(
+      '/contests/2024/s1/preview?file=README.md',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(200);
+    expect(bucket.get).toHaveBeenCalledWith('contests/2024/s1/README.md');
+  });
+
+  it('rejects editorial images, which go through /image', async () => {
+    const bucket = bucketReturning('x');
+    const res = await app.request(
+      '/contests/2024/s1/preview?file=editorial/fig.png',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(400);
+    expect(bucket.get).not.toHaveBeenCalled();
+  });
+
   it('returns 400 for a bad file', async () => {
     const bucket = bucketReturning('x');
     const res = await app.request(
@@ -87,6 +109,45 @@ describe('GET /contests/:year/:code/preview', () => {
       { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
     );
     expect(res.status).toBe(404);
+  });
+});
+
+describe('GET /contests/:year/:code/image', () => {
+  it('returns the image bytes with its content type', async () => {
+    const bytes = new Uint8Array([137, 80, 78, 71]);
+    const bucket = { get: vi.fn(async () => ({ body: new Response(bytes).body })) };
+    const res = await app.request(
+      '/contests/2025/s1/image?file=editorial/fig-1.png',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('image/png');
+    expect(res.headers.get('Cache-Tag')).toBe('contest:2025:s1');
+    expect(new Uint8Array(await res.arrayBuffer())).toEqual(bytes);
+    expect(bucket.get).toHaveBeenCalledWith('contests/2025/s1/editorial/fig-1.png');
+  });
+
+  it('returns 404 (not cached) when the image does not exist', async () => {
+    const bucket = { get: vi.fn(async () => null) };
+    const res = await app.request(
+      '/contests/2025/s1/image?file=editorial/missing.png',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(404);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('returns 400 for a file outside editorial/', async () => {
+    const bucket = { get: vi.fn() };
+    const res = await app.request(
+      '/contests/2025/s1/image?file=solutions/1.py',
+      {},
+      { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV },
+    );
+    expect(res.status).toBe(400);
+    expect(bucket.get).not.toHaveBeenCalled();
   });
 });
 
@@ -208,6 +269,12 @@ describe('GET /contests/:year/:code/list', () => {
       { n: 2, ext: 'py', bytes: 1500 },
     ]);
     expect(bucket.list).toHaveBeenCalledWith({ prefix: 'contests/2024/s1/' });
+  });
+
+  it('reports whether README.md exists', async () => {
+    const bucket = bucketListing([['contests/2024/j4/README.md', 200]]);
+    const res = await app.request('/contests/2024/j4/list', {}, { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV });
+    expect(((await res.json()) as { readme: boolean }).readme).toBe(true);
   });
 
   it('reports whether editorial.md exists', async () => {

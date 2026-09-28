@@ -47,6 +47,9 @@ describe('fileSchema', () => {
       'solutions/3.py',
       'solutions/1.t',
       'editorial.md',
+      'editorial/fig-1.png',
+      'editorial/tree.jpg',
+      'README.md',
     ];
     for (const f of ok) expect(fileSchema.safeParse(f).success).toBe(true);
   });
@@ -60,6 +63,9 @@ describe('fileSchema', () => {
       'tests/1', // no extension
       'editorial.txt', // the editorial is only Markdown
       'solutions/editorial.md', // the editorial sits at the problem root
+      'editorial/fig.svg', // images are png or jpg only
+      'editorial/../tests/1.in', // no traversal out of editorial/
+      'readme.md', // the README name is exact
     ];
     for (const f of bad) expect(fileSchema.safeParse(f).success).toBe(false);
   });

@@ -32,6 +32,10 @@ export function fetchContestPreview(
   return fetch(`${CONTEST_API_BASE}/contests/${year}/${code}/preview?file=${file}`, { signal });
 }
 
+export function contestImageUrl(year: string, code: string, file: string) {
+  return `${CONTEST_API_BASE}/contests/${year}/${code}/image?file=${file}`;
+}
+
 export function contestDownloadUrl(year: string, code: string, file: string) {
   return `${CONTEST_API_BASE}/contests/${year}/${code}/download?file=${file}`;
 }

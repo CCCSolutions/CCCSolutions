@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { AwsClient } from 'aws4fetch';
 import { z } from 'zod';
 import type { Bindings } from '../types';
-import { problemParamsSchema, fileSchema } from './validation';
+import { problemParamsSchema, fileSchema, editorialImageSchema } from './validation';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
 
@@ -27,6 +27,7 @@ r2.get('/:year/:code/list', async (c) => {
   const testsByKey: Record<string, { n: number; sample: boolean; inputBytes?: number; outputBytes?: number }> = {};
   const solutions: { n: number; ext: string; bytes: number }[] = [];
   let editorial = false;
+  let readme = false;
 
   for (const obj of objects) {
     const rel = obj.key.slice(prefix.length);
@@ -46,24 +47,26 @@ r2.get('/:year/:code/list', async (c) => {
     if (sol) solutions.push({ n: Number(sol[1]), ext: sol[2], bytes: obj.size });
 
     if (rel === 'editorial.md') editorial = true;
+    if (rel === 'README.md') readme = true;
   }
 
   const tests = Object.values(testsByKey).sort((a, b) => Number(a.sample) - Number(b.sample) || a.n - b.n);
   solutions.sort((a, b) => a.n - b.n);
 
   setContestCache(c, year, code);
-  return c.json({ tests, solutions, editorial });
+  return c.json({ tests, solutions, editorial, readme });
 });
 
 // R2 preview endpoint for test case files
 r2.get('/:year/:code/preview', async (c) => {
   const params = problemParamsSchema.safeParse({ year: c.req.param('year'), code: c.req.param('code') });
   const file = fileSchema.safeParse(c.req.query('file'));
-  if (!params.success || !file.success)
+  // Images are binary, so they go through /image instead.
+  if (!params.success || !file.success || editorialImageSchema.safeParse(file.data).success)
     return c.text('Bad request: /contests/<year>/<code>/preview?file=tests/1.in', 400);
   const key = `contests/${params.data.year}/${params.data.code}/${file.data}`;
-  // Solutions and the editorial come back whole. Test files are truncated.
-  const whole = file.data.startsWith('solutions/') || file.data === 'editorial.md';
+  // Solutions, the editorial and the README come back whole. Test files are truncated.
+  const whole = file.data.startsWith('solutions/') || file.data === 'editorial.md' || file.data === 'README.md';
 
   const obj = whole
     ? await c.env.TESTCASES_SOLUTIONS_BUCKET.get(key)
@@ -79,6 +82,26 @@ r2.get('/:year/:code/preview', async (c) => {
   const text = await obj.text();
   setContestCache(c, params.data.year, params.data.code);
   return c.text(whole ? text : text.split('\n').slice(0, 50).join('\n'));
+});
+
+// Editorial image endpoint: the bucket is private, so an editorial's <img> points here.
+r2.get('/:year/:code/image', async (c) => {
+  const params = problemParamsSchema.safeParse({ year: c.req.param('year'), code: c.req.param('code') });
+  const file = editorialImageSchema.safeParse(c.req.query('file'));
+  if (!params.success || !file.success)
+    return c.text('Bad request: /contests/<year>/<code>/image?file=editorial/1.png', 400);
+
+  const obj = await c.env.TESTCASES_SOLUTIONS_BUCKET.get(
+    `contests/${params.data.year}/${params.data.code}/${file.data}`,
+  );
+  if (!obj) {
+    c.header('Cache-Control', 'no-store');
+    return c.text('Image not found', 404);
+  }
+
+  setContestCache(c, params.data.year, params.data.code);
+  c.header('Content-Type', file.data.endsWith('.png') ? 'image/png' : 'image/jpeg');
+  return c.body(obj.body);
 });
 
 // Friendly download filename: samples read clearly, solutions carry year+code.

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '../ui/button';
 import { MarkdownPreview } from '../forum/MarkdownPreview';
 import { cn } from '../../lib/utils';
-import { cemcCommentaryUrl } from '../../lib/cemc';
+import { contestImageUrl } from '../../lib/contest-api';
 import { dmojEditorialUrl, dmojProblemUrl } from '../../lib/dmoj';
 
 function DmojLogo({ size }: { size: number }) {
@@ -65,7 +65,6 @@ export function EditorialContent({
   }
 
   if (markdown) {
-    const sourceUrl = cemcCommentaryUrl(contestYear, problemCode);
     return (
       <div
         className={cn(
@@ -73,20 +72,24 @@ export function EditorialContent({
           className
         )}
       >
-        <MarkdownPreview content={markdown} gfm />
-        {sourceUrl && (
-          <p className="mt-6 text-xs text-foreground-lighter">
-            Source:{' '}
-            <a
-              href={sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-foreground"
-            >
-              CEMC commentary
-            </a>
-          </p>
-        )}
+        <MarkdownPreview
+          content={markdown}
+          gfm
+          resolveImage={(src) =>
+            src.startsWith('editorial/') ? contestImageUrl(contestYear, problemCode, src) : src
+          }
+        />
+        <p className="mt-6 text-xs text-foreground-lighter">
+          Source:{' '}
+          <a
+            href="https://cemc.uwaterloo.ca/resources/past-contests"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            CEMC commentary
+          </a>
+        </p>
       </div>
     );
   }
