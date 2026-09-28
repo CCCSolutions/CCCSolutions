@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { MarkdownPreview } from '../forum/MarkdownPreview';
 import { cn } from '../../lib/utils';
+import { contestImageUrl } from '../../lib/contest-api';
 import { dmojEditorialUrl, dmojProblemUrl } from '../../lib/dmoj';
 
 function DmojLogo({ size }: { size: number }) {
@@ -44,10 +46,54 @@ export function ProblemActions({
 export function EditorialContent({
   contestYear,
   problemCode,
+  markdown,
+  loading = false,
+  className,
 }: {
   contestYear: string;
   problemCode: string;
+  markdown: string | null;
+  loading?: boolean;
+  className?: string;
 }) {
+  if (loading) {
+    return (
+      <div className="flex justify-center py-10">
+        <span className="size-5 animate-spin rounded-full border-2 border-surface-300 border-t-brand" />
+      </div>
+    );
+  }
+
+  if (markdown) {
+    return (
+      <div
+        className={cn(
+          '[&_h1]:mb-3 [&_h1]:mt-8 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-foreground [&_h1:first-child]:mt-0 [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-foreground [&_h2:first-child]:mt-0 [&_h3]:mt-4 [&_h3]:font-semibold [&_h3]:text-foreground [&_blockquote]:rounded-r-md [&_blockquote]:border-l-2 [&_blockquote]:border-brand-400 [&_blockquote]:bg-surface-200 [&_blockquote]:px-3 [&_blockquote]:py-2 [&_li>*+*]:mt-3!',
+          className
+        )}
+      >
+        <MarkdownPreview
+          content={markdown}
+          gfm
+          resolveImage={(src) =>
+            src.startsWith('editorial/') ? contestImageUrl(contestYear, problemCode, src) : src
+          }
+        />
+        <p className="mt-6 text-xs text-foreground-lighter">
+          Source:{' '}
+          <a
+            href="https://cemc.uwaterloo.ca/resources/past-contests"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            CEMC commentary
+          </a>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center px-4 py-10 text-center">
       <h2 className="text-base font-semibold tracking-tight text-foreground">

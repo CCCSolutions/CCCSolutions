@@ -33,7 +33,7 @@ export function WorkspaceView({
   problemInfo: Problem | undefined;
   data: ReturnType<typeof useContestData>;
 }) {
-  const { listStatus, loading, tests, solutionsMeta, solutions, solutionsError } = data;
+  const { listStatus, loading, tests, solutionsMeta, solutions, solutionsError, editorial } = data;
   const layout = usePanelLayout();
   const { minimized, fullscreen, leftSize, solutionSize } = layout;
 
@@ -71,6 +71,8 @@ export function WorkspaceView({
       contestYear={contestYear}
       problemCode={problemCode}
       layoutControls={desktop ? layoutControls : undefined}
+      editorial={editorial}
+      loading={loading}
       minimized={desktop && fullscreen !== 'editorial' && minimized.editorial}
       fullscreen={desktop && fullscreen === 'editorial'}
       onMinimize={() => layout.toggleMinimized('editorial')}

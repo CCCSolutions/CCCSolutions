@@ -20,6 +20,8 @@ export function EditorialPanel({
   contestYear,
   problemCode,
   layoutControls,
+  editorial,
+  loading,
   minimized,
   fullscreen,
   onMinimize,
@@ -30,6 +32,8 @@ export function EditorialPanel({
   contestYear: string;
   problemCode: string;
   layoutControls?: React.ReactNode;
+  editorial: string | null;
+  loading: boolean;
 }) {
   const title = problemInfo?.name || `${contestYear} ${problemCode.toUpperCase()}`;
 
@@ -131,7 +135,12 @@ export function EditorialPanel({
             </div>
           </div>
           <div className="mx-auto max-w-3xl">
-            <EditorialContent contestYear={contestYear} problemCode={problemCode} />
+            <EditorialContent
+              contestYear={contestYear}
+              problemCode={problemCode}
+              markdown={editorial}
+              loading={loading}
+            />
           </div>
         </article>
       )}

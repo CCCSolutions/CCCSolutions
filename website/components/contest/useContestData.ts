@@ -118,6 +118,7 @@ export function useContestData(contestYear: string, problemCode: string) {
   const [solutionsMeta, setSolutionsMeta] = useState<ContestSolutionMeta[]>([]);
   const [solutions, setSolutions] = useState<SolutionEntry[]>([]);
   const [solutionsError, setSolutionsError] = useState(false);
+  const [editorial, setEditorial] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -130,6 +131,7 @@ export function useContestData(contestYear: string, problemCode: string) {
       setTests([]);
       setSolutionsMeta([]);
       setSolutions([]);
+      setEditorial(null);
 
       try {
         const res = await fetchContestList(contestYear, problemCode, signal);
@@ -153,25 +155,46 @@ export function useContestData(contestYear: string, problemCode: string) {
         setSolutionsMeta(listSolutions);
         setListStatus('ok');
 
-        const solutionEntries = await Promise.all(
-          listSolutions.map(async (s): Promise<SolutionEntry | null> => {
-            try {
-              const sres = await fetchContestPreview(
-                contestYear,
-                problemCode,
-                `solutions/${s.n}.${s.ext}`,
-                signal
-              );
-              if (!sres.ok) return null;
-              const code = await sres.text();
-              return { ...s, code, language: extToLanguage(s.ext, code) };
-            } catch (error) {
-              if (!signal.aborted) console.error(`Error fetching solution ${s.n}:`, error);
-              return null;
-            }
-          })
-        );
+        const loadEditorial = async () => {
+          if (!data.editorial) return null;
+          try {
+            const eres = await fetchContestPreview(
+              contestYear,
+              problemCode,
+              'editorial.md',
+              signal
+            );
+            return eres.ok ? await eres.text() : null;
+          } catch (error) {
+            if (!signal.aborted) console.error('Error fetching editorial:', error);
+            return null;
+          }
+        };
+
+        const [editorialText, solutionEntries] = await Promise.all([
+          loadEditorial(),
+          Promise.all(
+            listSolutions.map(async (s): Promise<SolutionEntry | null> => {
+              try {
+                const sres = await fetchContestPreview(
+                  contestYear,
+                  problemCode,
+                  `solutions/${s.n}.${s.ext}`,
+                  signal
+                );
+                if (!sres.ok) return null;
+                const code = await sres.text();
+                return { ...s, code, language: extToLanguage(s.ext, code) };
+              } catch (error) {
+                if (!signal.aborted) console.error(`Error fetching solution ${s.n}:`, error);
+                return null;
+              }
+            })
+          ),
+        ]);
         if (signal.aborted) return;
+
+        setEditorial(editorialText);
 
         const validSolutions = solutionEntries.filter((e): e is SolutionEntry => e !== null);
         setSolutions(validSolutions);
@@ -190,7 +213,7 @@ export function useContestData(contestYear: string, problemCode: string) {
     return () => controller.abort();
   }, [contestYear, problemCode]);
 
-  return { listStatus, loading, tests, solutionsMeta, solutions, solutionsError };
+  return { listStatus, loading, tests, solutionsMeta, solutions, solutionsError, editorial };
 }
 
 export function useTestCase(
