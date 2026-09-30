@@ -363,13 +363,26 @@ describe('GET /contests/index', () => {
         truncated: false,
       },
     ];
-    const bucket = { list: vi.fn(async () => pages.shift()) };
+    // No stored index yet, so the route rebuilds it from the full listing and saves it.
+    const bucket = {
+      get: vi.fn(async () => null),
+      put: vi.fn(async () => ({})),
+      list: vi.fn(async () => pages.shift()),
+    };
     const res = await app.request('/contests/index', {}, { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ solutions: { '2026/s2': 2, '2026/j5': 1, '1997/p1': 1 } });
     expect(bucket.list).toHaveBeenNthCalledWith(1, { prefix: 'contests/', cursor: undefined });
     expect(bucket.list).toHaveBeenNthCalledWith(2, { prefix: 'contests/', cursor: 'next' });
+    expect(bucket.put).toHaveBeenCalledWith('meta/solution-index.json', '{"2026/s2":2,"2026/j5":1,"1997/p1":1}');
     expect(res.headers.get('Cache-Tag')).toBe('contests:index');
     expect(res.headers.get('Cache-Control')).toContain('s-maxage=604800');
+  });
+
+  it('serves the stored index with one read and no listing', async () => {
+    const bucket = { get: vi.fn(async () => ({ text: async () => '{"2013/s3":4}' })), list: vi.fn() };
+    const res = await app.request('/contests/index', {}, { TESTCASES_SOLUTIONS_BUCKET: bucket, ...R2_ENV });
+    expect(await res.json()).toEqual({ solutions: { '2013/s3': 4 } });
+    expect(bucket.list).not.toHaveBeenCalled();
   });
 });

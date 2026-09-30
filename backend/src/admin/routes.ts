@@ -2,7 +2,9 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Bindings } from '../types';
 import { problemParamsSchema, fileSchema } from '../r2/validation';
-import { purgeCacheTags, INDEX_CACHE_TAG } from '../cache';
+import { z } from 'zod';
+import { purgeCacheTags, purgeCacheTagsNow, INDEX_CACHE_TAG } from '../cache';
+import { recountProblem } from '../r2/solutionIndex';
 
 const admin = new Hono<{ Bindings: Bindings }>();
 
@@ -29,9 +31,15 @@ admin.use('*', async (c, next) => {
 
 // RULE: every R2 write MUST purge the contest cache tag, or the
 // cached /list + /preview go stale. Workers Cache tag-purge (GA 2026-07-06),
-// fire-and-forget via waitUntil.
-function purgeContest(c: Context<{ Bindings: Bindings }>, year: string, code: string): void {
-  purgeCacheTags(c, [`contest:${year}:${code}`, INDEX_CACHE_TAG], `contest ${year}/${code}`);
+// fire-and-forget via waitUntil. A solutions/ write also changes GET /contests/index.
+// Bulk scripts pass ?purge=0 on each write and call POST /admin/purge once at the end,
+// because purges are limited to 5 requests a minute.
+async function afterWrite(c: Context<{ Bindings: Bindings }>, year: string, code: string, file: string) {
+  const solution = file.startsWith('solutions/');
+  if (solution) await recountProblem(c.env.TESTCASES_SOLUTIONS_BUCKET, year, code);
+  if (c.req.query('purge') === '0') return;
+  const tags = [`contest:${year}:${code}`, ...(solution ? [INDEX_CACHE_TAG] : [])];
+  purgeCacheTags(c, tags, `contest ${year}/${code}`);
 }
 
 admin.post('/contests/:year/:code/upload', async (c) => {
@@ -43,7 +51,7 @@ admin.post('/contests/:year/:code/upload', async (c) => {
   const { year, code } = params.data;
   const key = `contests/${year}/${code}/${file.data}`;
   await c.env.TESTCASES_SOLUTIONS_BUCKET.put(key, await c.req.arrayBuffer());
-  purgeContest(c, year, code);
+  await afterWrite(c, year, code, file.data);
   return c.json({ ok: true, key });
 });
 
@@ -56,8 +64,27 @@ admin.delete('/contests/:year/:code/file', async (c) => {
   const { year, code } = params.data;
   const key = `contests/${year}/${code}/${file.data}`;
   await c.env.TESTCASES_SOLUTIONS_BUCKET.delete(key);
-  purgeContest(c, year, code);
+  await afterWrite(c, year, code, file.data);
   return c.json({ ok: true });
+});
+
+// One purge for a bulk upload: each problem's contest tag plus the solution index,
+// at most 100 tags per purge request.
+admin.post('/purge', async (c) => {
+  const body = z
+    .object({
+      problems: z
+        .array(z.string().regex(/^\d{4}\/[sjp][1-5]$/))
+        .min(1)
+        .max(99),
+    })
+    .safeParse(await c.req.json().catch(() => null));
+  if (!body.success) return c.text('Bad request: POST /admin/purge {"problems": ["2013/s3", ...]} (1 to 99)', 400);
+
+  const tags = [...new Set(body.data.problems)].map((p) => `contest:${p.replace('/', ':')}`);
+  tags.push(INDEX_CACHE_TAG);
+  const ok = await purgeCacheTagsNow(c, tags, `bulk purge (${tags.length} tags)`);
+  return c.json({ ok, tags: tags.length }, ok ? 200 : 502);
 });
 
 export default admin;
