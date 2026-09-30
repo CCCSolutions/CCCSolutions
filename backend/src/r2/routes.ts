@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type { Bindings } from '../types';
 import { INDEX_CACHE_TAG } from '../cache';
 import { problemParamsSchema, fileSchema, editorialImageSchema } from './validation';
+import { readSolutionCounts } from './solutionIndex';
 
 const r2 = new Hono<{ Bindings: Bindings }>();
 
@@ -17,18 +18,8 @@ function setContestCache(c: Context, year: string, code: string): void {
 
 // Solution index: how many solutions each problem has, for the archive table's icons.
 // One cached response instead of a /list call per problem. Admin writes purge its tag.
-
 r2.get('/index', async (c) => {
-  const solutions: Record<string, number> = {};
-  let cursor: string | undefined;
-  do {
-    const page = await c.env.TESTCASES_SOLUTIONS_BUCKET.list({ prefix: 'contests/', cursor });
-    for (const obj of page.objects) {
-      const m = obj.key.match(/^contests\/(\d{4})\/([sjp][1-5])\/solutions\/\d+\.[a-z]+$/);
-      if (m) solutions[`${m[1]}/${m[2]}`] = (solutions[`${m[1]}/${m[2]}`] ?? 0) + 1;
-    }
-    cursor = page.truncated ? page.cursor : undefined;
-  } while (cursor);
+  const solutions = await readSolutionCounts(c.env.TESTCASES_SOLUTIONS_BUCKET);
 
   c.header('Cache-Control', 'public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000');
   c.header('Cache-Tag', INDEX_CACHE_TAG);
