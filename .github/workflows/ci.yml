@@ -23,7 +23,12 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.4.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.1
 
       - name: Cache Bun dependencies
         uses: actions/cache@v6
@@ -66,7 +71,12 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.4.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.1
 
       - name: Cache Bun dependencies
         uses: actions/cache@v6
