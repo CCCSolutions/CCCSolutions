@@ -4,7 +4,7 @@ Competitive-programming solutions platform for the Canadian Computing Competitio
 
 ## Apps
 
-- `website/` — Next.js 16 (App Router) frontend, deployed on **Cloudflare Workers via OpenNext** (SSR/SSG/ISR). Also **still deployed on Netlify** during the hosting migration, so env vars must be set in both. See `website/AGENTS.md`.
+- `website/` — Next.js 16 (App Router) frontend, deployed on **Cloudflare Workers via OpenNext** (SSR/SSG/ISR) at `cccsolutions.ca`. Netlify still builds `main` and serves it at `old.cccsolutions.ca` as a fallback, so env vars must be set in both. See `website/AGENTS.md`.
 - `backend/` — Hono API on **Cloudflare Workers**. Serves contest test cases/solutions from a **private R2 bucket** via presigned URLs, and (in progress) the Supabase-backed forum/auth. See `backend/AGENTS.md` and `backend/docs/DATABASE.md`.
 
 Package manager is **bun** in both.
@@ -18,11 +18,11 @@ Package manager is **bun** in both.
 ## Migration state (v1 → v2)
 
 - ✅ R2 test-case API (data out of git, zero-egress presigned downloads)
-- ✅ Frontend on Cloudflare Workers via OpenNext (`v2.cccsolutions.ca`)
+- ✅ Frontend on Cloudflare Workers via OpenNext (`cccsolutions.ca`; `www` 301s to the apex)
 - ✅ Supabase migration foundation (Drizzle + CI-run migrations; `profiles` table live)
 - 🔜 Cherry-picking forum/auth (off the closed #176) into small PRs — `docs/Roadmap40.md`
 - 🔜 Forum still on PocketBase on `main` until the Supabase cutover
-- 🔜 Netlify decommission after DNS cutover
+- ✅ DNS cutover: `cccsolutions.ca` points at the Worker, `v2.cccsolutions.ca` is retired, Netlify kept as a fallback at `old.cccsolutions.ca`
 
 This may be out of date as changes often happen rapidly so always check the state of the existing project before treating this as fact.
 

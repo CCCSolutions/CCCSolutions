@@ -5,8 +5,13 @@ import { app } from '../src/index';
 // origin-callback behavior fails here instead of silently in prod.
 describe('CORS origin allowlist', () => {
   it('echoes an allowed exact origin', async () => {
+    const res = await app.request('/', { headers: { Origin: 'https://cccsolutions.ca' } }, {});
+    expect(res.headers.get('access-control-allow-origin')).toBe('https://cccsolutions.ca');
+  });
+
+  it('no longer allows the retired v2 subdomain', async () => {
     const res = await app.request('/', { headers: { Origin: 'https://v2.cccsolutions.ca' } }, {});
-    expect(res.headers.get('access-control-allow-origin')).toBe('https://v2.cccsolutions.ca');
+    expect(res.headers.get('access-control-allow-origin')).toBeNull();
   });
 
   it('echoes an allowed wildcard preview host by suffix', async () => {
