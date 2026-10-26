@@ -11,7 +11,7 @@ Cloudflare Workers + Hono API. Package manager: **bun**. R2 bucket `cccsolutions
 There is no in-Worker Cloudflare Access validation. A Worker has no origin IP, so there's no bypass vector for the Worker to guard against — an in-Worker check was redundant and broke local/CI testing, so it was removed. Don't add it back.
 
 - `*.workers.dev` and preview URLs are gated by **edge Cloudflare Access** (dashboard toggle). Unauthenticated requests are blocked at the edge before the Worker runs, so they aren't billed.
-- The public custom domain `api.cccsolutions.ca` is intentionally public, protected by a **WAF rate-limiting rule** (`http.host eq "api.cccsolutions.ca"`, per-IP ceiling).
+- The public custom domain `api.cccsolutions.ca` is intentionally public, protected by a **WAF rate-limiting rule** (per-IP ceiling).
 - Anything needing real auth (admin R2 upload, user accounts) uses app-level auth — an admin secret via `wrangler secret`, or Supabase RLS — never Cloudflare Access JWTs.
 
 ## RULE: Workers Cache is ON — every route must decide its cacheability
