@@ -12,7 +12,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v10
+      - uses: actions/stale@v11
         with:
           # PRs only. An idle PR really is abandoned, but the issue tracker here is a
           # long-lived roadmap: phase-3 work isn't stale, it just isn't due yet. -1
