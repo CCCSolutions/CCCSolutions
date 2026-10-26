@@ -55,7 +55,7 @@ These principles bias the design toward "open and inviting" over "engagement-opt
 | Solutions | 270+ |
 | Test case files | 16,800+ |
 | Repository size | ~7 GB (test cases stored directly in the git repo) |
-| Current stack | Next.js 15 + TypeScript + Tailwind CSS v4 + Radix UI, PocketBase for auth/forum, deployed on Netlify |
+| Current stack | Next.js 16 + TypeScript + Tailwind CSS v4 + Radix UI, PocketBase for auth/forum, deployed on Netlify |
 | Traffic sources | ~60% Organic Search, ~30% Direct, ~10% Referral |
 | Top geos | GTA (Toronto, Markham, Oakville), Singapore, Vancouver, Waterloo |
 

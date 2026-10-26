@@ -1,6 +1,6 @@
 # cccsolutions-website — agent instructions
 
-Next.js 15 (App Router) + React 18 + Tailwind v4. Package manager: **bun** (`bun install`, `bun run dev`). Deployed to Cloudflare Workers via OpenNext — SSR/SSG/ISR, not a static export. Dark mode via `next-themes` (`ThemeToggle` in the navbar).
+Next.js 16 (App Router) + React 19 + Tailwind v4. Package manager: **bun** (`bun install`, `bun run dev`). Deployed to Cloudflare Workers via OpenNext — SSR/SSG/ISR, not a static export. Dark mode via `next-themes` (`ThemeToggle` in the navbar).
 
 ## Environment variables
 

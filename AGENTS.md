@@ -4,7 +4,7 @@ Competitive-programming solutions platform for the Canadian Computing Competitio
 
 ## Apps
 
-- `website/` — Next.js 15 (App Router) frontend, deployed on **Cloudflare Workers via OpenNext** (SSR/SSG/ISR). Also **still deployed on Netlify** during the hosting migration, so env vars must be set in both. See `website/AGENTS.md`.
+- `website/` — Next.js 16 (App Router) frontend, deployed on **Cloudflare Workers via OpenNext** (SSR/SSG/ISR). Also **still deployed on Netlify** during the hosting migration, so env vars must be set in both. See `website/AGENTS.md`.
 - `backend/` — Hono API on **Cloudflare Workers**. Serves contest test cases/solutions from a **private R2 bucket** via presigned URLs, and (in progress) the Supabase-backed forum/auth. See `backend/AGENTS.md` and `backend/docs/DATABASE.md`.
 
 Package manager is **bun** in both.

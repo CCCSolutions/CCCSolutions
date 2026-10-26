@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org).
+# cccsolutions-website
+
+The CCCSolutions frontend: [Next.js](https://nextjs.org) 16 (App Router) + React 19 + Tailwind CSS v4, deployed to Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare). See [`AGENTS.md`](./AGENTS.md) for the layout map, conventions, and env var setup.
 
 ## Getting Started
 
-First, run the development server:
+This project uses [bun](https://bun.sh):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org) to automatically optimize and load [Geist](https://vercel.com), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org) for more details.
+- `bun run lint` / `bun run typecheck` / `bun run format:check` - the checks CI runs
+- `bun run build` - `next build`
+- `bun run preview` - build with OpenNext and serve the Worker locally (workerd)
+- `bun run deploy` - build with OpenNext and deploy to Cloudflare Workers
