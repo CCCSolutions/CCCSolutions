@@ -11,7 +11,7 @@ Every open issue is named below so nothing gets silently dropped.
 ## Already done (don't rebuild)
 
 - ✅ **R2 test-case API** — private bucket, presigned downloads, ~4GB out of git
-- ✅ **Frontend on Cloudflare Workers via OpenNext** (#42) at `v2.cccsolutions.ca`
+- ✅ **Frontend on Cloudflare Workers via OpenNext** (#42) at `cccsolutions.ca` (DNS cutover done, `v2.` retired)
 - ✅ **Supabase migration foundation** — Drizzle + CI-run migrations, `profiles` table, `prepare:false`
 
 ## Phase 0 — foundation hardening (days 1–4)

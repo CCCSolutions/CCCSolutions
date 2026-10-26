@@ -55,7 +55,7 @@ These principles bias the design toward "open and inviting" over "engagement-opt
 | Solutions | 270+ |
 | Test case files | 16,800+ |
 | Repository size | ~7 GB (test cases stored directly in the git repo) |
-| Current stack | Next.js 16 + TypeScript + Tailwind CSS v4 + Radix UI, PocketBase for auth/forum, deployed on Netlify |
+| Current stack | Next.js 16 + TypeScript + Tailwind CSS v4 + Radix UI, PocketBase for auth/forum, deployed on Cloudflare Workers (OpenNext) |
 | Traffic sources | ~60% Organic Search, ~30% Direct, ~10% Referral |
 | Top geos | GTA (Toronto, Markham, Oakville), Singapore, Vancouver, Waterloo |
 
@@ -258,7 +258,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
 ### Still needed
 
 - **Dark mode:** System preference detection via Radix UI's `appearance="inherit"` on the Theme provider. Should respect `prefers-color-scheme` out of the box. Tailwind v4's dark mode works with the `dark` class on `<html>`, and Radix Themes handles this automatically when `appearance` is set. Quick win since both Tailwind and Radix already support it natively.
-- **Cloudflare Pages deployment at `v2.cccsolutions.ca`** - v2 lives on a subdomain throughout development. The original site stays on Netlify at `cccsolutions.ca` untouched. DNS only cuts over when v2 is ready to ship.
+- **Cloudflare Pages deployment at `v2.cccsolutions.ca`** - v2 lives on a subdomain throughout development. The original site stays on Netlify at `cccsolutions.ca` untouched. DNS only cuts over when v2 is ready to ship. **Done:** `cccsolutions.ca` now points at the Worker, `v2.` is retired, and Netlify serves `old.cccsolutions.ca` as a fallback.
 - **301 redirects** for any URL format changes (preserve SEO rankings)
 - **Lighthouse SEO score >= 90**
 
@@ -294,7 +294,7 @@ Solutions and problem data rarely change. We use a three-layer cache to serve th
   src/middleware/auth.ts     - JWT verification
   src/middleware/rateLimit.ts - Workers Rate Limiting binding (per-user)
   ```
-- Configure CORS locked to the exact frontend origin only — `v2.cccsolutions.ca` (and its `*.workers.dev` preview), no wildcards
+- Configure CORS locked to the exact frontend origin only — `cccsolutions.ca` (and its `*.workers.dev` preview), no wildcards
 - Set up Wrangler for local development
 - Environment variables via `.dev.vars` for local, Wrangler secrets for production
 - `SUPABASE_SERVICE_ROLE_KEY` and all secrets never appear in frontend code (only `NEXT_PUBLIC_` prefixed vars are exposed to the browser)
@@ -650,7 +650,7 @@ History: within 15 minutes of the original v1 launch, a user exploited PocketBas
 - Pagination is cursor-based across all list endpoints
 - UUIDs used everywhere public-facing, no sequential IDs
 - Short JWT expiry with refresh tokens
-- CORS locked to exact frontend origin (`v2.cccsolutions.ca` + `*.workers.dev` preview)
+- CORS locked to exact frontend origin (`cccsolutions.ca` + `*.workers.dev` preview)
 - Service role keys never exposed to frontend
 
 ---
